@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2025-2026 北歐極地跨國遠征執行表</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; }
@@ -81,7 +83,7 @@
     <main class="max-w-5xl mx-auto px-4 pt-24 pb-20 space-y-8">
 
         <!-- Introduction Block -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8 mb-8 detail-content">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8 detail-content">
             <h2 class="text-xl font-bold text-slate-800 mb-4">執行摘要</h2>
             <p class="text-slate-600 mb-4 leading-relaxed">
                 本行程表針對 2025 年 12 月 28 日至 2026 年 1 月 9 日期間執行的北歐三國極地冬季遠征，提供每日微觀操作腳本。
@@ -105,6 +107,43 @@
                 </div>
             </div>
         </div>
+
+        <!-- Dashboard Section (Dark Theme) -->
+        <section class="bg-slate-900 rounded-xl shadow-lg p-6 md:p-8 text-white mb-8 overflow-hidden">
+            <div class="mb-6 border-b border-slate-700 pb-4">
+                <h2 class="text-2xl font-bold text-blue-400">戰略分析儀表板</h2>
+                <p class="text-slate-400 text-sm mt-1">本區塊展示本次遠征的活動結構、預期氣候變化與駕駛強度分析。請注意 Day 5 與 Day 10 的物流壓力。</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Chart 1: Activity Mix -->
+                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <h3 class="text-blue-300 font-semibold mb-4 text-sm uppercase tracking-wider">活動類型分佈 (Activity Mix)</h3>
+                    <div class="relative h-48 w-full flex justify-center">
+                        <canvas id="chartActivity"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 text-center">冒險、文化與物流的平衡配置</p>
+                </div>
+
+                <!-- Chart 2: Temperature Trend -->
+                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <h3 class="text-blue-300 font-semibold mb-4 text-sm uppercase tracking-wider">預期氣溫變化 (Temp. Trend)</h3>
+                    <div class="relative h-48 w-full">
+                        <canvas id="chartTemp"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 text-center">Day 4-5 為極寒峰值，需注意裝備</p>
+                </div>
+
+                <!-- Chart 3: Transit Intensity -->
+                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <h3 class="text-purple-300 font-semibold mb-4 text-sm uppercase tracking-wider">駕駛與移動強度 (Logistics)</h3>
+                    <div class="relative h-48 w-full">
+                        <canvas id="chartLogistics"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 text-center">Day 5 帝王蟹長征為體力最大考驗</p>
+                </div>
+            </div>
+        </section>
 
         <!-- Itinerary Container -->
         <div id="itinerary-container" class="space-y-12">
@@ -440,6 +479,82 @@
             });
         }
 
+        // Initialize Charts
+        function initCharts() {
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.borderColor = '#334155';
+
+            // Chart 1: Activity Mix (Donut)
+            new Chart(document.getElementById('chartActivity'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['自然探索 (極光/峽灣)', '文化體驗 (博物館/市區)', '移動與交通', '休閒與餐飲'],
+                    datasets: [{
+                        data: [45, 25, 20, 10],
+                        backgroundColor: ['#06b6d4', '#8b5cf6', '#3b82f6', '#f43f5e'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            // Chart 2: Temperature Trend (Line)
+            new Chart(document.getElementById('chartTemp'), {
+                type: 'line',
+                data: {
+                    labels: ['Day 1 HEL', 'Day 2 RVN', 'Day 4 Inari', 'Day 6 TOS', 'Day 9 BGO', 'Day 12 ARN'],
+                    datasets: [{
+                        label: '預估氣溫 (°C)',
+                        data: [-5, -12, -20, -5, 2, -3],
+                        borderColor: '#22d3ee',
+                        backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#1e293b' }, ticks: { callback: v => v + '°C' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Chart 3: Logistics Intensity (Bar)
+            new Chart(document.getElementById('chartLogistics'), {
+                type: 'bar',
+                data: {
+                    labels: ['Tromsø Local', 'Lyngen Trip', 'Bergen-Voss', 'Hardanger Loop', 'Airport Transfer'],
+                    datasets: [{
+                        label: '估計駕駛公里數 (km)',
+                        data: [30, 160, 110, 140, 50],
+                        backgroundColor: '#6366f1',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#1e293b' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
         // Toggle Logic
         const toggleBtn = document.getElementById('toggle-mode');
         const toggleKnob = document.getElementById('toggle-knob');
@@ -473,6 +588,7 @@
 
         // Initialize
         renderItinerary();
+        initCharts(); // Start charts
         
         // Setup intersection observer for active nav dots
         const observer = new IntersectionObserver((entries) => {
