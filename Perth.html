@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 西澳 9 天 8 夜終極自駕遊</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Scrollbar for horizontal scrolling */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            font-family: "Noto Sans TC", sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+        }
+        .timeline-line {
+            position: absolute;
+            left: 1.5rem; /* 24px */
+            top: 2.5rem;
+            bottom: 0;
+            width: 2px;
+            background-color: #e2e8f0; /* Slate 200 */
+            z-index: 0;
+        }
+        .active-nav {
+            border-bottom: 2px solid #0ea5e9; /* Sky 500 */
+            color: #0ea5e9;
+            font-weight: 600;
+        }
+        .note-box {
+            background-color: #fffbeb; /* Amber 50 */
+            border-left: 4px solid #f59e0b; /* Amber 500 */
+        }
+        .route-box {
+            background-color: #f0f9ff; /* Sky 50 */
+            border-left: 4px solid #0ea5e9; /* Sky 500 */
+        }
+    </style>
+</head>
+<body class="text-slate-700 bg-slate-50">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur shadow-sm border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('dashboard')">
+                    <span class="text-2xl">🐨</span>
+                    <span class="font-bold text-xl tracking-tight text-slate-800 hidden sm:block">西澳自駕 2026</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active-nav px-3 py-2 text-sm font-medium transition-colors hover:text-sky-500">行程儀表盤</button>
+                    <button onclick="switchTab('daily')" id="nav-daily" class="nav-item px-3 py-2 text-sm font-medium transition-colors hover:text-sky-500">每日行程細節</button>
+                    <button onclick="switchTab('food')" id="nav-food" class="nav-item px-3 py-2 text-sm font-medium transition-colors hover:text-sky-500">美食地圖</button>
+                    <button onclick="switchTab('info')" id="nav-info" class="nav-item px-3 py-2 text-sm font-medium transition-colors hover:text-sky-500">交通與準備</button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-2xl p-2 focus:outline-none">
+                        🍔
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 shadow-lg absolute w-full z-50">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-50 border-b border-slate-100">📊 儀表盤</button>
+            <button onclick="switchTab('daily'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-50 border-b border-slate-100">📅 每日行程細節</button>
+            <button onclick="switchTab('food'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-50 border-b border-slate-100">🦞 美食地圖</button>
+            <button onclick="switchTab('info'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-50">🧳 交通與準備</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
+
+        <!-- VIEW: DASHBOARD -->
+        <div id="view-dashboard" class="space-y-6 fade-in">
+            <!-- Header Banner -->
+            <div class="bg-gradient-to-r from-sky-600 to-indigo-700 rounded-2xl p-6 sm:p-10 text-white shadow-lg relative overflow-hidden">
+                <div class="relative z-10">
+                    <h1 class="text-3xl sm:text-4xl font-bold mb-2">2026 西澳 9 天 8 夜終極自駕</h1>
+                    <p class="text-sky-100 text-lg">2/12 (四) - 2/20 (五) • 5 位成人 • Kia Carnival</p>
+                    <div class="mt-6 flex flex-wrap gap-4">
+                        <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">📍 伯斯 (Perth)</span>
+                        <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">🚗 南北雙線自駕</span>
+                        <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">🦞 龍蝦與海鮮</span>
+                        <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">👨‍👩‍👧‍👦 長輩友善</span>
+                    </div>
+                </div>
+                <div class="absolute right-0 bottom-0 text-9xl opacity-10 transform translate-x-10 translate-y-10">🦘</div>
+            </div>
+
+            <!-- Weather Widget Row -->
+            <div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-3 overflow-x-auto pb-2 hide-scrollbar" id="weather-widget">
+                <!-- Weather Items Injected via JS -->
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Stats Chart -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 lg:col-span-2">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">⏱️ 行程強度分析 <span class="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-1 rounded">車程 vs 遊玩</span></h3>
+                    <div class="h-64 sm:h-80 w-full">
+                        <canvas id="tripChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Quick Summary -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
+                    <h3 class="text-lg font-bold mb-2">🌟 行程重點摘要</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition">
+                            <div class="bg-amber-100 text-amber-600 p-2 rounded-lg text-xl">🏜️</div>
+                            <div>
+                                <p class="font-bold text-slate-800">Day 1: 北部沙漠</p>
+                                <p class="text-xs text-slate-500">尖峰石陣、龍蝦工廠、沙丘滑沙</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition">
+                            <div class="bg-pink-100 text-pink-600 p-2 rounded-lg text-xl">🌸</div>
+                            <div>
+                                <p class="font-bold text-slate-800">Day 2: 粉紅夢境</p>
+                                <p class="text-xs text-slate-500">Hutt Lagoon 粉紅湖、世界之窗、海獅</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition">
+                            <div class="bg-blue-100 text-blue-600 p-2 rounded-lg text-xl">🌊</div>
+                            <div>
+                                <p class="font-bold text-slate-800">Day 6-7: 南部海洋</p>
+                                <p class="text-xs text-slate-500">抓龍蝦、Busselton 棧橋、寶石洞、魔鬼魚</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition">
+                            <div class="bg-orange-100 text-orange-600 p-2 rounded-lg text-xl">🚁</div>
+                            <div>
+                                <p class="font-bold text-slate-800">Day 8: 海陸空</p>
+                                <p class="text-xs text-slate-500">直升機體驗、無尾熊、最美夕陽</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="switchTab('daily')" class="w-full mt-2 bg-slate-800 text-white py-3 rounded-lg text-sm font-medium hover:bg-slate-700 transition shadow-lg shadow-slate-200/50">查看詳細每日行程 👉</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: DAILY ITINERARY -->
+        <div id="view-daily" class="hidden space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100 sticky top-16 sm:top-20 z-40 transition-all duration-200">
+                <div>
+                    <div class="flex items-baseline gap-2">
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900" id="daily-title">Day 1</h2>
+                        <span class="text-sm font-medium text-slate-500" id="daily-date">2/12</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm text-slate-600 mt-1">
+                        <span id="daily-stay">🏠 住宿: ...</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+                    <span class="text-xs font-semibold text-slate-600">詳細模式</span>
+                    <button id="mode-toggle" class="relative inline-flex h-5 w-9 items-center rounded-full bg-sky-500 transition-colors focus:outline-none" onclick="toggleDetailMode()">
+                        <span class="sr-only">Toggle detail mode</span>
+                        <span id="mode-knob" class="inline-block h-3 w-3 transform rounded-full bg-white transition-transform translate-x-5 shadow-sm"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Timeline Container -->
+            <div id="timeline-container" class="relative pb-20 px-2 sm:px-0">
+                <!-- Injected via JS -->
+            </div>
+            
+            <!-- Bottom Date Navigator -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-slate-200 p-3 z-50 overflow-x-auto hide-scrollbar safe-area-pb">
+                <div class="flex justify-start md:justify-center gap-2 min-w-max px-2" id="date-nav">
+                    <!-- Buttons Injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: FOOD MAP -->
+        <div id="view-food" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <h2 class="text-2xl font-bold mb-4">🦞 美食攻略地圖</h2>
+                <p class="text-slate-500 mb-6">依據行程精選的必吃餐廳，包含海鮮、澳式早午餐與中式慰藉。</p>
+                
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button onclick="filterFood('all')" class="food-filter active bg-slate-800 text-white px-4 py-1.5 rounded-full text-sm transition font-medium shadow-sm">全部</button>
+                    <button onclick="filterFood('seafood')" class="food-filter bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-sm hover:bg-slate-200 transition font-medium">🦞 海鮮</button>
+                    <button onclick="filterFood('brunch')" class="food-filter bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-sm hover:bg-slate-200 transition font-medium">☕ 早午餐</button>
+                    <button onclick="filterFood('chinese')" class="food-filter bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-sm hover:bg-slate-200 transition font-medium">🥢 中式/亞州</button>
+                    <button onclick="filterFood('snack')" class="food-filter bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-sm hover:bg-slate-200 transition font-medium">🍦 小吃甜點</button>
+                </div>
+
+                <!-- Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="food-grid">
+                    <!-- Cards Injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: INFO & PREP -->
+        <div id="view-info" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Accommodation -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🏨 住宿安排</h3>
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-sky-500 pl-4 py-1">
+                            <h4 class="font-semibold text-slate-800">Day 1: Jurien Bay Tourist Park</h4>
+                            <p class="text-sm text-slate-500">或 Jurien Bay Motel Apts。小木屋形式，適合煮食。</p>
+                        </div>
+                        <div class="border-l-4 border-pink-400 pl-4 py-1">
+                            <h4 class="font-semibold text-slate-800">Day 2: Kalbarri Edge Resort</h4>
+                            <p class="text-sm text-slate-500">舒適度假村，含廚房設施。</p>
+                        </div>
+                        <div class="border-l-4 border-indigo-500 pl-4 py-1">
+                            <h4 class="font-semibold text-slate-800">Day 3-5, 7-8: Fraser Suites Perth</h4>
+                            <p class="text-sm text-slate-500">五星公寓式酒店，生活機能佳，連住多晚。</p>
+                        </div>
+                        <div class="border-l-4 border-green-500 pl-4 py-1">
+                            <h4 class="font-semibold text-slate-800">Day 6: Busselton/Dunsborough (南部)</h4>
+                            <p class="text-sm text-slate-500">建議 Hilton Garden Inn。南部過夜，不走回頭路。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transport -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🚗 租車資訊</h3>
+                    <div class="bg-slate-50 p-4 rounded-lg mb-4 border border-slate-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold text-slate-700">車型</span>
+                            <span class="bg-sky-100 text-sky-700 text-xs font-bold px-2 py-1 rounded">8 人座</span>
+                        </div>
+                        <p class="text-2xl font-bold text-slate-800">Kia Carnival</p>
+                        <p class="text-sm text-slate-500 mt-1">空間寬敞，適合長途與長輩。</p>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-600 list-none pl-1">
+                        <li class="flex gap-2"><span class="text-red-500 font-bold">⚠️</span> <span>保險：務必購買 <strong>Zero Excess (全險)</strong>。</span></li>
+                        <li class="flex gap-2"><span class="text-green-500 font-bold">✅</span> <span>里程：確認包含 <strong>Unlimited KM (無限里程)</strong>。</span></li>
+                        <li class="flex gap-2"><span class="text-blue-500 font-bold">💧</span> <span>補給：機場 WHSmith 買兩桶 5L 水放車上。</span></li>
+                        <li class="flex gap-2"><span class="text-amber-500 font-bold">🦘</span> <span>安全：郊區開車避開夜間 (袋鼠出沒)。</span></li>
+                    </ul>
+                </div>
+
+                <!-- Checklist -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 md:col-span-2">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">✅ 必做預訂清單 (Action List)</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="checklist-grid">
+                        <!-- Checklist Items via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- DATA ---
+        // Fields: Time, Location, Item, Detailed Route/Activity, Notes/Restaurant
+        const itinerary = [
+            {
+                day: 1,
+                date: "2/12 (四)",
+                title: "沙漠奇景與龍蝦盛宴",
+                stay: "Jurien Bay Tourist Park",
+                weather: { icon: "☀️", temp: "32°C", text: "晴朗炎熱" },
+                events: [
+                    { 
+                        time: "04:15", loc: "伯斯機場", icon: "✈️", item: "抵達與取車", 
+                        route: "T1 入境 ➔ 購買網卡 (Optus/Telstra) ➔ 取車 (Kia Carnival)。", 
+                        note: "💡 必做：在機場 WHSmith 或便利商店先買兩桶 5L 飲用水放車上。\n⚠️ 租車：務必確認保單包含 Zero Excess (全險) 與 Unlimited KM (無限里程)。剛下機請年輕人輪流開車。", 
+                        link: "https://goo.gl/maps/perthairport" 
+                    },
+                    { 
+                        time: "08:30", loc: "Guildford", icon: "🥞", item: "澳式早餐", 
+                        route: "開車約 20 分鐘至 Guildford 古老街區。這裡有許多 19 世紀建築，氣氛悠閒，適合讓長輩休息吃早餐。", 
+                        note: "🍽️ 早餐：Padbury's Cafe (網友好評，鬆餅很有名) 或 Mankala。", 
+                        link: "https://goo.gl/maps/guildford" 
+                    },
+                    { 
+                        time: "11:00", loc: "Lancelin", icon: "🏂", item: "潔白沙丘", 
+                        route: "Lancelin Sand Dunes。車子停在入口處即可。爬上沙丘頂端拍「偽雪景」全家福。", 
+                        note: "⚠️ 防護：風很大，沙子會吹進眼睛，請戴墨鏡。\n💡 網友提示：租滑板 $10 (入口餐車租)，長輩不滑也沒關係，拍照就很美。", 
+                        link: "https://goo.gl/maps/lancelin" 
+                    },
+                    { 
+                        time: "12:30", loc: "Cervantes", icon: "🦞", item: "龍蝦午餐", 
+                        route: "Lobster Shack。參觀龍蝦處理工廠生產線 (長輩會覺得新奇)，然後享用午餐。", 
+                        note: "🍽️ 午餐：必點 Grilled Half Lobster & Chips (烤半龍蝦套餐)。\n💡 這裡有乾淨洗手間，請多利用。", 
+                        link: "https://goo.gl/maps/lobstershack" 
+                    },
+                    { 
+                        time: "13:40", loc: "Cervantes", icon: "🌊", item: "翡翠海灘", 
+                        route: "Thirsty Point Lookout。距離工廠僅 4 分鐘車程。海水顏色像翡翠一樣綠，有木棧道可以走到沙灘邊，適合飯後散步。", 
+                        note: "💡 這是網友推薦的順路秘境，人少好拍。", 
+                        link: "https://goo.gl/maps/thirstypoint" 
+                    },
+                    { 
+                        time: "14:30", loc: "Pinnacles", icon: "🪨", item: "尖峰石陣", 
+                        route: "Nambung National Park。🚗 玩法：車子可以直接開進沙漠裡的車道 (4km loop)，看到喜歡的奇石再下車拍照，不用全程走路，對長輩膝蓋友善。", 
+                        note: "⚠️ 防蠅：這裡蒼蠅非常多，請拿出防蠅網罩在頭上。\n💰 門票：每車約 $17 (或買 Holiday Pass)。", 
+                        link: "https://goo.gl/maps/pinnacles" 
+                    },
+                    { 
+                        time: "16:30", loc: "Jurien Bay", icon: "🌅", item: "棧橋夕陽", 
+                        route: "抵達 Jurien Bay 辦理入住。傍晚去 Jurien Bay Jetty 散步，這裡的海水是著名的蒂芬妮藍。", 
+                        note: "🍽️ 晚餐：Jurien Bay Hotel (當地熱鬧酒吧，有牛排/炸魚) 或 IGA 超市買食材回小木屋煮。\n❌ 避雷：網友強烈建議不要去 Tanti's Restaurant。", 
+                        link: "https://goo.gl/maps/jurienbay" 
+                    }
+                ]
+            },
+            {
+                day: 2,
+                date: "2/13 (五)",
+                title: "海獅同游與夢幻粉紅湖",
+                stay: "Kalbarri Edge Resort",
+                weather: { icon: "🔥", temp: "34°C", text: "烈日防曬" },
+                events: [
+                    { 
+                        time: "07:30", loc: "Jurien Bay", icon: "🦁", item: "海獅同游", 
+                        route: "參加 Sea Lion Swim (如 Turquoise Safaris)。乘船出海，下水與野生澳洲海獅互動。即使不下水，在船上看牠們像小狗一樣玩耍也很療癒。", 
+                        note: "⚠️ 預約：務必提前訂位。\n💡 網友評價：水很冷但店家有提供防寒衣，非常值得！", 
+                        link: "https://goo.gl/maps/jurienbay" 
+                    },
+                    { 
+                        time: "10:30", loc: "Jurien Bay", icon: "🍔", item: "網紅早午餐", 
+                        route: "上岸後去 Meraki Jurien Bay。這是鎮上評價最高的咖啡廳，補充體力再上路。", 
+                        note: "🍽️ 網友激推：食物好吃，咖啡水準高。推薦漢堡與義大利麵。", 
+                        link: "https://goo.gl/maps/meraki" 
+                    },
+                    { 
+                        time: "13:30", loc: "Hutt Lagoon", icon: "🌸", item: "粉紅湖", 
+                        route: "導航 Pink Lake Lookout (Port Gregory)。此時正午陽光直射，湖水呈現最鮮豔的粉紅色。車子停在路邊即可走到湖畔。", 
+                        note: "📸 拍照：這裡是拍人生照片的最佳點。\n⚠️ 提醒：海風很大，空拍機可能會有強風警報，請小心操作。", 
+                        link: "https://goo.gl/maps/huttlagoon" 
+                    },
+                    { 
+                        time: "16:00", loc: "Kalbarri", icon: "🪟", item: "世界之窗", 
+                        route: "Kalbarri National Park (內陸區)。\n1. Nature's Window：透過紅岩框看壯闊峽谷，必拍。\n2. Skywalk：懸空步道，視野極佳。", 
+                        note: "⚠️ 高溫警報：若當日氣溫超過 38°C，步道會關閉，請改明早去。帶足夠的水。", 
+                        link: "https://goo.gl/maps/natureswindow" 
+                    },
+                    { 
+                        time: "18:30", loc: "Kalbarri", icon: "🍻", item: "露天晚餐", 
+                        route: "Finlay's Kalbarri。這是一個露天大院子餐廳，有自釀啤酒和新鮮海鮮，氣氛極佳。", 
+                        note: "🍽️ 晚餐：必吃生蠔、烤魚。\n⚠️ 務必提前訂位，非常熱門。", 
+                        link: "https://goo.gl/maps/finlays" 
+                    }
+                ]
+            },
+            {
+                day: 3,
+                date: "2/14 (六)",
+                title: "懸崖絕景與歷史古鎮",
+                stay: "Fraser Suites Perth",
+                weather: { icon: "🌤️", temp: "30°C", text: "舒適多雲" },
+                events: [
+                    { 
+                        time: "08:30", loc: "Kalbarri", icon: "🐦", item: "餵鵜鶘", 
+                        route: "前往河岸旁 (Grey St)。每天早上 08:45 當地志工會餵食野生鵜鶘，可以近距離觀察這些大嘴鳥。", 
+                        note: "💡 旁邊有咖啡廳可買早餐邊看邊吃。", 
+                        link: "https://goo.gl/maps/kalbarripelican" 
+                    },
+                    { 
+                        time: "09:30", loc: "Kalbarri Coast", icon: "🌊", item: "紅岩絕景", 
+                        route: "離開小鎮前，繞去海岸線。網友推薦路線：Castle Cove ➔ Pot Alley ➔ Red Bluff。這裡的紅色岩石懸崖比大洋路更狂野壯觀。", 
+                        note: "💡 適合拿望遠鏡看海面上是否有鯨魚或海豚。\n⚠️ 風大請抓好帽子。", 
+                        link: "https://goo.gl/maps/redbluff" 
+                    },
+                    { 
+                        time: "12:30", loc: "Geraldton", icon: "🍽️", item: "海港午餐", 
+                        route: "抵達西澳第二大城 Geraldton。在海港邊用餐。", 
+                        note: "🍽️ 午餐：Skeetas Restaurant (景觀佳、環境舒適)。", 
+                        link: "https://goo.gl/maps/skeetas" 
+                    },
+                    { 
+                        time: "13:30", loc: "Geraldton", icon: "⚓", item: "人文雙景", 
+                        route: "1. Museum of Geraldton：參觀「巴達維亞號」沈船寶藏 (大砲/金幣)。\n2. HMAS Sydney II Memorial：車子直接開上山頂，俯瞰由645隻銀色海鷗組成的圓頂與印度洋全景。", 
+                        note: "💡 室內博物館有冷氣，剛好避開中午烈日。紀念台視野無敵，長輩不用爬樓梯。\n💰 博物館免費入場 (建議捐款)。", 
+                        link: "https://goo.gl/maps/geraldtonmuseum" 
+                    },
+                    { 
+                        time: "15:40", loc: "Greenough", icon: "🌳", item: "歪脖子樹", 
+                        route: "導航 The Leaning Tree。就在公路旁，下車拍張照，見證被海風吹到貼地生長的樹。", 
+                        note: "💡 旁邊有 Historic Settlement (古鎮)，若還有時間可購票進入參觀。", 
+                        link: "https://goo.gl/maps/leaningtree" 
+                    },
+                    { 
+                        time: "17:00", loc: "Highway", icon: "🛣️", item: "返回伯斯", 
+                        route: "沿 Indian Ocean Drive 返回 (約 4 小時)。準備藍牙音樂或 Podcast 給長輩解悶。", 
+                        note: "⚠️ 傍晚可能有袋鼠跳出，請副駕駛幫忙注意路況。\n💡 中途停 Jurien Bay 加油站上廁所。", 
+                        link: "" 
+                    },
+                    { 
+                        time: "20:30", loc: "Perth", icon: "🍜", item: "暖胃中餐", 
+                        route: "抵達市區，連吃幾天西餐後，這餐安排熱騰騰的中菜。", 
+                        note: "🍽️ 晚餐：Kung Fu Kitchen (北橋) 酸菜魚/火鍋 或 Tai Wei Wei (泰偉偉) 蘭州牛肉麵。", 
+                        link: "https://goo.gl/maps/northbridge" 
+                    }
+                ]
+            },
+            {
+                day: 4,
+                date: "2/15 (日)",
+                title: "羅特尼斯島 Quokka",
+                stay: "Fraser Suites Perth",
+                weather: { icon: "☀️", temp: "28°C", text: "海島晴朗" },
+                events: [
+                    { 
+                        time: "08:30", loc: "Fremantle", icon: "⛴️", item: "搭船", 
+                        route: "前往 Fremantle B Shed 碼頭。出發前去彩虹貨櫃 (Rainbow Containers) 拍照。", 
+                        note: "🚗 停車攻略：導航 Zone 3 Parking，一天只要 $12，走路去碼頭約 5-10 分鐘。\n🎫 船票：務必提前網上訂購 (Rottnest Express)。", 
+                        link: "https://goo.gl/maps/bshed" 
+                    },
+                    { 
+                        time: "10:30", loc: "Rottnest", icon: "🚌", item: "環島巴士", 
+                        route: "購買 Island Explorer Bus (隨上隨下)。網友精選必停站點：\n📍 Little Salmon Bay (最美海灣)\n📍 Parker Point (海水漸層藍)\n📍 West End (最西端，看壯闊印度洋)", 
+                        note: "💡 帶長輩搭巴士最輕鬆，不用騎腳踏車曬太陽。\n👙 記得帶泳衣（若想下水）。", 
+                        link: "" 
+                    },
+                    { 
+                        time: "12:30", loc: "Settlement", icon: "🐹", item: "Quokka & 午餐", 
+                        route: "在 Settlement 商店街附近的樹下尋找 Quokka。", 
+                        note: "📸 技巧：由下往上拍，Quokka 看起來會像在笑。\n🍽️ 午餐：Isola Bar (海景義式料理) 或 Rottnest Bakery (肉派/甜甜圈)。", 
+                        link: "" 
+                    },
+                    { 
+                        time: "16:30", loc: "Pier", icon: "🔙", item: "搭船返回", 
+                        route: "搭船返回 Fremantle，船程約 30 分鐘。", 
+                        note: "", 
+                        link: "" 
+                    },
+                    { 
+                        time: "18:00", loc: "Fremantle", icon: "🎪", item: "週末市集", 
+                        route: "逛 Fremantle Markets (週五-週日營業)。感受百年建築氛圍，買蜂巢蛋糕、新鮮水果。", 
+                        note: "🍽️ 晚餐：Kailis Fish Market (著名的海鮮拼盤/炸魚薯條) 或 Cicerello's。", 
+                        link: "https://goo.gl/maps/freomarkets" 
+                    }
+                ]
+            },
+            {
+                day: 5,
+                date: "2/16 (一)",
+                title: "內陸波浪谷 (長征日)",
+                stay: "Fraser Suites Perth",
+                weather: { icon: "🌡️", temp: "36°C", text: "內陸乾熱" },
+                events: [
+                    { 
+                        time: "07:30", loc: "Perth", icon: "🚗", item: "出發內陸", 
+                        route: "準時出發！今日車程較長，請準備頸枕與零食。", 
+                        note: "🍽️ 早餐：車上解決或自製三明治。", 
+                        link: "" 
+                    },
+                    { 
+                        time: "09:00", loc: "York", icon: "🏘️", item: "約克古鎮", 
+                        route: "1. York Town Hall：拍復古市政廳。\n2. Mount Brown Lookout：車子直接開上山頂，360度俯瞰小鎮與麥田，視野極佳。", 
+                        note: "💡 這裡有廁所，請長輩上個廁所再繼續趕路。", 
+                        link: "https://goo.gl/maps/yorkwa" 
+                    },
+                    { 
+                        time: "11:30", loc: "Kulin", icon: "🐎", item: "錫馬公路", 
+                        route: "Tin Horse Highway。沿路尋找油桶做的搞笑馬匹 (如開飛機的馬)，還有鎮上的 The Big Ram (巨型公羊)。", 
+                        note: "💡 這是長途開車的提神亮點。", 
+                        link: "https://goo.gl/maps/tinhorse" 
+                    },
+                    { 
+                        time: "12:30", loc: "Hyden", icon: "🌊", item: "波浪谷", 
+                        route: "Wave Rock。\n1. 攀爬波浪岩拍照。\n2. Hippo's Yawn：河馬哈欠岩。\n3. Lake Magic (神奇湖)：就在波浪岩對面，極美的鹽湖。", 
+                        note: "🍽️ 午餐：景區門口簡餐 (Wave Rock Cafe) 或自備野餐。\n⚠️ 必備：這裡蒼蠅極多，請戴防蠅網。", 
+                        link: "https://goo.gl/maps/waverock" 
+                    },
+                    { 
+                        time: "15:30", loc: "Corrigin", icon: "🐶", item: "狗狗公墓", 
+                        route: "停靠 Corrigin Dog Cemetery。充滿愛的寵物墓園，溫馨特別。", 
+                        note: "⚠️ 回程西曬，駕駛請戴墨鏡。", 
+                        link: "https://goo.gl/maps/dogcemetery" 
+                    },
+                    { 
+                        time: "20:00", loc: "Perth", icon: "🥩", item: "自煮晚餐", 
+                        route: "回公寓酒店煮火鍋或煎牛排。", 
+                        note: "💡 超市買澳洲牛肉配紅酒，消除疲勞。", 
+                        link: "" 
+                    }
+                ]
+            },
+            {
+                day: 6,
+                date: "2/17 (二)",
+                title: "南下精華 (南部過夜)",
+                stay: "Hilton Garden Inn Busselton",
+                weather: { icon: "🌤️", temp: "26°C", text: "涼爽舒適" },
+                events: [
+                    { 
+                        time: "08:30", loc: "Perth", icon: "🧳", item: "退房南下", 
+                        route: "帶著所有行李出發前往 Mandurah (1小時)。", 
+                        note: "⚠️ 行李全帶走，今晚不住伯斯。", 
+                        link: "" 
+                    },
+                    { 
+                        time: "10:00", loc: "Mandurah", icon: "🛥️", item: "抓龍蝦船", 
+                        route: "Wild Seafood Experience。出海 3 小時收龍蝦籠，船長現煮海鮮 BBQ 大餐 (含龍蝦/螃蟹/生蠔)。", 
+                        note: "⚠️ 預訂：務必預訂 10:00 場次，才能接下午行程。", 
+                        link: "https://goo.gl/maps/mandurah" 
+                    },
+                    { 
+                        time: "13:00", loc: "Bunbury", icon: "🥕", item: "農夫市集", 
+                        route: "Bunbury Farmers Market (順路經過)。網友激推：「強迫症天堂」，東西排超整齊。", 
+                        note: "🍰 必吃：Carrot Cake (胡蘿蔔蛋糕)、水果杯。買些熟食、壽司、水果當晚上的宵夜或點心。", 
+                        link: "https://goo.gl/maps/bunburyfarmers" 
+                    },
+                    { 
+                        time: "15:30", loc: "Busselton", icon: "🚂", item: "棧橋小火車", 
+                        route: "Busselton Jetty。搭乘紅色小火車到 1.8km 外的海中央，參觀 Underwater Observatory (海底觀測站)，深入水下 8 米看野生珊瑚。", 
+                        note: "💡 網友形容：像《千與千尋》的海上火車。\n🎫 門票：買火車+觀測站套票。", 
+                        link: "https://goo.gl/maps/busseltonjetty" 
+                    },
+                    { 
+                        time: "18:00", loc: "Busselton", icon: "🍺", item: "海景晚餐", 
+                        route: "在棧橋旁用餐。", 
+                        note: "🍽️ 晚餐：The Goose 或 Shelter Brewing Co。這兩家氣氛好，就在海邊。", 
+                        link: "https://goo.gl/maps/busseltonfood" 
+                    }
+                ]
+            },
+            {
+                day: 7,
+                date: "2/18 (三)",
+                title: "寶石洞、魔鬼魚與運河岩",
+                stay: "Fraser Suites Perth",
+                weather: { icon: "☀️", temp: "27°C", text: "晴時多雲" },
+                events: [
+                    { 
+                        time: "08:00", loc: "Busselton", icon: "🚗", item: "南下", 
+                        route: "吃完早餐南下開車約 1 小時 15 分前往 Augusta。", 
+                        note: "", 
+                        link: "" 
+                    },
+                    { 
+                        time: "09:30", loc: "Augusta", icon: "💎", item: "寶石洞", 
+                        route: "Jewel Cave。參加導覽 (約 1 小時)。這是西澳最大、最華麗的鐘乳石洞。", 
+                        note: "💡 洞內階梯較多，請長輩慢慢走。\n⚠️ 需提前預約導覽場次。", 
+                        link: "https://goo.gl/maps/jewelcave" 
+                    },
+                    { 
+                        time: "11:00", loc: "Hamelin", icon: "🐟", item: "尋找魔鬼魚", 
+                        route: "Hamelin Bay。離鐘乳石洞 20 分鐘。這裡以野生魟魚 (Stingray) 聞名，牠們常游到沙灘邊，運氣好可近距離看到。", 
+                        note: "💡 這裡的沙灘也非常美。", 
+                        link: "https://goo.gl/maps/hamelinbay" 
+                    },
+                    { 
+                        time: "12:30", loc: "Margaret River", icon: "🍷", item: "酒莊午餐", 
+                        route: "北返途經瑪格麗特河。享受葡萄園美景與美食。", 
+                        note: "🍽️ 推薦：1. Fishbone (日式/西式結合，適合亞洲胃) 2. Vasse Felix (西澳最老牌酒莊，環境優雅)。", 
+                        link: "https://goo.gl/maps/margaretriver" 
+                    },
+                    { 
+                        time: "14:30", loc: "Yallingup", icon: "🪨", item: "運河岩", 
+                        route: "Canal Rocks。天然形成的岩石運河，海浪拍打時很震撼，有木棧道可以走。", 
+                        note: "💡 網友強烈推薦的壯觀景點。", 
+                        link: "https://goo.gl/maps/canalrocks" 
+                    },
+                    { 
+                        time: "15:30", loc: "Cowaramup", icon: "🐄", item: "乳牛小鎮", 
+                        route: "Cowaramup (順路經過)。鎮上到處都是乳牛雕像，停下來買個冰淇淋拍照。", 
+                        note: "💡 很有趣的小鎮。", 
+                        link: "https://goo.gl/maps/cowaramup" 
+                    },
+                    { 
+                        time: "16:00", loc: "Highway", icon: "🛣️", item: "返回伯斯", 
+                        route: "開車回伯斯 (約 3 小時)。長輩可在車上補眠。", 
+                        note: "", 
+                        link: "" 
+                    },
+                    { 
+                        time: "19:30", loc: "Perth", icon: "🏨", item: "返回入住", 
+                        route: "抵達伯斯辦理入住。", 
+                        note: "🍽️ 晚餐：Dragon Palace (龍門) 飲茶 或 The Cray Seafood。", 
+                        link: "" 
+                    }
+                ]
+            },
+            {
+                day: 8,
+                date: "2/19 (四)",
+                title: "無尾熊補考與海陸空",
+                stay: "Fraser Suites Perth",
+                weather: { icon: "🚁", temp: "29°C", text: "絕佳視野" },
+                events: [
+                    { 
+                        time: "09:00", loc: "Caversham", icon: "🐨", item: "抱無尾熊", 
+                        route: "Caversham Wildlife Park (補考行程)。\n1. Koala Hugging (合照需排隊付费)。\n2. Wombat (袋熊) 合照。\n3. 親手餵食袋鼠。", 
+                        note: "💡 這是與動物零距離接觸的最好機會。", 
+                        link: "https://goo.gl/maps/caversham" 
+                    },
+                    { 
+                        time: "12:00", loc: "City", icon: "🇬🇧", item: "英倫拱廊", 
+                        route: "London Court。逛街買伴手禮，拍哈利波特風格照片。", 
+                        note: "🍽️ 午餐：市區簡單吃 (如 Petition Kitchen)。", 
+                        link: "https://goo.gl/maps/londoncourt" 
+                    },
+                    { 
+                        time: "14:00", loc: "Burswood", icon: "🚁", item: "直升機體驗", 
+                        route: "Helicopter Flight。前往皇冠賭場旁停機坪，體驗 15 分鐘飛行，俯瞰天鵝河與伯斯市景。", 
+                        note: "💡 父母的驚喜亮點！", 
+                        link: "https://goo.gl/maps/perthheli" 
+                    },
+                    { 
+                        time: "15:30", loc: "City", icon: "💙", item: "市區觀光", 
+                        route: "1. Blue Boat House：藍色小屋拍照 (路邊暫停)。\n2. Kings Park：若還有體力可去走玻璃橋。", 
+                        note: "", 
+                        link: "https://goo.gl/maps/kingspark" 
+                    },
+                    { 
+                        time: "17:00", loc: "Cottesloe", icon: "🌅", item: "最美夕陽", 
+                        route: "Cottesloe Beach。參觀 Indiana Teahouse 建築，在草地上看印度洋夕陽。", 
+                        note: "💡 西澳最經典的日落點。", 
+                        link: "https://goo.gl/maps/cottesloe" 
+                    },
+                    { 
+                        time: "19:00", loc: "Crown", icon: "🍽️", item: "豪華慶功宴", 
+                        route: "Epicurean Buffet (皇冠賭場內)。西澳最頂級的自助餐，海鮮、生蠔、甜點吃到飽。", 
+                        note: "⚠️ 務必提前 1-2 個月訂位。", 
+                        link: "https://goo.gl/maps/crownperth" 
+                    }
+                ]
+            },
+            {
+                day: 9,
+                date: "2/20 (五)",
+                title: "採買與返程",
+                stay: "Sweet Home",
+                weather: { icon: "✈️", temp: "-", text: "平安返家" },
+                events: [
+                    { 
+                        time: "10:00", loc: "City", icon: "🛍️", item: "最後採買", 
+                        route: "Chemist Warehouse (買魚油/保健品) 或 Watertown Outlet。", 
+                        note: "💡 網友提示：最後一天去 Coles 買 TimTam 餅乾。", 
+                        link: "" 
+                    },
+                    { 
+                        time: "12:00", loc: "Morley", icon: "🍜", item: "午餐", 
+                        route: "Coventry Village 亞洲美食街。離機場近，選擇多又便宜。", 
+                        note: "🍽️ 推薦：海南雞飯、Laksa。", 
+                        link: "https://goo.gl/maps/coventryvillage" 
+                    },
+                    { 
+                        time: "14:45", loc: "Airport", icon: "⛽", item: "還車", 
+                        route: "前往 T1 還車 (Sixt/Hertz 都在附近)。", 
+                        note: "⚠️ 記得將油箱加滿油再還車。", 
+                        link: "https://goo.gl/maps/perthairportT1" 
+                    },
+                    { 
+                        time: "17:45", loc: "T1", icon: "🛫", item: "起飛", 
+                        route: "搭乘 TR 9 飛往新加坡。旅途愉快！", 
+                        note: "", 
+                        link: "" 
+                    }
+                ]
+            }
+        ];
+
+        const foodMap = [
+            { name: "Lobster Shack", type: "seafood", area: "Cervantes", desc: "必點烤半龍蝦套餐，工廠參觀。", link: "https://goo.gl/maps/lobstershack" },
+            { name: "Padbury's Cafe", type: "brunch", area: "Guildford", desc: "著名的鬆餅，百年建築氛圍。", link: "https://goo.gl/maps/padburys" },
+            { name: "Finlay's Kalbarri", type: "seafood", area: "Kalbarri", desc: "露天大院子，自釀啤酒與烤魚。", link: "https://goo.gl/maps/finlays" },
+            { name: "Skeetas Restaurant", type: "brunch", area: "Geraldton", desc: "海港景觀，環境舒適。", link: "https://goo.gl/maps/skeetas" },
+            { name: "Kung Fu Kitchen", type: "chinese", area: "Perth (Northbridge)", desc: "酸菜魚、火鍋，撫慰中國胃。", link: "https://goo.gl/maps/kungfu" },
+            { name: "Isola Bar", type: "seafood", area: "Rottnest", desc: "海景義式料理，適合度假氛圍。", link: "https://goo.gl/maps/isola" },
+            { name: "Rottnest Bakery", type: "snack", area: "Rottnest", desc: "經典肉派與甜甜圈。", link: "" },
+            { name: "Wave Rock Cafe", type: "snack", area: "Hyden", desc: "景區門口簡餐，方便為主。", link: "" },
+            { name: "Bunbury Farmers Market", type: "snack", area: "Bunbury", desc: "必買 Carrot Cake 與優格水果杯。", link: "https://goo.gl/maps/bunburyfarmers" },
+            { name: "The Goose", type: "seafood", area: "Busselton", desc: "棧橋旁海景餐廳，氣氛極佳。", link: "https://goo.gl/maps/thegoose" },
+            { name: "Fishbone", type: "chinese", area: "Margaret River", desc: "日式/西式結合，有熱湯麵。", link: "https://goo.gl/maps/fishbone" },
+            { name: "Dragon Palace", type: "chinese", area: "Perth", desc: "飲茶點心，晚餐好選擇。", link: "https://goo.gl/maps/dragonpalace" },
+            { name: "Epicurean Buffet", type: "seafood", area: "Perth (Crown)", desc: "頂級自助餐，生蠔甜點吃到飽。", link: "https://goo.gl/maps/crownperth" },
+            { name: "Coventry Village", type: "chinese", area: "Morley", desc: "亞洲美食街，便宜選擇多 (Laksa/雞飯)。", link: "https://goo.gl/maps/coventry" }
+        ];
+
+        const checklist = [
+            "Day 2: Jurien Bay 海獅同游 (需預約)",
+            "Day 4: Rottnest Island 船票 (Fremantle 往返)",
+            "Day 6: Mandurah 抓龍蝦船 (10:00 場次)",
+            "Day 6: Busselton 小火車+觀測站 (15:30 場次)",
+            "Day 7: Jewel Cave 導覽 (09:30/10:00)",
+            "Day 8: 直升機體驗 (需預約)",
+            "Day 8: Crown Epicurean 自助餐 (需提前1-2月)",
+            "住宿: Day 6 南部住宿 (Busselton)",
+            "網卡: 機場 Optus/Telstra",
+            "租車: 確認保險 Zero Excess",
+            "裝備: 防蠅網 (重要!)、墨鏡、頸枕"
+        ];
+
+        let currentDay = 0;
+        let detailMode = true;
+
+        // --- INIT ---
+        window.onload = function() {
+            renderDashboard();
+            renderDaily(currentDay);
+            renderDateNav();
+            renderFood('all');
+            renderInfo();
+            initChart();
+        };
+
+        // --- RENDER FUNCTIONS ---
+        
+        function switchTab(tabId) {
+            // Hide all
+            ['view-dashboard', 'view-daily', 'view-food', 'view-info'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            // Show target
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            
+            // Update Nav State (Desktop)
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-nav', 'text-sky-500'));
+            const navBtn = document.getElementById(`nav-${tabId}`);
+            if(navBtn) navBtn.classList.add('active-nav');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function renderDashboard() {
+            const weatherContainer = document.getElementById('weather-widget');
+            weatherContainer.innerHTML = itinerary.map(day => `
+                <div class="min-w-[85px] bg-white p-2 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm snap-center hover:border-sky-300 transition cursor-pointer" onclick="switchTab('daily'); renderDaily(${day.day-1})">
+                    <span class="text-xs font-bold text-slate-400">Day ${day.day}</span>
+                    <span class="text-2xl my-1">${day.weather.icon}</span>
+                    <span class="text-xs font-bold text-slate-700">${day.weather.temp}</span>
+                    <span class="text-[10px] text-slate-500 truncate w-full">${day.weather.text}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderDaily(dayIndex) {
+            currentDay = dayIndex;
+            const data = itinerary[dayIndex];
+            
+            // Update Header
+            document.getElementById('daily-title').innerText = `Day ${data.day}: ${data.title}`;
+            document.getElementById('daily-date').innerText = data.date;
+            document.getElementById('daily-stay').innerText = `🏠 住宿: ${data.stay}`;
+
+            // Render Timeline
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = `<div class="timeline-line"></div>`; // Reset line
+
+            data.events.forEach((event, idx) => {
+                const isLast = idx === data.events.length - 1;
+                
+                let detailBlock = '';
+                if (detailMode) {
+                    // Split content by newline for better formatting
+                    const routeLines = event.route ? event.route.split('\n').map(line => `<p class="mb-1">${line}</p>`).join('') : '';
+                    const noteLines = event.note ? event.note.split('\n').map(line => `<p class="mb-1">${line}</p>`).join('') : '';
+
+                    detailBlock = `
+                        <div class="mt-3 space-y-3 animate-fade-in">
+                            ${routeLines ? `
+                            <div class="route-box p-3 rounded-r-lg text-sm text-slate-700">
+                                <h4 class="text-xs font-bold text-sky-600 mb-1 uppercase tracking-wider">詳細路線與活動</h4>
+                                ${routeLines}
+                                ${event.link ? `<div class="mt-2"><a href="${event.link}" target="_blank" class="inline-flex items-center text-sky-600 hover:text-sky-800 font-medium text-xs bg-white px-2 py-1 rounded border border-sky-100 shadow-sm transition">📍 Google Maps 導航</a></div>` : ''}
+                            </div>` : ''}
+                            
+                            ${noteLines ? `
+                            <div class="note-box p-3 rounded-r-lg text-sm text-slate-700">
+                                <h4 class="text-xs font-bold text-amber-600 mb-1 uppercase tracking-wider">注意事項 / 餐廳建議</h4>
+                                ${noteLines}
+                            </div>` : ''}
+                        </div>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="relative pl-14 sm:pl-16 py-4">
+                        <!-- Dot -->
+                        <div class="absolute left-5 sm:left-5 top-5 w-4 h-4 rounded-full border-2 border-white shadow-md z-10 ${idx === 0 ? 'bg-sky-500 ring-4 ring-sky-100' : (isLast ? 'bg-indigo-500' : 'bg-slate-300')}"></div>
+                        
+                        <!-- Content Card -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3">
+                                <span class="absolute left-2 top-5 font-mono text-xs font-bold text-slate-400 w-12 text-right">${event.time}</span>
+                                <div class="flex-1 w-full">
+                                    <div class="flex justify-between items-start">
+                                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                            <span>${event.icon}</span>
+                                            ${event.item}
+                                        </h3>
+                                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full whitespace-nowrap ml-2">${event.loc}</span>
+                                    </div>
+                                    ${detailBlock}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Highlight active date nav
+            renderDateNav();
+        }
+
+        function renderDateNav() {
+            const container = document.getElementById('date-nav');
+            container.innerHTML = itinerary.map((day, idx) => `
+                <button onclick="renderDaily(${idx})" class="flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all border ${currentDay === idx ? 'bg-sky-500 border-sky-600 text-white shadow-md scale-105' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'}">
+                    <span class="text-xs font-bold">D${day.day}</span>
+                    <span class="text-[10px]">${day.date.split(' ')[0]}</span>
+                </button>
+            `).join('');
+        }
+
+        function toggleDetailMode() {
+            detailMode = !detailMode;
+            const knob = document.getElementById('mode-knob');
+            const btn = document.getElementById('mode-toggle');
+            
+            if (detailMode) {
+                knob.classList.add('translate-x-5');
+                knob.classList.remove('translate-x-1');
+                btn.classList.add('bg-sky-500');
+                btn.classList.remove('bg-slate-300');
+            } else {
+                knob.classList.remove('translate-x-5');
+                knob.classList.add('translate-x-1');
+                btn.classList.remove('bg-sky-500');
+                btn.classList.add('bg-slate-300');
+            }
+            renderDaily(currentDay);
+        }
+
+        function renderFood(filterType) {
+            const grid = document.getElementById('food-grid');
+            const btns = document.querySelectorAll('.food-filter');
+            
+            // Update buttons
+            btns.forEach(btn => {
+                if (btn.innerText.toLowerCase().includes(filterType === 'all' ? '全部' : (filterType === 'seafood' ? '海鮮' : (filterType === 'brunch' ? '早午餐' : (filterType === 'chinese' ? '中式' : '甜點'))))) {
+                    btn.classList.add('bg-slate-800', 'text-white');
+                    btn.classList.remove('bg-slate-100', 'text-slate-600');
+                } else {
+                    btn.classList.remove('bg-slate-800', 'text-white');
+                    btn.classList.add('bg-slate-100', 'text-slate-600');
+                }
+            });
+
+            // Filter data
+            const filtered = filterType === 'all' ? foodMap : foodMap.filter(f => f.type === filterType);
+
+            grid.innerHTML = filtered.map(item => `
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded-full uppercase font-bold tracking-wide">${item.type}</span>
+                        <a href="${item.link}" target="_blank" class="text-sky-500 hover:text-sky-600 text-sm font-medium">📍 導航</a>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-800 mb-1">${item.name}</h3>
+                    <p class="text-xs text-slate-400 mb-3 flex items-center gap-1">📍 ${item.area}</p>
+                    <p class="text-sm text-slate-600 leading-relaxed">${item.desc}</p>
+                </div>
+            `).join('');
+        }
+        
+        // Alias for onclick
+        window.filterFood = renderFood;
+
+        function renderInfo() {
+            const list = document.getElementById('checklist-grid');
+            list.innerHTML = checklist.map(item => `
+                <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100 hover:bg-slate-100 transition">
+                    <input type="checkbox" class="mt-1 w-5 h-5 text-sky-600 rounded focus:ring-sky-500 border-gray-300 cursor-pointer">
+                    <span class="text-sm text-slate-700 select-none cursor-pointer">${item}</span>
+                </div>
+            `).join('');
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('tripChart').getContext('2d');
+            
+            // Estimated Hours: Drive vs Play (Rough estimate from itinerary)
+            const driveData = [4, 2, 5, 1, 6, 2.5, 3.5, 1, 1]; // hrs
+            const playData =  [4, 6, 4, 7, 3, 6, 5, 8, 2];   // hrs
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9'],
+                    datasets: [
+                        {
+                            label: '🚗 車程時數',
+                            data: driveData,
+                            backgroundColor: '#94a3b8', // Slate 400
+                            borderRadius: 4,
+                        },
+                        {
+                            label: '📸 遊玩時數',
+                            data: playData,
+                            backgroundColor: '#0ea5e9', // Sky 500
+                            borderRadius: 4,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, beginAtZero: true, max: 12, title: { display: true, text: '小時 (hr)' } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
