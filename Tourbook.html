@@ -59,7 +59,7 @@
         
         /* Smooth scrolling adjustment for sticky headers */
         html {
-            scroll-padding-top: 140px; /* Adjust based on header height */
+            scroll-padding-top: 20px; 
         }
     </style>
 </head>
@@ -94,7 +94,7 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto bg-slate-50 scroll-smooth" id="main-content">
+    <main class="flex-1 overflow-y-auto bg-slate-50 scroll-smooth pb-24" id="main-content">
         <!-- Dynamic Content Injected Here -->
     </main>
 
@@ -127,36 +127,57 @@
             ],
             dailyItinerary: [
                 {
-                    day: 1, date: "12/28 (Sun)", fullDate: "2025-12-28", title: "赫爾辛基前哨戰", location: "Helsinki",
+                    day: 1, date: "12/28 (Sun)", fullDate: "2025-12-28", title: "赫爾辛基前哨戰", location: "Helsinki (EET UTC+2)",
                     theme: "功能主義與波羅的海序曲",
                     aurora: "極低 (城市光害)",
                     events: [
                         { 
                             time: "13:10", type: "transport", title: "戰術抵達 HEL", 
-                            desc: "航班 KL1251 降落 T2。領取行李後，立即在機場內穿上預備好的重裝冬衣。",
-                            details: "依循黃色火車圖示前往地下車站。使用 HSL App 購買「ABC區單程票」(€4.10, 90分鐘效期)。",
+                            desc: "航班 KL1251 降落 T2。領取行李後，立即在機場內穿上預備好的重裝冬衣（羽絨、毛帽）。",
+                            details: "依循黃色火車圖示前往地下車站。使用 HSL App 購買「ABC區單程票」(€4.10, 90分鐘效期)。HSL App 需事先下載綁定信用卡。",
                             tips: "風險：室內外溫差極大，避免出汗後受寒。",
                             link: "https://www.google.com/maps/search/?api=1&query=Helsinki+Airport" 
                         },
+                        {
+                            time: "14:00", type: "transport", title: "軌道轉移",
+                            desc: "搭乘 P線 或 I線 列車（環狀線）。",
+                            details: "行車約 30 分鐘。觀察窗外由針葉林轉變為花崗岩建築的地貌。車廂內有暖氣，建議解開外套拉鍊。",
+                            tips: "",
+                            link: ""
+                        },
                         { 
                             time: "14:40", type: "stay", title: "基地建立：Sokos Vaakuna", 
-                            desc: "入住 Original Sokos Hotel Vaakuna，中央車站正對面。",
+                            desc: "抵達中央車站。直接由地下通道或站前廣場步行至 Original Sokos Hotel Vaakuna。",
                             details: "建築亮點：1952年奧運會功能主義傑作。請務必依據備註要求 'High Floor, Station View'，俯瞰埃列爾·薩里寧設計的車站與「持燈者」雕像。",
                             tips: "文件：備妥護照與入住憑證。",
                             link: "https://www.google.com/maps/search/?api=1&query=Original+Sokos+Hotel+Vaakuna+Helsinki" 
                         },
                         { 
                             time: "15:30", type: "activity", title: "藍色時刻散策 (Blue Hour)", 
-                            desc: "參議院廣場、白教堂、烏斯佩斯基大教堂(外觀)。",
-                            details: "此時日落已過，城市進入漫長的藍色暮光。白教堂的高台階梯是拍攝市景的最佳點，但在冬季極滑，請務必扶手或走側坡。隨後步行至市集廣場 (Market Square) 感受海風。",
+                            desc: "路線：飯店 → Aleksanterinkatu → 參議院廣場 → 白教堂。",
+                            details: "此時日落已過，城市進入漫長的藍色暮光。白教堂的高台階梯是拍攝市景的最佳點，但在冬季極滑，請務必扶手或走側坡。",
                             tips: "風險：廣場地面石板易結冰，走路請像企鵝一樣重心向前。",
                             link: "https://www.google.com/maps/search/?api=1&query=Senate+Square+Helsinki" 
                         },
+                        {
+                            time: "16:30", type: "activity", title: "東正教與港口",
+                            desc: "烏斯佩斯基大教堂 (外觀) 與市集廣場 (Market Square)。",
+                            details: "感受波羅的海的凜冽海風，眺望遠處的破冰船隊。港口區風大，體感溫度極低。",
+                            tips: "務必戴好毛帽、圍巾。",
+                            link: "https://www.google.com/maps/search/?api=1&query=Uspenski+Cathedral"
+                        },
+                        {
+                            time: "17:30", type: "activity", title: "光之大道漫遊",
+                            desc: "沿著 Esplanadi 公園往回走。",
+                            details: "兩側的椴樹被光網覆蓋，這是北歐對抗冬季憂鬱 (SAD) 的城市設計。瀏覽沿途的 Iittala 與 Artek 設計商店櫥窗 (多數 18:00 關門)。",
+                            tips: "",
+                            link: "https://www.google.com/maps/search/?api=1&query=Esplanadi"
+                        },
                         { 
                             time: "19:00", type: "food", title: "晚餐：Ravintola Zetor", 
-                            desc: "Leningrad Cowboys 設計的拖拉機主題餐廳。",
-                            details: "充滿農村諷刺風格。推薦菜色：Sautéed Reindeer (炒馴鹿肉)，搭配馬鈴薯泥與越橘醬 (Lingonberry)，酸甜口感平衡鹿肉野味。",
-                            tips: "建議提前訂位。地址：Mannerheimintie 3。",
+                            desc: "拖拉機主題餐廳，體驗芬蘭式幽默。",
+                            details: "推薦菜色：Sautéed Reindeer (炒馴鹿肉)，搭配馬鈴薯泥與越橘醬 (Lingonberry)。",
+                            tips: "強烈建議預訂。地址：Mannerheimintie 3。",
                             link: "https://www.google.com/maps/search/?api=1&query=Ravintola+Zetor" 
                         },
                         {
@@ -169,10 +190,17 @@
                     ]
                 },
                 {
-                    day: 2, date: "12/29 (Mon)", fullDate: "2025-12-29", title: "飛越北極圈", location: "Rovaniemi",
+                    day: 2, date: "12/29 (Mon)", fullDate: "2025-12-29", title: "飛越北極圈", location: "Rovaniemi (EET UTC+2)",
                     theme: "拉普蘭前哨戰 & 極光伏擊",
                     aurora: "中 (Norvajärvi 湖邊)",
                     events: [
+                        {
+                            time: "09:30", type: "transport", title: "撤收與轉移",
+                            desc: "早餐後退房，搭乘火車 (P/I線) 返回 HEL 機場。",
+                            details: "上班尖峰時間人潮較多，預留緩衝。",
+                            tips: "",
+                            link: ""
+                        },
                         { 
                             time: "11:55", type: "transport", title: "空中北伐：HEL -> RVN", 
                             desc: "Finnair AY0533 飛往羅瓦涅米。建議右側靠窗。",
@@ -201,6 +229,13 @@
                             tips: "若氣溫低於 -15°C，引擎加熱是發動關鍵。",
                             link: "https://www.google.com/maps/search/?api=1&query=Rauhankatu+37+B+Rovaniemi" 
                         },
+                        {
+                            time: "16:30", type: "food", title: "重裝補給：K-Citymarket",
+                            desc: "進入荒野前最後的大型補給點。",
+                            details: "採購：解凍噴霧 (De-icer)、抗凍雨刷水 (-20°C)、暖暖包、未來兩天的早餐食材。",
+                            tips: "",
+                            link: "https://www.google.com/maps/search/?api=1&query=K-Citymarket+Rovaniemi"
+                        },
                         { 
                             time: "19:00", type: "food", title: "晚餐：Restaurant Nili", 
                             desc: "極致野味體驗，內部裝飾如獵人小屋。",
@@ -218,143 +253,174 @@
                     ]
                 },
                 {
-                    day: 3, date: "12/30 (Tue)", fullDate: "2025-12-30", title: "鋼鐵意志", location: "Kemi/Tornio",
+                    day: 3, date: "12/30 (Tue)", fullDate: "2025-12-30", title: "鋼鐵意志", location: "Kemi/Tornio (跨時區)",
                     theme: "破冰船跨國突襲",
                     aurora: "中 (Ounasvaara 山頂)",
                     events: [
                         { 
-                            time: "09:00", type: "transport", title: "邊境推進：E75 公路", 
+                            time: "09:00 (FI)", type: "transport", title: "邊境推進：E75 公路", 
                             desc: "南下前往瑞典邊境。注意「雪霧」。",
                             details: "風險：與大型聯結車交會時，輪胎捲起的粉狀乾雪會形成白色霧牆，導致瞬間能見度為零。對策：握緊方向盤，保持直線。",
-                            tips: "10:00 在 Neste Tervola 休息。",
+                            tips: "10:00 在 Neste Tervola 休息 (檢查車輛)。",
                             link: "https://www.google.com/maps/search/?api=1&query=E75+road+Finland" 
                         },
                         { 
                             time: "10:30 (FI)", type: "activity", title: "雙子城與時差紅利", 
                             desc: "抵達 Tornio (芬) / Haparanda (瑞)。",
-                            details: "跨過托爾尼奧河進入瑞典，手機時間會自動倒退 1 小時 (變回 09:30)。可參觀 Kemi Church 或 Haparanda Candy World。",
-                            tips: "",
+                            details: "跨過托爾尼奧河進入瑞典，手機時間會自動倒退 1 小時 (變回 09:30)。可參觀 Kemi Church 或 Haparanda Candy World (瑞典糖果文化)。",
+                            tips: "注意時差：芬蘭 10:30 = 瑞典 09:30。",
                             link: "https://www.google.com/maps/search/?api=1&query=Haparanda" 
                         },
                         { 
+                            time: "11:50 (SE)", type: "transport", title: "港口集結", 
+                            desc: "抵達 Axelsvik Marine (Båtskärsnäs)。", 
+                            details: "工業港口，充滿起重機。務必在 12:30 (瑞典時間) 前完成報到。導航輸入準確座標，避免迷路。", 
+                            tips: "", 
+                            link: "https://www.google.com/maps/search/?api=1&query=Axelsvik+Marine" 
+                        },
+                        { 
                             time: "13:00 (SE)", type: "activity", title: "破冰行動：Polar Explorer", 
-                            desc: "Axelsvik Marine 出發。龍蝦裝漂浮體驗。",
+                            desc: "出航。龍蝦裝漂浮體驗。",
                             details: "參觀引擎室，感受船身壓碎冰層。穿著橘色生存衣跳入冰海。注意：漂浮衣不透氣，建議內層只穿輕薄羊毛衣，勿穿羽絨外套。",
-                            tips: "務必在 12:30 (瑞典時間) 前完成報到。",
+                            tips: "船上有熱湯與麵包午餐。",
                             link: "https://www.google.com/maps/search/?api=1&query=Polar+Explorer+Icebreaker" 
                         },
                         { 
                             time: "17:30 (FI)", type: "transport", title: "夜間返航", 
                             desc: "返回羅瓦涅米。天色全黑，警戒馴鹿。",
                             details: "需特別留意路邊反光標示（可能代表有馴鹿）。善用遠光燈，遇對向來車務必切換近光燈。",
-                            tips: "回到羅瓦涅米後簡單自煮或吃漢堡 (Kauppayhtiö)。",
+                            tips: "",
                             link: "" 
+                        },
+                        {
+                            time: "19:30 (FI)", type: "stay", title: "休整",
+                            desc: "回到羅瓦涅米。",
+                            details: "建議在民宿簡單自煮或購買熟食 (Kauppayhtiö 漢堡)，早點休息以應對明日的長途移動。",
+                            tips: "",
+                            link: ""
                         }
                     ]
                 },
                 {
-                    day: 4, date: "12/31 (Wed)", fullDate: "2025-12-31", title: "深入荒野", location: "Inari",
+                    day: 4, date: "12/31 (Wed)", fullDate: "2025-12-31", title: "深入荒野", location: "Inari (EET UTC+2)",
                     theme: "紫水晶與極地跨年",
                     aurora: "極高 (戰略重點)",
                     events: [
                         { time: "09:00", type: "transport", title: "北上征途", desc: "退房，沿 E75 北上，右轉 962 前往 Luosto。", details: "962 號公路較窄，注意除雪狀況。景觀轉變為 Tykky (雪雕樹) 形態。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Luosto" },
-                        { time: "11:00", type: "activity", title: "紫水晶礦", desc: "Ukko-Luosto 搭乘 Pendolino 雪地車上山。", details: "挖掘 20 億年前形成的紫水晶。每人可帶走一顆拳頭大小以內的寶石。山頂風大需全套防風裝備。", tips: "11:25 前報到。", link: "https://www.google.com/maps/search/?api=1&query=Lampivaara+Amethyst+Mine" },
-                        { time: "14:30", type: "transport", title: "縱貫拉普蘭", desc: "E75 繼續北上。中途停靠 Tankavaara 淘金村。", details: "進入 Inari 地區後，馴鹿直接走上公路舔食路鹽的機率大增。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Tankavaara+Gold+Village" },
+                        { time: "11:00", type: "activity", title: "紫水晶礦", desc: "Ukko-Luosto 搭乘 11:30 Pendolino 雪地車上山。", details: "挖掘 20 億年前形成的紫水晶。每人可帶走一顆拳頭大小以內的寶石。山頂風大需全套防風裝備。", tips: "11:25 前報到。", link: "https://www.google.com/maps/search/?api=1&query=Lampivaara+Amethyst+Mine" },
+                        { time: "13:30", type: "food", title: "午餐：Restaurant Vaisko", desc: "提供高品質拉普蘭料理，氛圍溫馨。", details: "下山後用餐。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Restaurant+Vaisko" },
+                        { time: "14:30", type: "transport", title: "縱貫拉普蘭", desc: "E75 繼續北上。中途停靠 Tankavaara 淘金村。", details: "中途點：Sodankylä Old Church (1689年木造教堂) 與 Tankavaara。進入 Inari 地區後，馴鹿直接走上公路舔食路鹽的機率大增。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Tankavaara+Gold+Village" },
                         { time: "17:30", type: "stay", title: "隱世居所：Nangu", desc: "入住 Wilderness Hotel Nangu & Igloos。", details: "位於伊納里湖的南岸，位置極度隱密，光害極低。含跨年晚餐。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Wilderness+Hotel+Nangu" },
-                        { time: "23:55", type: "aurora", title: "跨年極光", desc: "站在結冰的伊納里湖上迎接 2026。", details: "在無光害的環境下，等待極光與 2026 年的第一秒一同降臨。湖面風大，體感溫度極低。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Lake+Inari" }
+                        { time: "19:00", type: "food", title: "跨年盛宴", desc: "享用飯店 Gala Dinner。", details: "芬蘭跨年傳統「熔錫占卜」(Uudenvuodentina)，將熔化的錫倒入冷水中，解讀形狀預測運勢。", tips: "", link: "" },
+                        { time: "23:55", type: "aurora", title: "跨年極光", desc: "站在結冰的伊納里湖上迎接 2026。", details: "在無光害的環境下，等待極光與 2026 年的第一秒一同降臨。湖面風大，體感溫度極低。", tips: "注意保暖。", link: "https://www.google.com/maps/search/?api=1&query=Lake+Inari" }
                     ]
                 },
                 {
-                    day: 5, date: "01/01 (Thu)", fullDate: "2026-01-01", title: "帝王蟹遠征", location: "Kirkenes (NO)",
+                    day: 5, date: "01/01 (Thu)", fullDate: "2026-01-01", title: "帝王蟹遠征", location: "Kirkenes (跨時區)",
                     theme: "極限邊境與甲殼盛宴",
                     aurora: "高 (回程 971 公路)",
                     events: [
-                        { time: "09:30", type: "transport", title: "最美公路 971", desc: "前往挪威。薩米文化核心區。", details: "途經 Sevetin Baari 咖啡補給。通過 Neiden 邊境進入挪威，時差 -1 小時。可暫停 Skoltefossen 瀑布。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Road+971+Finland" },
-                        { time: "13:00", type: "food", title: "帝王蟹狩獵", desc: "Snowhotel Kirkenes。", details: "搭乘雪地摩托車雪橇前往冰封峽灣，親手拉起巨大的蟹籠。享用現煮帝王蟹腿吃到飽。", tips: "紅色帝王蟹是蘇聯引入的外來種。", link: "https://www.google.com/maps/search/?api=1&query=Snowhotel+Kirkenes" },
-                        { time: "17:00", type: "transport", title: "戰略撤退", desc: "夜間駕駛返回芬蘭。", details: "高蛋白飲食易導致飯後嗜睡 (Food Coma)，加上全程黑暗駕駛，風險極高。對策：離開前喝濃咖啡，車內溫度勿過高。", tips: "", link: "" },
-                        { time: "19:00", type: "food", title: "強制喚醒：Kaamanen", desc: "Kaamasen Kievari (卡馬寧客棧)。", details: "傳奇路邊休息站。在此停留 30 分鐘強制醒腦，吃馴鹿派與甜甜圈。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Kaamasen+Kievari" },
-                        { time: "21:30", type: "stay", title: "抵達 Saariselkä", desc: "入住 Northern Lights Village Saariselkä (玻璃屋)。", details: "事前 Email 確認飯店是否預留冷盤晚餐。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Northern+Lights+Village+Saariselkä" }
+                        { time: "09:30 (FI)", type: "transport", title: "最美公路 971", desc: "前往挪威。薩米文化核心區。", details: "途經 Sevetin Baari 咖啡補給。通過 Neiden 邊境進入挪威。這條路蜿蜒穿過無數小湖泊與岩石丘陵。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Road+971+Finland" },
+                        { time: "12:00 (NO)", type: "activity", title: "Neiden 瀑布與時差", desc: "暫停 Skoltefossen 瀑布。", details: "跨越峽谷的橋樑景觀壯觀。注意時差：芬蘭 (UTC+2) -> 挪威 (UTC+1)，手機時間倒退 1 小時。進入挪威後物價翻倍。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Skoltefossen" },
+                        { time: "13:00 (NO)", type: "food", title: "帝王蟹狩獵", desc: "Snowhotel Kirkenes。", details: "搭乘雪地摩托車雪橇前往冰封峽灣，親手拉起巨大的蟹籠。享用現煮帝王蟹腿吃到飽。紅色帝王蟹是蘇聯引入的外來種。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Snowhotel+Kirkenes" },
+                        { time: "17:00 (NO)", type: "transport", title: "戰略撤退", desc: "夜間駕駛返回芬蘭。", details: "高蛋白飲食易導致飯後嗜睡 (Food Coma)，加上全程黑暗駕駛，風險極高。對策：離開前喝濃咖啡，車內溫度勿過高。", tips: "", link: "" },
+                        { time: "19:00 (FI)", type: "food", title: "強制喚醒：Kaamanen", desc: "Kaamasen Kievari (卡馬寧客棧)。", details: "傳奇路邊休息站。在此停留 30 分鐘強制醒腦，吃馴鹿派與甜甜圈。此時手機時間跳回芬蘭時間 (+1小時)。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Kaamasen+Kievari" },
+                        { time: "21:30 (FI)", type: "stay", title: "抵達 Saariselkä", desc: "入住 Northern Lights Village Saariselkä (玻璃屋)。", details: "事前 Email 確認飯店是否預留冷盤晚餐 (Cold Plate)。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Northern+Lights+Village+Saariselkä" }
                     ]
                 },
                 {
-                    day: 6, date: "01/02 (Fri)", fullDate: "2026-01-02", title: "特羅姆瑟登陸戰", location: "Tromsø (NO)",
+                    day: 6, date: "01/02 (Fri)", fullDate: "2026-01-02", title: "特羅姆瑟登陸戰", location: "Tromsø (CET UTC+1)",
                     theme: "巨魔與極地科學",
                     aurora: "中 (纜車山頂)",
                     events: [
-                        { time: "04:15", type: "transport", title: "極限出發", desc: "03:45 起床，04:15 準時發動引擎。", details: "沿 E75 南下前往 Rovaniemi 機場 (257km)。凌晨 4 點遇除雪車隊絕對不要超車。", tips: "", link: "" },
-                        { time: "08:00", type: "transport", title: "RVN 機場還車", desc: "加滿油，拍照存證，歸還 Green Motion。", details: "搭乘 Finnair AY0541 (09:25 起飛) 前往特羅姆瑟。", tips: "保留加油收據。", link: "https://www.google.com/maps/search/?api=1&query=Rovaniemi+Airport" },
-                        { time: "09:40", type: "transport", title: "Tromsø 落地租車", desc: "Thrifty 櫃台領取 Volvo V40。", details: "導航至 Fjellet P-hus (Tunnel Parking)。這是挖掘在山體內的地下停車場，恆溫且安全。", tips: "特羅姆瑟多隧道且有地下圓環。", link: "https://www.google.com/maps/search/?api=1&query=Fjellet+P-hus" },
-                        { time: "11:30", type: "activity", title: "巨魔博物館", desc: "Troll Museum (AR體驗)。", details: "利用擴增實境 (AR) 技術，觀察隱藏在展品中的巨魔。了解挪威神話。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Troll+Museum+Tromso" },
-                        { time: "14:30", type: "activity", title: "Polaria 水族館", desc: "觀看 15:30 海豹餵食秀。", details: "建築外觀像倒塌的骨牌。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Polaria" },
-                        { time: "18:00", type: "activity", title: "Fjellheisen 纜車", desc: "上山看夜景。", details: "俯瞰特羅姆瑟島如發光寶石漂浮在黑色峽灣中。今晚接近滿月，適合拍攝雪山夜景。", tips: "腳架必備。", link: "https://www.google.com/maps/search/?api=1&query=Fjellheisen" }
+                        { time: "04:15 (FI)", type: "transport", title: "極限出發", desc: "03:45 起床，04:15 準時發動引擎。", details: "沿 E75 南下前往 Rovaniemi 機場 (257km)。凌晨 4 點遇除雪車隊絕對不要超車，跟隨其後享受平整路面。", tips: "絕對紀律。", link: "" },
+                        { time: "08:00 (FI)", type: "transport", title: "RVN 機場還車", desc: "加滿油，拍照存證，歸還 Green Motion。", details: "保留加油收據。搭乘 Finnair AY0541 (09:25 起飛) 前往特羅姆瑟。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Rovaniemi+Airport" },
+                        { time: "09:40 (NO)", type: "transport", title: "Tromsø 落地租車", desc: "Thrifty 櫃台領取 Volvo V40。", details: "導航至 Fjellet P-hus (Tunnel Parking)。這是挖掘在山體內的地下停車場，恆溫且安全。", tips: "特羅姆瑟多隧道且有地下圓環。", link: "https://www.google.com/maps/search/?api=1&query=Fjellet+P-hus" },
+                        { time: "11:30", type: "activity", title: "巨魔博物館", desc: "Troll Museum (AR體驗)。", details: "利用擴增實境 (AR) 技術，觀察隱藏在展品中的巨魔。了解挪威神話中 Jotnar (巨人) 與 Huldra (隱形族) 的區別。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Troll+Museum+Tromso" },
+                        { time: "13:00", type: "food", title: "港口午餐", desc: "Full Steam 或 Skarven。", details: "推薦嘗試當地的 炸鱈魚舌 (Cod Tongues) 或濃郁魚湯。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Full+Steam+Tromso" },
+                        { time: "14:30", type: "activity", title: "Polaria 水族館", desc: "觀看 15:30 海豹餵食秀。", details: "建築外觀像倒塌的骨牌（象徵冰壓）。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Polaria" },
+                        { time: "16:00", type: "stay", title: "民宿入住", desc: "Guesthouse Tromsø (Krokelvdalen)。", details: "位置位於大陸側，便於明日前往 Lyngen。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Guesthouse+Tromsø" },
+                        { time: "18:00", type: "activity", title: "Fjellheisen 纜車", desc: "上山看夜景。", details: "俯瞰特羅姆瑟島如發光寶石漂浮在黑色峽灣中。今晚接近滿月，適合拍攝雪山夜景。", tips: "腳架必備。山頂有 Fjellstua Café。", link: "https://www.google.com/maps/search/?api=1&query=Fjellheisen" }
                     ]
                 },
                 {
-                    day: 7, date: "01/03 (Sat)", fullDate: "2026-01-03", title: "冰與火之歌", location: "Lyngen",
+                    day: 7, date: "01/03 (Sat)", fullDate: "2026-01-03", title: "冰與火之歌", location: "Lyngen (CET UTC+1)",
                     theme: "雪地摩托與薩米文化",
                     aurora: "低至中 (滿月 Wolf Moon)",
                     events: [
-                        { time: "08:15", type: "transport", title: "前往 Lyngen", desc: "沿 E8 公路南下前往 Hatteng。", details: "沿著 Balsfjorden 行駛，風景壯麗但海風強勁，注意路面「黑冰」。中途在 Nordkjosbotn 的 Vollan Gjestestue 休息。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=North+Experience+Basecamp" },
+                        { time: "08:15", type: "transport", title: "前往 Lyngen", desc: "沿 E8 公路南下前往 Hatteng。", details: "沿著 Balsfjorden 行駛，風景壯麗但海風強勁，注意路面「黑冰」。", tips: "側風強烈，握緊方向盤。", link: "https://www.google.com/maps/search/?api=1&query=North+Experience+Basecamp" },
+                        { time: "09:15", type: "transport", title: "戰術休息", desc: "Vollan Gjestestue (Nordkjosbotn)。", details: "E6 與 E8 交匯處的戰略補給站。建議在此如廁並購買飲料。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Vollan+Gjestestue" },
                         { time: "10:30", type: "activity", title: "雪地摩托車", desc: "North Experience Basecamp。", details: "兩人一車，駛入被雪覆蓋的荒野與山谷。必須攜帶實體駕照。", tips: "", link: "" },
                         { time: "14:00", type: "activity", title: "Ice Domes", desc: "Tromsø Ice Domes 導覽。", details: "參觀冰雪飯店、冰雕酒吧、電影院。了解「雪氣球」建造技術。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Tromso+Ice+Domes" },
                         { time: "15:30", type: "transport", title: "中場整備", desc: "返回民宿洗澡。", details: "雪地摩托車的廢氣味會附著在衣物上。強烈建議在參加晚上的馴鹿活動前洗澡並更換全套衣物。", tips: "", link: "" },
-                        { time: "18:30", type: "activity", title: "薩米之夜", desc: "Tromso Arctic Reindeer。", details: "關鍵導航：根據憑證，您的訂單是 'Own Transport'。直接開車至 Krokelvdalen (Fv53 1570)。餵食馴鹿，享用 Bidos (馴鹿湯)，聆聽 Joik 歌謠。", tips: "切勿前往市區 Radisson Blu 集合點。", link: "https://www.google.com/maps/search/?api=1&query=Tromso+Arctic+Reindeer" }
+                        { time: "18:15", type: "transport", title: "前往馴鹿營地", desc: "Tromso Arctic Reindeer。", details: "關鍵導航：根據憑證，您的訂單是 'Own Transport'。直接開車至 Fv53 1570 (離民宿僅 10-15 分鐘)。千萬不要去市區 Radisson Blu。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Tromso+Arctic+Reindeer" },
+                        { time: "18:30", type: "activity", title: "薩米之夜", desc: "餵食馴鹿 & 傳統晚餐。", details: "手持水桶餵食 300 隻野生馴鹿。隨後進入 Lavvu 帳篷，享用 Bidos (馴鹿湯)，聆聽 Joik 歌謠。", tips: "Joik 是一種靈魂的展現，請保持肅靜聆聽。", link: "" }
                     ]
                 },
                 {
-                    day: 8, date: "01/04 (Sun)", fullDate: "2026-01-04", title: "峽灣轉場", location: "Bergen/Hardanger",
+                    day: 8, date: "01/04 (Sun)", fullDate: "2026-01-04", title: "峽灣轉場", location: "Bergen/Hardanger (CET UTC+1)",
                     theme: "電動車時代來臨",
                     aurora: "低 (緯度較低)",
                     events: [
-                        { time: "09:30", type: "activity", title: "博物館巡禮", desc: "Arctic University Museum。", details: "參觀 Roald Amundsen 探險歷史與薩米文化展。隨後去科學中心看極光電影。", tips: "週日商店多關門，博物館是首選。", link: "https://www.google.com/maps/search/?api=1&query=Arctic+University+Museum+of+Norway" },
+                        { time: "09:30", type: "activity", title: "博物館巡禮", desc: "Arctic University Museum。", details: "參觀 Roald Amundsen 探險歷史與薩米文化展。週日商店多關門，博物館是首選。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Arctic+University+Museum+of+Norway" },
+                        { time: "12:00", type: "activity", title: "極光科學", desc: "Northern Norwegian Science Center。", details: "觀賞天象儀電影 \"Extreme Auroras\"，從科學角度理解這幾天看到的自然現象。", tips: "Kaffebønna 咖啡輕食。", link: "https://www.google.com/maps/search/?api=1&query=Northern+Norwegian+Science+Center" },
+                        { time: "15:00", type: "transport", title: "機場轉移", desc: "將 Volvo 加滿油，歸還給 Thrifty。", details: "辦理登機。", tips: "", link: "" },
                         { time: "17:05", type: "transport", title: "飛往卑爾根", desc: "Widerøe WF627 (TOS -> BGO)。", details: "Widerøe 是挪威支線航空霸主，若天氣晴朗可俯瞰海岸線。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Bergen+Airport" },
                         { time: "19:15", type: "transport", title: "EV 資產接收", desc: "Sixt 領取 Audi e-tron。", details: "EV 操作指南：1. 檢查充電線 (Type 2)。 2. 下載充電 App (Elton, Mer, Fortum)。 3. 確認電量 (SoC) >80%。", tips: "", link: "" },
+                        { time: "20:30", type: "transport", title: "夜間突襲", desc: "駕駛前往 Norheimsund (約 75km)。", details: "途經多條隧道，Audi 矩陣式頭燈將發揮作用。中繼站：Bjørkheim Kro。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Bjørkheim+Kro" },
                         { time: "22:00", type: "stay", title: "峽灣夜宿", desc: "Thon Hotel Sandven (Norheimsund)。", details: "建於 1857 年的歷史飯店。若飯店有目的地充電樁，務必插上過夜。", tips: "自備零食 (廚房已關)。", link: "https://www.google.com/maps/search/?api=1&query=Thon+Hotel+Sandven" }
                     ]
                 },
                 {
-                    day: 9, date: "01/05 (Mon)", fullDate: "2026-01-05", title: "峽灣深度擴充", location: "Hardangerfjord",
+                    day: 9, date: "01/05 (Mon)", fullDate: "2026-01-05", title: "峽灣深度擴充", location: "Hardangerfjord (CET UTC+1)",
                     theme: "Lofthus 戰略抉擇",
                     aurora: "極低",
                     events: [
-                        { time: "08:30", type: "activity", title: "史坦達爾瀑布", desc: "Steinsdalsfossen。", details: "挪威少數可「走到瀑布後方」的景點。早晨前往可獨享步道。步道可能結冰。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Steinsdalsfossen" },
+                        { time: "08:30", type: "activity", title: "史坦達爾瀑布", desc: "Steinsdalsfossen。", details: "挪威少數可「走到瀑布後方」的景點。早晨前往可獨享步道。步道可能結冰，小心行走。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Steinsdalsfossen" },
+                        { time: "09:30", type: "activity", title: "海事博物館", desc: "Hardanger Maritime Museum。", details: "觀看傳統木船 (Clinker-built boats) 的建造工坊與繩索製作。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Hardanger+Maritime+Museum" },
                         { time: "11:00", type: "activity", title: "RIB Safari", desc: "Hardangerfjord Adventure。", details: "穿上保暖浮力衣，從海平面視角仰望峽灣峭壁。風寒效應強，務必戴護目鏡。", tips: "", link: "" },
-                        { time: "13:00", type: "transport", title: "Lofthus 迂迴", desc: "過 Hardanger Bridge 南下 Rv13。", details: "這段南下路程即是用戶覺得「迂迴」的部分，但 Rv13 景色絕美 (挪威縮影精華)。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Hardanger+Bridge" },
+                        { time: "13:00", type: "transport", title: "Lofthus 迂迴", desc: "過 Hardanger Bridge 南下 Rv13。", details: "這段南下路程即是用戶覺得「迂迴」的部分，但 Rv13 景色絕美 (挪威縮影精華)，值得一開。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Hardanger+Bridge" },
                         { time: "13:45", type: "food", title: "歷史午餐", desc: "Hotel Ullensvang。", details: "作曲家葛里格 (Edvard Grieg) 的創作地。在飯店花園眺望對岸的 Folgefonna 冰河。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Hotel+Ullensvang" },
-                        { time: "16:30", type: "activity", title: "Vøringsfossen", desc: "開車上山至觀景台。", details: "若天色許可。若太暗或天氣惡劣，移至明日一早。", tips: "注意山路結冰。", link: "https://www.google.com/maps/search/?api=1&query=Vøringsfossen" },
+                        { time: "15:30", type: "transport", title: "Rv13 北上", desc: "前往 Eidfjord。", details: "沿 Rv13 北上折返，經 Kinsarvik 接 Rv7。這段迂迴增加了約 50km，加上暖氣消耗，需密切注意電量。", tips: "", link: "" },
+                        { time: "16:30", type: "activity", title: "Vøringsfossen", desc: "開車上山至觀景台。", details: "(若天色許可) 趁著最後一點藍光。若太暗或天氣惡劣，移至明日一早。注意山路結冰。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Vøringsfossen" },
                         { time: "17:30", type: "transport", title: "關鍵：強制充電", desc: "Eidfjord Tesla Supercharger。", details: "Critical Mission: 強制將 e-tron 充至 95-100%。這是為了確保明日翻越山區與趕飛機的絕對安全餘裕。", tips: "入住 Ingrids Apartments。", link: "https://www.google.com/maps/search/?api=1&query=Eidfjord+Tesla+Supercharger" }
                     ]
                 },
                 {
-                    day: 10, date: "01/06 (Tue)", fullDate: "2026-01-06", title: "撤收閃電戰", location: "Voss/Bergen",
+                    day: 10, date: "01/06 (Tue)", fullDate: "2026-01-06", title: "撤收閃電戰", location: "Voss/Bergen (CET UTC+1)",
                     theme: "瀑布、纜車與城市快閃",
                     aurora: "無",
                     events: [
+                        { time: "08:00", type: "transport", title: "行動開始", desc: "準時出發。", details: "若昨日未去瀑布，現在立刻上山 (Rv7)；若已去，則直接前往 Voss。若 Rv7 山路結冰嚴重，放棄瀑布直接走。", tips: "", link: "" },
                         { time: "09:00", type: "activity", title: "Skjervsfossen", desc: "路邊景點：最美公廁。", details: "落地窗面瀑布。停留控制在 20 分鐘內。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Skjervsfossen" },
-                        { time: "10:15", type: "activity", title: "Voss 停留", desc: "Voss Gondol 纜車或石教堂。", details: "死線：11:30 必須上車離開 Voss，沿 E16 前往卑爾根。", tips: "E16 多隧道，需監控路況。", link: "https://www.google.com/maps/search/?api=1&query=Voss+Gondol" },
-                        { time: "13:00", type: "activity", title: "卑爾根快閃", desc: "Bryggen 漢薩同盟彩色木屋。", details: "決策點：若 13:00 前抵達，可進行 45 分鐘快閃。若 E16 塞車，此行程需無情捨棄，直奔機場。", tips: "停車：Rosenkrantz P-hus。", link: "https://www.google.com/maps/search/?api=1&query=Bryggen+Bergen" },
-                        { time: "13:45", type: "transport", title: "資產處置", desc: "BGO 機場還車 (Sixt)。", details: "搭乘 Norwegian DY631 (16:15) 飛往斯德哥爾摩 (ARN)。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Bergen+Airport" },
-                        { time: "21:00", type: "stay", title: "Nordic Light Hotel", desc: "入住。", details: "搭乘 Arlanda Express 18 分鐘直達中央車站。飯店位於快線月台旁，無需拖行李走雪地。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Nordic+Light+Hotel" }
+                        { time: "10:15", type: "activity", title: "Voss 停留", desc: "Voss Gondol 纜車或石教堂。", details: "停留 75 分鐘。死線：11:30 必須上車離開 Voss，沿 E16 前往卑爾根。", tips: "E16 多隧道，需監控路況。", link: "https://www.google.com/maps/search/?api=1&query=Voss+Gondol" },
+                        { time: "13:00", type: "activity", title: "卑爾根快閃", desc: "Bryggen 漢薩同盟彩色木屋。", details: "決策點：若 13:00 前抵達，可進行 45 分鐘快閃。若 E16 塞車，此行程需無情捨棄，直奔機場。停車：Rosenkrantz P-hus。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Bryggen+Bergen" },
+                        { time: "13:45", type: "transport", title: "資產處置", desc: "BGO 機場還車 (Sixt)。", details: "檢查：清除藍牙連結與導航紀錄。搭乘 Norwegian DY631 (16:15) 飛往斯德哥爾摩 (ARN)。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Bergen+Airport" },
+                        { time: "20:30", type: "transport", title: "光速進城", desc: "搭乘 Arlanda Express。", details: "18 分鐘直達中央車站。票務：機器或 App 購票。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Arlanda+Express" },
+                        { time: "21:00", type: "stay", title: "Nordic Light Hotel", desc: "入住。", details: "飯店位於快線月台旁，無需拖行李走雪地。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Nordic+Light+Hotel" }
                     ]
                 },
                 {
-                    day: 11, date: "01/07 (Wed)", fullDate: "2026-01-07", title: "斯德哥爾摩 I", location: "Stockholm",
+                    day: 11, date: "01/07 (Wed)", fullDate: "2026-01-07", title: "斯德哥爾摩 I", location: "Stockholm (CET UTC+1)",
                     theme: "皇城與沈船 (圖資整合)",
                     aurora: "無",
                     events: [
-                        { time: "09:00", type: "activity", title: "老城區 (Gamla Stan)", desc: "窄巷、雕塑與教堂。", details: "(1) Mårten Trotzigs gränd：90cm 寬窄巷。(2) 德國教堂。(3) 聖喬治屠龍雕塑。(4) 月光男孩小鐵人 (記得摸頭)。", tips: "依據圖資 Image 2 Point 1-4。", link: "https://www.google.com/maps/search/?api=1&query=Gamla+Stan" },
-                        { time: "10:45", type: "activity", title: "諾貝爾博物館", desc: "Stortorget 大廣場。", details: "參觀椅子下的簽名與輸送帶展品。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Nobel+Prize+Museum" },
-                        { time: "13:30", type: "activity", title: "瑞典皇宮", desc: "Kungliga Slottet。", details: "參觀皇家寓所 (Royal Apartments)、國庫 (Treasury) 與三王冠博物館。", tips: "午餐推薦 Stockholms Gästabud。", link: "https://www.google.com/maps/search/?api=1&query=Kungliga+Slottet" },
-                        { time: "15:30", type: "activity", title: "瓦薩沈船博物館", desc: "Vasa Museum (Djurgården)。", details: "從 Slussen 搭 82 號渡輪前往。98% 船體為原件，了解 PEG 保存技術。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Vasa+Museum" },
-                        { time: "18:00", type: "activity", title: "當代攝影", desc: "Fotografiska。", details: "既是博物館也是社交場所。晚餐可於館內頂樓享用。", tips: "開放至 23:00。", link: "https://www.google.com/maps/search/?api=1&query=Fotografiska" }
+                        { time: "09:00", type: "activity", title: "老城區：窄巷與教堂", desc: "Gamla Stan。", details: "(1) Mårten Trotzigs gränd：90cm 寬窄巷。(2) 德國教堂 (Tyska Kyrkan)。體驗中世紀空間感。", tips: "依據圖資 Image 2 Point 1 & 2。", link: "https://www.google.com/maps/search/?api=1&query=Gamla+Stan" },
+                        { time: "10:00", type: "activity", title: "老城區：屠龍與鐵人", desc: "雕塑巡禮。", details: "(3) 聖喬治屠龍雕塑。(4) 月光男孩小鐵人 (Järnpojke)，摸頭會帶來好運，可供奉硬幣或糖果。", tips: "依據圖資 Image 2 Point 3 & 4。", link: "https://www.google.com/maps/search/?api=1&query=Iron+Boy+Stockholm" },
+                        { time: "10:45", type: "activity", title: "諾貝爾博物館", desc: "Stortorget 大廣場。", details: "參觀椅子下的簽名與輸送帶展品 (Image 1 No.3)。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Nobel+Prize+Museum" },
+                        { time: "12:00", type: "food", title: "大教堂與午餐", desc: "Stockholms Gästabud。", details: "參觀 Storkyrkan (大教堂)，隨後在 Stockholms Gästabud 享用瑞典肉丸。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Stockholms+Gästabud" },
+                        { time: "13:30", type: "activity", title: "瑞典皇宮", desc: "Kungliga Slottet。", details: "參觀皇家寓所 (Royal Apartments)、國庫 (Treasury) 與三王冠博物館。", tips: "圖資對應：Image 2 Point 7。", link: "https://www.google.com/maps/search/?api=1&query=Kungliga+Slottet" },
+                        { time: "15:00", type: "transport", title: "海上巴士", desc: "從 Slussen 搭 82 號渡輪。", details: "前往 Djurgården 動物園島。從水上欣賞城市天際線。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Slussen+Ferry" },
+                        { time: "15:30", type: "activity", title: "瓦薩沈船博物館", desc: "Vasa Museum (Djurgården)。", details: "98% 船體為原件。觀察船尾雕刻，了解 PEG 保存技術。", tips: "Image 1 No.6。", link: "https://www.google.com/maps/search/?api=1&query=Vasa+Museum" },
+                        { time: "18:00", type: "activity", title: "當代攝影", desc: "Fotografiska。", details: "搭渡輪回 Slussen。晚餐可於館內頂樓享用（主打植物優先永續料理），享有無敵海景。", tips: "開放至 23:00。", link: "https://www.google.com/maps/search/?api=1&query=Fotografiska" }
                     ]
                 },
                 {
-                    day: 12, date: "01/08 (Thu)", fullDate: "2026-01-08", title: "斯德哥爾摩 II", location: "Stockholm",
+                    day: 12, date: "01/08 (Thu)", fullDate: "2026-01-08", title: "斯德哥爾摩 II", location: "Stockholm (CET UTC+1)",
                     theme: "榮耀之日：諾貝爾與歌劇",
                     aurora: "無",
                     events: [
-                        { time: "10:00", type: "activity", title: "市政廳導覽", desc: "Stockholm City Hall。", details: "參加導覽進入「藍廳」(諾貝爾晚宴處) 與「金廳」(1800萬塊金箔馬賽克)。", tips: "需參加導覽團才能入內。", link: "https://www.google.com/maps/search/?api=1&query=Stockholm+City+Hall" },
+                        { time: "10:00", type: "activity", title: "市政廳導覽", desc: "Stockholm City Hall (Stadshuset)。", details: "參加導覽進入「藍廳」(諾貝爾晚宴處) 與「金廳」(1800萬塊金箔馬賽克)。", tips: "需參加導覽團才能入內。", link: "https://www.google.com/maps/search/?api=1&query=Stockholm+City+Hall" },
                         { time: "12:30", type: "food", title: "午餐：Lisa Elmqvist", desc: "Östermalms Saluhall 市場。", details: "必點 Toast Skagen (鮮蝦吐司)，瑞典經典前菜。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Lisa+Elmqvist" },
                         { time: "14:30", type: "activity", title: "設計與購物", desc: "Svenskt Tenn 或 NK 百貨。", details: "欣賞瑞典經典錫器與印花設計。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Svenskt+Tenn" },
                         { time: "17:30", type: "food", title: "晚餐：Bakfickan", desc: "歌劇院後方小酒館。", details: "以瑞典肉丸 (Köttbullar) 聞名。不接受訂位，只有 28 個座位，建議 17:15 去排隊。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Bakfickan" },
@@ -412,15 +478,9 @@
             const element = document.getElementById(`day-${dayIndex}`);
             const mainContainer = document.getElementById('main-content');
             
-            // Calculate position to scroll with some offset for the sticky header
-            const headerOffset = 150; // Adjusted offset for new smaller header
-            const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + mainContainer.scrollTop - headerOffset;
-
-            mainContainer.scrollTo({
-                top: offsetPosition,
-                behavior: "smooth"
-            });
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         function renderNav() {
@@ -572,31 +632,32 @@
         }
 
         function renderItinerary() {
-            // Sticky Date Nav - Optimized for Mobile
+            // Updated Date Nav - Moved to Bottom
             const dateButtons = appData.dailyItinerary.map(day => `
                 <button onclick="scrollToDay(${day.day})" class="flex-none px-3 py-1 rounded-full text-xs font-medium bg-white border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-colors shadow-sm whitespace-nowrap snap-start">
                     D${day.day} <span class="font-normal text-slate-400 ml-1">${day.date.split(' ')[0]}</span>
                 </button>
             `).join('');
 
-            // Optimized sticky header: Reduced height, padding, and font size
-            const stickyHeader = `
-                <div class="sticky top-0 z-30 bg-slate-50/95 backdrop-blur py-2 -mx-4 px-4 sm:-mx-8 sm:px-8 border-b border-slate-200/50 shadow-md mb-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-lg font-bold text-slate-900">行程執行細節</h2>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-[10px] font-medium text-slate-500 ${appData.viewMode === 'simplified' ? 'text-indigo-600' : ''}">簡化</span>
-                            
-                            <button onclick="toggleViewMode()" class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${appData.viewMode === 'detailed' ? 'bg-indigo-600' : 'bg-slate-200'}" role="switch">
-                                <span class="sr-only">切換詳情模式</span>
-                                <span aria-hidden="true" class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${appData.viewMode === 'detailed' ? 'translate-x-4' : 'translate-x-0'}"></span>
-                            </button>
-                            
-                            <span class="text-[10px] font-medium text-slate-500 ${appData.viewMode === 'detailed' ? 'text-indigo-600' : ''}">詳細</span>
+            const stickyFooter = `
+                <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] pb-safe-area">
+                    <div class="max-w-7xl mx-auto px-4 py-2 sm:px-6 lg:px-8">
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-sm font-bold text-slate-900">日期導覽</h2>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-[10px] font-medium text-slate-500 ${appData.viewMode === 'simplified' ? 'text-indigo-600' : ''}">簡化</span>
+                                
+                                <button onclick="toggleViewMode()" class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${appData.viewMode === 'detailed' ? 'bg-indigo-600' : 'bg-slate-200'}" role="switch">
+                                    <span class="sr-only">切換詳情模式</span>
+                                    <span aria-hidden="true" class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${appData.viewMode === 'detailed' ? 'translate-x-4' : 'translate-x-0'}"></span>
+                                </button>
+                                
+                                <span class="text-[10px] font-medium text-slate-500 ${appData.viewMode === 'detailed' ? 'text-indigo-600' : ''}">詳細</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex space-x-2 overflow-x-auto pb-1 snap-x no-scrollbar">
-                        ${dateButtons}
+                        <div class="flex space-x-2 overflow-x-auto pb-2 snap-x no-scrollbar">
+                            ${dateButtons}
+                        </div>
                     </div>
                 </div>
             `;
@@ -662,7 +723,7 @@
                 }).join('');
 
                 return `
-                    <div id="day-${day.day}" class="mb-12 relative scroll-mt-48">
+                    <div id="day-${day.day}" class="mb-12 relative scroll-mt-24">
                         <div class="flex justify-between items-center mb-6">
                             <div>
                                 <h2 class="text-2xl font-bold text-slate-900 flex items-center">
@@ -688,7 +749,7 @@
                 `;
             }).join('');
 
-            return `<div class="max-w-4xl mx-auto relative">${stickyHeader}${itineraryHtml}</div>`;
+            return `<div class="max-w-4xl mx-auto pb-32 relative">${itineraryHtml}${stickyFooter}</div>`;
         }
 
         function renderLogistics() {
@@ -779,22 +840,42 @@
         let currentFoodFilter = 'all';
 
         function renderFoodMap() {
-            const filters = [
+            const types = [
                 { id: 'all', label: '全部' },
                 { id: '野味', label: '野味/肉類' },
                 { id: '海鮮', label: '極地海鮮' },
                 { id: '甜點', label: '咖啡甜點' },
                 { id: '特色', label: '特色體驗' }
             ];
+            
+            const locations = [
+                { id: 'Helsinki', label: '赫爾辛基' },
+                { id: 'Rovaniemi', label: '羅瓦涅米' },
+                { id: 'Kaamanen', label: '卡馬寧' },
+                { id: 'Kirkenes', label: '希爾克內斯' },
+                { id: 'Tromsø', label: '特羅姆瑟' },
+                { id: 'Stockholm', label: '斯德哥爾摩' }
+            ];
 
             const filteredList = currentFoodFilter === 'all' 
                 ? appData.restaurants 
-                : appData.restaurants.filter(r => r.tags.some(t => t.includes(currentFoodFilter)) || r.type === currentFoodFilter);
+                : appData.restaurants.filter(r => 
+                    r.tags.some(t => t.includes(currentFoodFilter)) || 
+                    r.type === currentFoodFilter ||
+                    r.location === currentFoodFilter
+                );
 
-            const filterButtons = filters.map(f => `
+            const typeButtons = types.map(f => `
                 <button onclick="setFoodFilter('${f.id}')" 
-                    class="px-4 py-2 rounded-full text-sm font-medium transition-colors ${currentFoodFilter === f.id ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">
+                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors border ${currentFoodFilter === f.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 hover:bg-slate-50 border-slate-200'}">
                     ${f.label}
+                </button>
+            `).join('');
+            
+            const locationButtons = locations.map(l => `
+                <button onclick="setFoodFilter('${l.id}')" 
+                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors border ${currentFoodFilter === l.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 hover:bg-slate-50 border-slate-200'}">
+                    <i class="fa-solid fa-location-dot mr-1 text-[10px]"></i>${l.label}
                 </button>
             `).join('');
 
@@ -822,8 +903,15 @@
             `).join('');
 
             return `
-                <div class="mb-6 flex flex-wrap gap-2 justify-center sm:justify-start">
-                    ${filterButtons}
+                <div class="mb-6 space-y-3">
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <span class="text-xs font-bold text-slate-400 uppercase w-12">分類:</span>
+                        ${typeButtons}
+                    </div>
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <span class="text-xs font-bold text-slate-400 uppercase w-12">地區:</span>
+                        ${locationButtons}
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     ${cards}
