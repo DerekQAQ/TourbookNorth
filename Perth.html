@@ -24,7 +24,7 @@
         .timeline-line {
             position: absolute;
             left: 1.5rem; /* 24px */
-            top: 2.5rem;
+            top: 0;
             bottom: 0;
             width: 2px;
             background-color: #e2e8f0; /* Slate 200 */
@@ -35,6 +35,13 @@
             color: #0ea5e9;
             font-weight: 600;
         }
+        .active-date-btn {
+            background-color: #0ea5e9 !important; /* Sky 500 */
+            color: white !important;
+            border-color: #0284c7 !important; /* Sky 600 */
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
         .note-box {
             background-color: #fffbeb; /* Amber 50 */
             border-left: 4px solid #f59e0b; /* Amber 500 */
@@ -42,6 +49,16 @@
         .route-box {
             background-color: #f0f9ff; /* Sky 50 */
             border-left: 4px solid #0ea5e9; /* Sky 500 */
+        }
+        /* Mobile Menu Fix */
+        #mobile-menu {
+            top: 64px; /* Height of nav */
+            max-height: calc(100vh - 64px);
+            overflow-y: auto;
+        }
+        /* Safe area for bottom nav */
+        .safe-area-pb {
+            padding-bottom: env(safe-area-inset-bottom, 20px);
         }
     </style>
 </head>
@@ -53,7 +70,7 @@
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('dashboard')">
                     <span class="text-2xl">🐨</span>
-                    <span class="font-bold text-xl tracking-tight text-slate-800 hidden sm:block">西澳自駕 2026</span>
+                    <span class="font-bold text-xl tracking-tight text-slate-800">西澳自駕 2026</span>
                 </div>
                 
                 <!-- Desktop Menu -->
@@ -66,23 +83,23 @@
 
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">
-                    <button onclick="toggleMobileMenu()" class="text-2xl p-2 focus:outline-none">
-                        🍔
+                    <button onclick="toggleMobileMenu()" class="text-2xl p-2 focus:outline-none text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg">
+                        ☰
                     </button>
                 </div>
             </div>
         </div>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 shadow-lg absolute w-full z-50">
-            <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-50 border-b border-slate-100">📊 儀表盤</button>
-            <button onclick="switchTab('daily'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-50 border-b border-slate-100">📅 每日行程細節</button>
-            <button onclick="switchTab('food'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-50 border-b border-slate-100">🦞 美食地圖</button>
-            <button onclick="switchTab('info'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-50">🧳 交通與準備</button>
+        <!-- Mobile Menu (Fixed Position) -->
+        <div id="mobile-menu" class="hidden md:hidden fixed left-0 w-full bg-white border-t border-slate-100 shadow-xl z-40 transition-all duration-300 ease-in-out">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="block w-full text-left px-6 py-4 text-base font-medium hover:bg-slate-50 border-b border-slate-100">📊 行程儀表盤</button>
+            <button onclick="switchTab('daily'); toggleMobileMenu()" class="block w-full text-left px-6 py-4 text-base font-medium hover:bg-slate-50 border-b border-slate-100">📅 每日行程細節</button>
+            <button onclick="switchTab('food'); toggleMobileMenu()" class="block w-full text-left px-6 py-4 text-base font-medium hover:bg-slate-50 border-b border-slate-100">🦞 美食地圖</button>
+            <button onclick="switchTab('info'); toggleMobileMenu()" class="block w-full text-left px-6 py-4 text-base font-medium hover:bg-slate-50">🧳 交通與準備</button>
         </div>
     </nav>
 
     <!-- Main Content Area -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-32">
 
         <!-- VIEW: DASHBOARD -->
         <div id="view-dashboard" class="space-y-6 fade-in">
@@ -119,32 +136,32 @@
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
                     <h3 class="text-lg font-bold mb-2">🌟 行程重點摘要</h3>
                     <div class="space-y-4">
-                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition">
+                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition cursor-pointer" onclick="scrollToDay(0)">
                             <div class="bg-amber-100 text-amber-600 p-2 rounded-lg text-xl">🏜️</div>
                             <div>
                                 <p class="font-bold text-slate-800">Day 1: 北部沙漠</p>
-                                <p class="text-xs text-slate-500">尖峰石陣、龍蝦工廠、沙丘滑沙</p>
+                                <p class="text-xs text-slate-500">尖峰石陣、龍蝦工廠</p>
                             </div>
                         </div>
-                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition">
+                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition cursor-pointer" onclick="scrollToDay(1)">
                             <div class="bg-pink-100 text-pink-600 p-2 rounded-lg text-xl">🌸</div>
                             <div>
                                 <p class="font-bold text-slate-800">Day 2: 粉紅夢境</p>
-                                <p class="text-xs text-slate-500">Hutt Lagoon 粉紅湖、世界之窗、海獅</p>
+                                <p class="text-xs text-slate-500">Hutt Lagoon 粉紅湖</p>
                             </div>
                         </div>
-                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition">
+                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition cursor-pointer" onclick="scrollToDay(5)">
                             <div class="bg-blue-100 text-blue-600 p-2 rounded-lg text-xl">🌊</div>
                             <div>
                                 <p class="font-bold text-slate-800">Day 6-7: 南部海洋</p>
-                                <p class="text-xs text-slate-500">抓龍蝦、Busselton 棧橋、寶石洞、魔鬼魚</p>
+                                <p class="text-xs text-slate-500">抓龍蝦、Busselton 棧橋</p>
                             </div>
                         </div>
-                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition">
+                        <div class="flex items-start gap-3 p-2 hover:bg-slate-50 rounded-lg transition cursor-pointer" onclick="scrollToDay(7)">
                             <div class="bg-orange-100 text-orange-600 p-2 rounded-lg text-xl">🚁</div>
                             <div>
                                 <p class="font-bold text-slate-800">Day 8: 海陸空</p>
-                                <p class="text-xs text-slate-500">直升機體驗、無尾熊、最美夕陽</p>
+                                <p class="text-xs text-slate-500">直升機、無尾熊</p>
                             </div>
                         </div>
                     </div>
@@ -153,19 +170,12 @@
             </div>
         </div>
 
-        <!-- VIEW: DAILY ITINERARY -->
-        <div id="view-daily" class="hidden space-y-6">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100 sticky top-16 sm:top-20 z-40 transition-all duration-200">
-                <div>
-                    <div class="flex items-baseline gap-2">
-                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900" id="daily-title">Day 1</h2>
-                        <span class="text-sm font-medium text-slate-500" id="daily-date">2/12</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-sm text-slate-600 mt-1">
-                        <span id="daily-stay">🏠 住宿: ...</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+        <!-- VIEW: DAILY ITINERARY (SINGLE PAGE) -->
+        <div id="view-daily" class="hidden space-y-12">
+            
+            <div class="sticky top-16 z-30 bg-white/95 backdrop-blur-sm py-3 px-4 border-b border-slate-200 shadow-sm flex justify-between items-center">
+                <span class="text-sm font-bold text-slate-500">全行程檢視</span>
+                <div class="flex items-center gap-3 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
                     <span class="text-xs font-semibold text-slate-600">詳細模式</span>
                     <button id="mode-toggle" class="relative inline-flex h-5 w-9 items-center rounded-full bg-sky-500 transition-colors focus:outline-none" onclick="toggleDetailMode()">
                         <span class="sr-only">Toggle detail mode</span>
@@ -174,14 +184,14 @@
                 </div>
             </div>
 
-            <!-- Timeline Container -->
-            <div id="timeline-container" class="relative pb-20 px-2 sm:px-0">
+            <!-- All Days Container -->
+            <div id="all-days-container" class="space-y-16 px-2 sm:px-0">
                 <!-- Injected via JS -->
             </div>
             
             <!-- Bottom Date Navigator -->
-            <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-slate-200 p-3 z-50 overflow-x-auto hide-scrollbar safe-area-pb">
-                <div class="flex justify-start md:justify-center gap-2 min-w-max px-2" id="date-nav">
+            <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-slate-200 p-3 z-50 overflow-x-auto hide-scrollbar safe-area-pb shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <div class="flex justify-start md:justify-center gap-3 min-w-max px-2" id="date-nav">
                     <!-- Buttons Injected via JS -->
                 </div>
             </div>
@@ -702,13 +712,12 @@
             "裝備: 防蠅網 (重要!)、墨鏡、頸枕"
         ];
 
-        let currentDay = 0;
         let detailMode = true;
 
         // --- INIT ---
         window.onload = function() {
             renderDashboard();
-            renderDaily(currentDay);
+            renderAllDaily(); // Changed to render all days
             renderDateNav();
             renderFood('all');
             renderInfo();
@@ -735,13 +744,14 @@
         }
 
         function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
         }
 
         function renderDashboard() {
             const weatherContainer = document.getElementById('weather-widget');
-            weatherContainer.innerHTML = itinerary.map(day => `
-                <div class="min-w-[85px] bg-white p-2 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm snap-center hover:border-sky-300 transition cursor-pointer" onclick="switchTab('daily'); renderDaily(${day.day-1})">
+            weatherContainer.innerHTML = itinerary.map((day, idx) => `
+                <div class="min-w-[85px] bg-white p-2 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm snap-center hover:border-sky-300 transition cursor-pointer" onclick="scrollToDay(${idx})">
                     <span class="text-xs font-bold text-slate-400">Day ${day.day}</span>
                     <span class="text-2xl my-1">${day.weather.icon}</span>
                     <span class="text-xs font-bold text-slate-700">${day.weather.temp}</span>
@@ -750,79 +760,115 @@
             `).join('');
         }
 
-        function renderDaily(dayIndex) {
-            currentDay = dayIndex;
-            const data = itinerary[dayIndex];
-            
-            // Update Header
-            document.getElementById('daily-title').innerText = `Day ${data.day}: ${data.title}`;
-            document.getElementById('daily-date').innerText = data.date;
-            document.getElementById('daily-stay').innerText = `🏠 住宿: ${data.stay}`;
+        function renderAllDaily() {
+            const container = document.getElementById('all-days-container');
+            container.innerHTML = ''; // Clear existing
 
-            // Render Timeline
-            const container = document.getElementById('timeline-container');
-            container.innerHTML = `<div class="timeline-line"></div>`; // Reset line
-
-            data.events.forEach((event, idx) => {
-                const isLast = idx === data.events.length - 1;
-                
-                let detailBlock = '';
-                if (detailMode) {
-                    // Split content by newline for better formatting
-                    const routeLines = event.route ? event.route.split('\n').map(line => `<p class="mb-1">${line}</p>`).join('') : '';
-                    const noteLines = event.note ? event.note.split('\n').map(line => `<p class="mb-1">${line}</p>`).join('') : '';
-
-                    detailBlock = `
-                        <div class="mt-3 space-y-3 animate-fade-in">
-                            ${routeLines ? `
-                            <div class="route-box p-3 rounded-r-lg text-sm text-slate-700">
-                                <h4 class="text-xs font-bold text-sky-600 mb-1 uppercase tracking-wider">詳細路線與活動</h4>
-                                ${routeLines}
-                                ${event.link ? `<div class="mt-2"><a href="${event.link}" target="_blank" class="inline-flex items-center text-sky-600 hover:text-sky-800 font-medium text-xs bg-white px-2 py-1 rounded border border-sky-100 shadow-sm transition">📍 Google Maps 導航</a></div>` : ''}
-                            </div>` : ''}
-                            
-                            ${noteLines ? `
-                            <div class="note-box p-3 rounded-r-lg text-sm text-slate-700">
-                                <h4 class="text-xs font-bold text-amber-600 mb-1 uppercase tracking-wider">注意事項 / 餐廳建議</h4>
-                                ${noteLines}
-                            </div>` : ''}
+            itinerary.forEach((data, dayIndex) => {
+                let dayHTML = `
+                <div id="day-${dayIndex}" class="scroll-mt-36">
+                    <!-- Day Header -->
+                    <div class="flex flex-col sm:flex-row gap-2 sm:items-center justify-between mb-6 border-l-4 border-sky-500 pl-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900">Day ${data.day}: ${data.title}</h2>
+                            <p class="text-sm font-medium text-slate-500">${data.date} • ${data.weather.icon} ${data.weather.text}</p>
                         </div>
-                    `;
-                }
-
-                container.innerHTML += `
-                    <div class="relative pl-14 sm:pl-16 py-4">
-                        <!-- Dot -->
-                        <div class="absolute left-5 sm:left-5 top-5 w-4 h-4 rounded-full border-2 border-white shadow-md z-10 ${idx === 0 ? 'bg-sky-500 ring-4 ring-sky-100' : (isLast ? 'bg-indigo-500' : 'bg-slate-300')}"></div>
-                        
-                        <!-- Content Card -->
-                        <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                            <div class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3">
-                                <span class="absolute left-2 top-5 font-mono text-xs font-bold text-slate-400 w-12 text-right">${event.time}</span>
-                                <div class="flex-1 w-full">
-                                    <div class="flex justify-between items-start">
-                                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                            <span>${event.icon}</span>
-                                            ${event.item}
-                                        </h3>
-                                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full whitespace-nowrap ml-2">${event.loc}</span>
-                                    </div>
-                                    ${detailBlock}
-                                </div>
-                            </div>
+                        <div class="text-xs bg-slate-100 px-3 py-1.5 rounded-lg text-slate-600 self-start sm:self-center">
+                            🏠 ${data.stay}
                         </div>
                     </div>
+
+                    <!-- Timeline -->
+                    <div class="relative pl-4 sm:pl-8 py-2">
+                        <div class="timeline-line left-4 sm:left-8"></div>
                 `;
+
+                data.events.forEach((event, idx) => {
+                    const isLast = idx === data.events.length - 1;
+                    
+                    let detailBlock = '';
+                    if (detailMode) {
+                        const routeLines = event.route ? event.route.split('\n').map(line => `<p class="mb-1">${line}</p>`).join('') : '';
+                        const noteLines = event.note ? event.note.split('\n').map(line => `<p class="mb-1">${line}</p>`).join('') : '';
+
+                        detailBlock = `
+                            <div class="mt-3 space-y-3 animate-fade-in border-t border-slate-50 pt-3">
+                                ${routeLines ? `
+                                <div class="text-sm text-slate-600 pl-1">
+                                    <span class="text-xs font-bold text-sky-600 uppercase tracking-wider block mb-1">詳細路線</span>
+                                    ${routeLines}
+                                    ${event.link ? `<div class="mt-2"><a href="${event.link}" target="_blank" class="inline-flex items-center text-sky-600 hover:text-sky-800 font-medium text-xs bg-sky-50 px-2 py-1 rounded border border-sky-100 shadow-sm transition">📍 Google Maps</a></div>` : ''}
+                                </div>` : ''}
+                                
+                                ${noteLines ? `
+                                <div class="text-sm text-slate-600 pl-1 mt-2 bg-amber-50 p-3 rounded-lg border-l-2 border-amber-400">
+                                    <span class="text-xs font-bold text-amber-600 uppercase tracking-wider block mb-1">Tips & Food</span>
+                                    ${noteLines}
+                                </div>` : ''}
+                            </div>
+                        `;
+                    }
+
+                    // Mobile Layout: Dot -> [Card containing Time + Title + Details]
+                    // We remove absolute positioning for Time to prevent overlap
+                    dayHTML += `
+                        <div class="relative pl-8 sm:pl-10 py-4">
+                            <!-- Dot -->
+                            <div class="absolute left-1.5 sm:left-[1.35rem] top-6 w-4 h-4 rounded-full border-2 border-white shadow-md z-10 bg-sky-500 ring-2 ring-sky-50"></div>
+                            
+                            <!-- Content Card -->
+                            <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 mb-1">
+                                    <!-- Time is now relative, inside the card -->
+                                    <span class="font-mono text-xs font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded w-fit sm:w-auto">${event.time}</span>
+                                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 flex-wrap">
+                                        <span>${event.icon}</span>
+                                        ${event.item}
+                                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full whitespace-nowrap">${event.loc}</span>
+                                    </h3>
+                                </div>
+                                ${detailBlock}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                dayHTML += `</div></div>`; // Close timeline & wrapper
+                container.innerHTML += dayHTML;
             });
+        }
+
+        function scrollToDay(index) {
+            // First switch to daily view if not active
+            switchTab('daily');
             
-            // Highlight active date nav
-            renderDateNav();
+            // Scroll logic
+            const element = document.getElementById(`day-${index}`);
+            if (element) {
+                // Adjust for sticky header height
+                const yOffset = -140; 
+                const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({top: y, behavior: 'smooth'});
+            }
+            
+            // Update active state in nav
+            document.querySelectorAll('#date-nav button').forEach((btn, idx) => {
+                if (idx === index) {
+                    btn.classList.add('active-date-btn');
+                    btn.classList.remove('bg-white', 'text-slate-400');
+                    // Scroll nav button into view
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else {
+                    btn.classList.remove('active-date-btn');
+                    btn.classList.add('bg-white', 'text-slate-400');
+                }
+            });
         }
 
         function renderDateNav() {
             const container = document.getElementById('date-nav');
             container.innerHTML = itinerary.map((day, idx) => `
-                <button onclick="renderDaily(${idx})" class="flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all border ${currentDay === idx ? 'bg-sky-500 border-sky-600 text-white shadow-md scale-105' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'}">
+                <button onclick="scrollToDay(${idx})" class="flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 flex-shrink-0">
                     <span class="text-xs font-bold">D${day.day}</span>
                     <span class="text-[10px]">${day.date.split(' ')[0]}</span>
                 </button>
@@ -845,7 +891,8 @@
                 btn.classList.remove('bg-sky-500');
                 btn.classList.add('bg-slate-300');
             }
-            renderDaily(currentDay);
+            // Re-render whole list
+            renderAllDaily();
         }
 
         function renderFood(filterType) {
