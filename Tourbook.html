@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025-2026 北歐極地跨國遠征戰略指揮中心</title>
+    <title>2025-2026 北歐極地跨國遠征戰略 粗花!</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,7 +20,7 @@
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f3f4f6; /* Slate 100 */
+            background-color: #f8fafc; /* Slate 50 */
         }
         
         /* Custom Scrollbar */
@@ -57,44 +57,63 @@
             scrollbar-width: none;  /* Firefox */
         }
         
-        /* Smooth scrolling adjustment for sticky headers */
+        /* Smooth scrolling adjustment */
         html {
-            scroll-padding-top: 20px; 
+            scroll-behavior: smooth;
+        }
+        
+        /* Active state for map buttons */
+        .map-btn-active {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
         }
     </style>
 </head>
 <body class="text-slate-800 antialiased flex flex-col h-screen overflow-hidden">
 
     <!-- Top Navigation -->
-    <header class="bg-white shadow-sm z-50 flex-none relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
+    <header class="bg-white shadow-sm z-50 flex-none relative h-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+            <div class="flex justify-between items-center h-full">
+                <!-- Logo Area -->
                 <div class="flex items-center">
                     <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="switchTab('dashboard')">
                         <i class="fa-solid fa-compass text-2xl text-slate-800"></i>
                         <span class="font-bold text-xl tracking-tight hidden sm:block">北歐極地遠征 <span class="text-slate-500 font-normal text-sm ml-1">2025-26</span></span>
                         <span class="font-bold text-xl tracking-tight sm:hidden">Nordic 2026</span>
                     </div>
-                    <div class="hidden sm:ml-10 sm:flex sm:space-x-8" id="desktop-nav">
+                    <!-- Desktop Menu -->
+                    <div class="hidden md:ml-10 md:flex md:space-x-8" id="desktop-nav">
                         <!-- Nav items injected by JS -->
                     </div>
                 </div>
+
+                <!-- Right Side: Status & Mobile Toggle -->
                 <div class="flex items-center">
-                   <div class="text-sm text-right hidden md:block">
+                   <div class="text-sm text-right hidden md:block mr-4">
                        <div class="font-medium text-slate-900">極地戰略指揮部</div>
                        <div class="text-slate-500 text-xs">狀態: 準備執行</div>
                    </div>
+                   <!-- Mobile Menu Button -->
+                   <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fa-solid fa-bars text-xl"></i>
+                   </button>
                 </div>
             </div>
         </div>
-        <!-- Mobile Nav Menu -->
-        <div class="sm:hidden flex justify-around border-t border-gray-200 py-2 bg-slate-50 overflow-x-auto" id="mobile-nav">
-             <!-- Mobile Nav items injected by JS -->
+
+        <!-- Mobile Menu Dropdown (Absolute Positioning Fix) -->
+        <div id="mobile-menu" class="hidden absolute top-16 left-0 w-full bg-white shadow-lg border-t border-slate-100 z-50 fade-in md:hidden">
+             <div class="px-2 pt-2 pb-3 space-y-1" id="mobile-nav-items">
+                 <!-- Mobile Nav items injected by JS -->
+             </div>
         </div>
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto bg-slate-50 scroll-smooth pb-24" id="main-content">
+    <main class="flex-1 overflow-y-auto bg-slate-50 scroll-smooth pb-24 relative" id="main-content">
         <!-- Dynamic Content Injected Here -->
     </main>
 
@@ -103,7 +122,8 @@
         // --- DATA STORE ---
         const appData = {
             currentTab: 'dashboard',
-            viewMode: 'detailed', // 'simplified' or 'detailed'
+            viewMode: 'detailed', 
+            mobileMenuOpen: false,
             tripStats: {
                 totalDays: 13,
                 countries: ['芬蘭', '瑞典', '挪威'],
@@ -125,68 +145,34 @@
                 { day: 12, loc: "Stockholm", temp: "-4°C", cond: "Clear", icon: "fa-sun", sun: "08:44 - 15:02" },
                 { day: 13, loc: "Airport", temp: "-5°C", cond: "Cloudy", icon: "fa-plane", sun: "N/A" },
             ],
+            // Map Locations for "Jump" functionality
+            mapLocations: [
+                { id: 1, name: "Day 1: Helsinki", q: "Helsinki,Finland" },
+                { id: 2, name: "Day 2: Rovaniemi", q: "Rovaniemi,Finland" },
+                { id: 3, name: "Day 3: Kemi/Tornio", q: "Tornio,Finland" },
+                { id: 4, name: "Day 4: Inari", q: "Inari,Finland" },
+                { id: 5, name: "Day 5: Kirkenes", q: "Kirkenes,Norway" },
+                { id: 6, name: "Day 6: Tromsø", q: "Tromso,Norway" },
+                { id: 7, name: "Day 7: Lyngen", q: "Lyngen,Norway" },
+                { id: 8, name: "Day 8: Bergen", q: "Bergen,Norway" },
+                { id: 9, name: "Day 9: Hardanger", q: "Hardangerfjord,Norway" },
+                { id: 10, name: "Day 10: Voss", q: "Voss,Norway" },
+                { id: 11, name: "Day 11: Stockholm (Old Town)", q: "Gamla Stan,Stockholm" },
+                { id: 12, name: "Day 12: Stockholm (City)", q: "Stockholm City Hall" },
+            ],
             dailyItinerary: [
                 {
                     day: 1, date: "12/28 (Sun)", fullDate: "2025-12-28", title: "赫爾辛基前哨戰", location: "Helsinki (EET UTC+2)",
                     theme: "功能主義與波羅的海序曲",
                     aurora: "極低 (城市光害)",
                     events: [
-                        { 
-                            time: "13:10", type: "transport", title: "戰術抵達 HEL", 
-                            desc: "航班 KL1251 降落 T2。領取行李後，立即在機場內穿上預備好的重裝冬衣（羽絨、毛帽）。",
-                            details: "依循黃色火車圖示前往地下車站。使用 HSL App 購買「ABC區單程票」(€4.10, 90分鐘效期)。HSL App 需事先下載綁定信用卡。",
-                            tips: "風險：室內外溫差極大，避免出汗後受寒。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Helsinki+Airport" 
-                        },
-                        {
-                            time: "14:00", type: "transport", title: "軌道轉移",
-                            desc: "搭乘 P線 或 I線 列車（環狀線）。",
-                            details: "行車約 30 分鐘。觀察窗外由針葉林轉變為花崗岩建築的地貌。車廂內有暖氣，建議解開外套拉鍊。",
-                            tips: "",
-                            link: ""
-                        },
-                        { 
-                            time: "14:40", type: "stay", title: "基地建立：Sokos Vaakuna", 
-                            desc: "抵達中央車站。直接由地下通道或站前廣場步行至 Original Sokos Hotel Vaakuna。",
-                            details: "建築亮點：1952年奧運會功能主義傑作。請務必依據備註要求 'High Floor, Station View'，俯瞰埃列爾·薩里寧設計的車站與「持燈者」雕像。",
-                            tips: "文件：備妥護照與入住憑證。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Original+Sokos+Hotel+Vaakuna+Helsinki" 
-                        },
-                        { 
-                            time: "15:30", type: "activity", title: "藍色時刻散策 (Blue Hour)", 
-                            desc: "路線：飯店 → Aleksanterinkatu → 參議院廣場 → 白教堂。",
-                            details: "此時日落已過，城市進入漫長的藍色暮光。白教堂的高台階梯是拍攝市景的最佳點，但在冬季極滑，請務必扶手或走側坡。",
-                            tips: "風險：廣場地面石板易結冰，走路請像企鵝一樣重心向前。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Senate+Square+Helsinki" 
-                        },
-                        {
-                            time: "16:30", type: "activity", title: "東正教與港口",
-                            desc: "烏斯佩斯基大教堂 (外觀) 與市集廣場 (Market Square)。",
-                            details: "感受波羅的海的凜冽海風，眺望遠處的破冰船隊。港口區風大，體感溫度極低。",
-                            tips: "務必戴好毛帽、圍巾。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Uspenski+Cathedral"
-                        },
-                        {
-                            time: "17:30", type: "activity", title: "光之大道漫遊",
-                            desc: "沿著 Esplanadi 公園往回走。",
-                            details: "兩側的椴樹被光網覆蓋，這是北歐對抗冬季憂鬱 (SAD) 的城市設計。瀏覽沿途的 Iittala 與 Artek 設計商店櫥窗 (多數 18:00 關門)。",
-                            tips: "",
-                            link: "https://www.google.com/maps/search/?api=1&query=Esplanadi"
-                        },
-                        { 
-                            time: "19:00", type: "food", title: "晚餐：Ravintola Zetor", 
-                            desc: "拖拉機主題餐廳，體驗芬蘭式幽默。",
-                            details: "推薦菜色：Sautéed Reindeer (炒馴鹿肉)，搭配馬鈴薯泥與越橘醬 (Lingonberry)。",
-                            tips: "強烈建議預訂。地址：Mannerheimintie 3。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Ravintola+Zetor" 
-                        },
-                        {
-                            time: "20:30", type: "food", title: "戰術補給：K-Supermarket",
-                            desc: "前往 Postitalo 分店採購水與補給。",
-                            details: "採購清單：5公升大桶水（極地乾燥需大量補水）、Fazer 巧克力條（緊急熱量）、明日機上輕食。",
-                            tips: "芬蘭自來水可生飲，但車內備水較方便。",
-                            link: "https://www.google.com/maps/search/?api=1&query=K-Supermarket+Postitalo"
-                        }
+                        { time: "13:10", type: "transport", title: "戰術抵達 HEL", desc: "航班 KL1251 降落 T2。領取行李後，立即在機場內穿上預備好的重裝冬衣。", details: "依循黃色火車圖示前往地下車站。使用 HSL App 購買「ABC區單程票」(€4.10, 90分鐘效期)。HSL App 需事先下載綁定信用卡。", tips: "風險：室內外溫差極大，避免出汗後受寒。", link: "https://www.google.com/maps/search/?api=1&query=Helsinki+Airport" },
+                        { time: "14:00", type: "transport", title: "軌道轉移", desc: "搭乘 P線 或 I線 列車（環狀線）。", details: "行車約 30 分鐘。觀察窗外由針葉林轉變為花崗岩建築的地貌。車廂內有暖氣，建議解開外套拉鍊。", tips: "", link: "" },
+                        { time: "14:40", type: "stay", title: "基地建立：Sokos Vaakuna", desc: "中央車站旁，奧運功能主義經典建築。", details: "請務必依據備註要求 'High Floor, Station View'，俯瞰埃列爾·薩里寧設計的車站與「持燈者」雕像。", tips: "文件：備妥護照與入住憑證。", link: "https://www.google.com/maps/search/?api=1&query=Original+Sokos+Hotel+Vaakuna+Helsinki" },
+                        { time: "15:30", type: "activity", title: "藍色時刻散策 (Blue Hour)", desc: "參議院廣場、白教堂、烏斯佩斯基大教堂。", details: "此時日落已過，城市進入漫長的藍色暮光。白教堂的高台階梯冬季極滑，請務必扶手或走側坡。", tips: "風險：廣場地面石板易結冰，走路請像企鵝一樣重心向前。", link: "https://www.google.com/maps/search/?api=1&query=Senate+Square+Helsinki" },
+                        { time: "17:30", type: "activity", title: "光之大道漫遊", desc: "沿著 Esplanadi 公園往回走。", details: "兩側的椴樹被光網覆蓋，這是北歐對抗冬季憂鬱 (SAD) 的城市設計。瀏覽 Iittala 與 Artek 設計商店櫥窗。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Esplanadi" },
+                        { time: "19:00", type: "food", title: "晚餐：Ravintola Zetor", desc: "拖拉機主題餐廳，體驗芬蘭式幽默。", details: "推薦菜色：Sautéed Reindeer (炒馴鹿肉)，搭配馬鈴薯泥與越橘醬 (Lingonberry)。", tips: "強烈建議預訂。地址：Mannerheimintie 3。", link: "https://www.google.com/maps/search/?api=1&query=Ravintola+Zetor" },
+                        { time: "20:30", type: "food", title: "戰術補給：K-Supermarket", desc: "前往 Postitalo 分店採購水與補給。", details: "採購清單：5公升大桶水（極地乾燥需大量補水）、Fazer 巧克力條（緊急熱量）、明日機上輕食。", tips: "芬蘭自來水可生飲，但車內備水較方便。", link: "https://www.google.com/maps/search/?api=1&query=K-Supermarket+Postitalo" }
                     ]
                 },
                 {
@@ -194,62 +180,13 @@
                     theme: "拉普蘭前哨戰 & 極光伏擊",
                     aurora: "中 (Norvajärvi 湖邊)",
                     events: [
-                        {
-                            time: "09:30", type: "transport", title: "撤收與轉移",
-                            desc: "早餐後退房，搭乘火車 (P/I線) 返回 HEL 機場。",
-                            details: "上班尖峰時間人潮較多，預留緩衝。",
-                            tips: "",
-                            link: ""
-                        },
-                        { 
-                            time: "11:55", type: "transport", title: "空中北伐：HEL -> RVN", 
-                            desc: "Finnair AY0533 飛往羅瓦涅米。建議右側靠窗。",
-                            details: "隨著緯度升高，地貌將從破碎湖區轉變為被白雪覆蓋的廣袤針葉林 (Taiga)。",
-                            tips: "機上無免費餐食，建議自備。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Rovaniemi+Airport" 
-                        },
-                        { 
-                            time: "13:20", type: "transport", title: "資產接收：Green Motion", 
-                            desc: "領取 VW Golf (或同級) ICE 車輛。",
-                            details: "驗車 SOP (關鍵)：1. 確認引擎加熱線 (Heating Cable) 與雪鏟/刮冰器齊全。 2. 確認輪胎為釘胎 (Studded Tyres)。",
-                            tips: "再次確認 Avis 訂單已取消以免 No-Show 罰款。",
-                            link: "" 
-                        },
-                        { 
-                            time: "14:30", type: "activity", title: "聖誕老人村 & 午餐", 
-                            desc: "跨越北緯 66°33′07″ 線，午餐吃烤鮭魚。",
-                            details: "直奔 Santa's Salmon Place (Kotahovi) 午餐，只賣現烤鮭魚 (€25)。隨後參觀聖誕老人辦公室。",
-                            tips: "下午時段人潮較少，天色漸暗燈飾亮起更有氣氛。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Santa+Claus+Village" 
-                        },
-                        { 
-                            time: "16:00", type: "stay", title: "基地部署：Modern Log Apt", 
-                            desc: "Rauhankatu 37 B。設定停車位加熱柱。",
-                            details: "聯絡房東取得密碼。學習使用停車位加熱柱 (Tolppa)，設定定時器在明早出發前 2 小時加熱引擎。",
-                            tips: "若氣溫低於 -15°C，引擎加熱是發動關鍵。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Rauhankatu+37+B+Rovaniemi" 
-                        },
-                        {
-                            time: "16:30", type: "food", title: "重裝補給：K-Citymarket",
-                            desc: "進入荒野前最後的大型補給點。",
-                            details: "採購：解凍噴霧 (De-icer)、抗凍雨刷水 (-20°C)、暖暖包、未來兩天的早餐食材。",
-                            tips: "",
-                            link: "https://www.google.com/maps/search/?api=1&query=K-Citymarket+Rovaniemi"
-                        },
-                        { 
-                            time: "19:00", type: "food", title: "晚餐：Restaurant Nili", 
-                            desc: "極致野味體驗，內部裝飾如獵人小屋。",
-                            details: "推薦：熊肉 (Bear Meat)。口感似牛肉但更粗纖維且帶甜味。",
-                            tips: "必須提前預訂。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Restaurant+Nili" 
-                        },
-                        { 
-                            time: "21:00", type: "aurora", title: "極光伏擊：Norvajärvi", 
-                            desc: "前往 Norvajärvi Public Beach (約20分車程)。",
-                            details: "戰略優勢：避開 Ounasvaara 滑雪場光害。面向正北方，前方是廣闊冰封湖面。",
-                            tips: "保持引擎怠速運轉維持暖氣，注意排氣管勿被雪堵塞。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Norvajärvi+Public+Beach" 
-                        }
+                        { time: "11:55", type: "transport", title: "空中北伐", desc: "Finnair AY0533 飛往羅瓦涅米 (RVN)。", details: "隨著緯度升高，地貌將從破碎湖區轉變為被白雪覆蓋的廣袤針葉林 (Taiga)。建議右側靠窗。", tips: "機上無免費餐食，建議自備。", link: "https://www.google.com/maps/search/?api=1&query=Rovaniemi+Airport" },
+                        { time: "13:20", type: "transport", title: "資產接收", desc: "Green Motion 領取 VW Golf ICE。", details: "驗車 SOP (關鍵)：1. 確認引擎加熱線 (Heating Cable) 與雪鏟/刮冰器齊全。 2. 確認輪胎為釘胎 (Studded Tyres)。", tips: "再次確認 Avis 訂單已取消以免 No-Show 罰款。", link: "https://www.google.com/maps/search/?api=1&query=Rovaniemi+Airport" },
+                        { time: "14:30", type: "activity", title: "聖誕老人村 & 午餐", desc: "跨越北緯 66°33′07″ 線，午餐吃烤鮭魚。", details: "直奔 Santa's Salmon Place (Kotahovi) 午餐，只賣現烤鮭魚 (€25)。隨後參觀聖誕老人辦公室。", tips: "下午時段人潮較少，天色漸暗燈飾亮起更有氣氛。", link: "https://www.google.com/maps/search/?api=1&query=Santa+Claus+Village" },
+                        { time: "16:00", type: "stay", title: "基地部署：Modern Log Apt", desc: "Rauhankatu 37 B。設定停車位加熱柱。", details: "學習使用停車位加熱柱 (Tolppa)，設定定時器在明早出發前 2 小時加熱引擎。", tips: "若氣溫低於 -15°C，引擎加熱是發動關鍵。", link: "https://www.google.com/maps/search/?api=1&query=Rauhankatu+37+B+Rovaniemi" },
+                        { time: "16:30", type: "food", title: "重裝補給：K-Citymarket", desc: "進入荒野前最後的大型補給點。", details: "採購：解凍噴霧 (De-icer)、抗凍雨刷水 (-20°C)、暖暖包、未來兩天的早餐食材。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=K-Citymarket+Rovaniemi" },
+                        { time: "19:00", type: "food", title: "晚餐：Restaurant Nili", desc: "極致野味體驗，內部裝飾如獵人小屋。", details: "推薦：熊肉 (Bear Meat)。口感似牛肉但更粗纖維且帶甜味。", tips: "必須提前預訂。", link: "https://www.google.com/maps/search/?api=1&query=Restaurant+Nili" },
+                        { time: "21:00", type: "aurora", title: "極光伏擊", desc: "Norvajärvi Public Beach。", details: "戰略優勢：避開 Ounasvaara 滑雪場光害。面向正北方，前方是廣闊冰封湖面。", tips: "保持引擎怠速運轉維持暖氣，注意排氣管勿被雪堵塞。", link: "https://www.google.com/maps/search/?api=1&query=Norvajärvi+Public+Beach" }
                     ]
                 },
                 {
@@ -257,48 +194,12 @@
                     theme: "破冰船跨國突襲",
                     aurora: "中 (Ounasvaara 山頂)",
                     events: [
-                        { 
-                            time: "09:00 (FI)", type: "transport", title: "邊境推進：E75 公路", 
-                            desc: "南下前往瑞典邊境。注意「雪霧」。",
-                            details: "風險：與大型聯結車交會時，輪胎捲起的粉狀乾雪會形成白色霧牆，導致瞬間能見度為零。對策：握緊方向盤，保持直線。",
-                            tips: "10:00 在 Neste Tervola 休息 (檢查車輛)。",
-                            link: "https://www.google.com/maps/search/?api=1&query=E75+road+Finland" 
-                        },
-                        { 
-                            time: "10:30 (FI)", type: "activity", title: "雙子城與時差紅利", 
-                            desc: "抵達 Tornio (芬) / Haparanda (瑞)。",
-                            details: "跨過托爾尼奧河進入瑞典，手機時間會自動倒退 1 小時 (變回 09:30)。可參觀 Kemi Church 或 Haparanda Candy World (瑞典糖果文化)。",
-                            tips: "注意時差：芬蘭 10:30 = 瑞典 09:30。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Haparanda" 
-                        },
-                        { 
-                            time: "11:50 (SE)", type: "transport", title: "港口集結", 
-                            desc: "抵達 Axelsvik Marine (Båtskärsnäs)。", 
-                            details: "工業港口，充滿起重機。務必在 12:30 (瑞典時間) 前完成報到。導航輸入準確座標，避免迷路。", 
-                            tips: "", 
-                            link: "https://www.google.com/maps/search/?api=1&query=Axelsvik+Marine" 
-                        },
-                        { 
-                            time: "13:00 (SE)", type: "activity", title: "破冰行動：Polar Explorer", 
-                            desc: "出航。龍蝦裝漂浮體驗。",
-                            details: "參觀引擎室，感受船身壓碎冰層。穿著橘色生存衣跳入冰海。注意：漂浮衣不透氣，建議內層只穿輕薄羊毛衣，勿穿羽絨外套。",
-                            tips: "船上有熱湯與麵包午餐。",
-                            link: "https://www.google.com/maps/search/?api=1&query=Polar+Explorer+Icebreaker" 
-                        },
-                        { 
-                            time: "17:30 (FI)", type: "transport", title: "夜間返航", 
-                            desc: "返回羅瓦涅米。天色全黑，警戒馴鹿。",
-                            details: "需特別留意路邊反光標示（可能代表有馴鹿）。善用遠光燈，遇對向來車務必切換近光燈。",
-                            tips: "",
-                            link: "" 
-                        },
-                        {
-                            time: "19:30 (FI)", type: "stay", title: "休整",
-                            desc: "回到羅瓦涅米。",
-                            details: "建議在民宿簡單自煮或購買熟食 (Kauppayhtiö 漢堡)，早點休息以應對明日的長途移動。",
-                            tips: "",
-                            link: ""
-                        }
+                        { time: "09:00", type: "transport", title: "邊境推進", desc: "E75 南下前往瑞典邊境。注意「雪霧」。", details: "風險：與大型聯結車交會時，輪胎捲起的粉狀乾雪會形成白色霧牆，導致瞬間能見度為零。對策：握緊方向盤，保持直線。", tips: "10:00 在 Neste Tervola 休息 (檢查車輛)。", link: "https://www.google.com/maps/search/?api=1&query=E75+road+Finland" },
+                        { time: "10:30 (FI)", type: "activity", title: "雙子城與時差紅利", desc: "抵達 Tornio (芬) / Haparanda (瑞)。", details: "跨過托爾尼奧河進入瑞典，手機時間會自動倒退 1 小時 (變回 09:30)。可參觀 Kemi Church 或 Haparanda Candy World。", tips: "注意時差：芬蘭 10:30 = 瑞典 09:30。", link: "https://www.google.com/maps/search/?api=1&query=Haparanda" },
+                        { time: "11:50 (SE)", type: "transport", title: "港口集結", desc: "抵達 Axelsvik Marine (Båtskärsnäs)。", details: "工業港口，充滿起重機。務必在 12:30 (瑞典時間) 前完成報到。導航輸入準確座標，避免迷路。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Axelsvik+Marine" },
+                        { time: "13:00 (SE)", type: "activity", title: "破冰行動：Polar Explorer", desc: "出航。龍蝦裝漂浮體驗。", details: "參觀引擎室，感受船身壓碎冰層。穿著橘色生存衣跳入冰海。注意：漂浮衣不透氣，建議內層只穿輕薄羊毛衣，勿穿羽絨外套。", tips: "船上有熱湯與麵包午餐。", link: "https://www.google.com/maps/search/?api=1&query=Polar+Explorer+Icebreaker" },
+                        { time: "17:30 (FI)", type: "transport", title: "夜間返航", desc: "返回羅瓦涅米。天色全黑，警戒馴鹿。", details: "需特別留意路邊反光標示（可能代表有馴鹿）。善用遠光燈，遇對向來車務必切換近光燈。", tips: "", link: "" },
+                        { time: "19:30 (FI)", type: "stay", title: "休整", desc: "回到羅瓦涅米。", details: "建議在民宿簡單自煮或購買熟食 (Kauppayhtiö 漢堡)，早點休息以應對明日的長途移動。", tips: "", link: "" }
                     ]
                 },
                 {
@@ -310,7 +211,7 @@
                         { time: "11:00", type: "activity", title: "紫水晶礦", desc: "Ukko-Luosto 搭乘 11:30 Pendolino 雪地車上山。", details: "挖掘 20 億年前形成的紫水晶。每人可帶走一顆拳頭大小以內的寶石。山頂風大需全套防風裝備。", tips: "11:25 前報到。", link: "https://www.google.com/maps/search/?api=1&query=Lampivaara+Amethyst+Mine" },
                         { time: "13:30", type: "food", title: "午餐：Restaurant Vaisko", desc: "提供高品質拉普蘭料理，氛圍溫馨。", details: "下山後用餐。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Restaurant+Vaisko" },
                         { time: "14:30", type: "transport", title: "縱貫拉普蘭", desc: "E75 繼續北上。中途停靠 Tankavaara 淘金村。", details: "中途點：Sodankylä Old Church (1689年木造教堂) 與 Tankavaara。進入 Inari 地區後，馴鹿直接走上公路舔食路鹽的機率大增。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Tankavaara+Gold+Village" },
-                        { time: "17:30", type: "stay", title: "隱世居所：Nangu", desc: "入住 Wilderness Hotel Nangu & Igloos。", details: "位於伊納里湖的南岸，位置極度隱密，光害極低。含跨年晚餐。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Wilderness+Hotel+Nangu" },
+                        { time: "17:30", type: "stay", title: "隱世居所：Nangu", desc: "入住 Wilderness Hotel Nangu & Igloos。", details: "位於伊納里湖的南岸，位置極度隱密，光害極低。含跨年晚餐。", tips: "極光觀測點。", link: "https://www.google.com/maps/search/?api=1&query=Wilderness+Hotel+Nangu" },
                         { time: "19:00", type: "food", title: "跨年盛宴", desc: "享用飯店 Gala Dinner。", details: "芬蘭跨年傳統「熔錫占卜」(Uudenvuodentina)，將熔化的錫倒入冷水中，解讀形狀預測運勢。", tips: "", link: "" },
                         { time: "23:55", type: "aurora", title: "跨年極光", desc: "站在結冰的伊納里湖上迎接 2026。", details: "在無光害的環境下，等待極光與 2026 年的第一秒一同降臨。湖面風大，體感溫度極低。", tips: "注意保暖。", link: "https://www.google.com/maps/search/?api=1&query=Lake+Inari" }
                     ]
@@ -322,9 +223,9 @@
                     events: [
                         { time: "09:30 (FI)", type: "transport", title: "最美公路 971", desc: "前往挪威。薩米文化核心區。", details: "途經 Sevetin Baari 咖啡補給。通過 Neiden 邊境進入挪威。這條路蜿蜒穿過無數小湖泊與岩石丘陵。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Road+971+Finland" },
                         { time: "12:00 (NO)", type: "activity", title: "Neiden 瀑布與時差", desc: "暫停 Skoltefossen 瀑布。", details: "跨越峽谷的橋樑景觀壯觀。注意時差：芬蘭 (UTC+2) -> 挪威 (UTC+1)，手機時間倒退 1 小時。進入挪威後物價翻倍。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Skoltefossen" },
-                        { time: "13:00 (NO)", type: "food", title: "帝王蟹狩獵", desc: "Snowhotel Kirkenes。", details: "搭乘雪地摩托車雪橇前往冰封峽灣，親手拉起巨大的蟹籠。享用現煮帝王蟹腿吃到飽。紅色帝王蟹是蘇聯引入的外來種。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Snowhotel+Kirkenes" },
+                        { time: "13:00 (NO)", type: "food", title: "帝王蟹狩獵", desc: "Snowhotel Kirkenes。", details: "搭乘雪地摩托車雪橇前往冰封峽灣，親手拉起巨大的蟹籠。享用現煮帝王蟹腿吃到飽。紅色帝王蟹是蘇聯引入的外來種。", tips: "高蛋白易想睡。", link: "https://www.google.com/maps/search/?api=1&query=Snowhotel+Kirkenes" },
                         { time: "17:00 (NO)", type: "transport", title: "戰略撤退", desc: "夜間駕駛返回芬蘭。", details: "高蛋白飲食易導致飯後嗜睡 (Food Coma)，加上全程黑暗駕駛，風險極高。對策：離開前喝濃咖啡，車內溫度勿過高。", tips: "", link: "" },
-                        { time: "19:00 (FI)", type: "food", title: "強制喚醒：Kaamanen", desc: "Kaamasen Kievari (卡馬寧客棧)。", details: "傳奇路邊休息站。在此停留 30 分鐘強制醒腦，吃馴鹿派與甜甜圈。此時手機時間跳回芬蘭時間 (+1小時)。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Kaamasen+Kievari" },
+                        { time: "19:00 (FI)", type: "food", title: "強制喚醒：Kaamanen", desc: "Kaamasen Kievari (卡馬寧客棧)。", details: "傳奇路邊休息站。在此停留 30 分鐘強制醒腦，吃馴鹿派與甜甜圈。此時手機時間跳回芬蘭時間 (+1小時)。", tips: "防範公路催眠。", link: "https://www.google.com/maps/search/?api=1&query=Kaamasen+Kievari" },
                         { time: "21:30 (FI)", type: "stay", title: "抵達 Saariselkä", desc: "入住 Northern Lights Village Saariselkä (玻璃屋)。", details: "事前 Email 確認飯店是否預留冷盤晚餐 (Cold Plate)。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Northern+Lights+Village+Saariselkä" }
                     ]
                 },
@@ -432,7 +333,7 @@
                     theme: "任務結束",
                     aurora: "無",
                     events: [
-                        { time: "03:45", type: "transport", title: "拂曉出擊", desc: "Taxi 直奔 ARN 機場。", details: "預訂 Uber 或 Taxi Stockholm，約 40 分鐘直達航廈。Arlanda Express 首班車風險過高。", tips: "搭乘 Austrian Airlines OS970 (06:35)。", link: "" }
+                        { time: "03:45", type: "transport", title: "拂曉出擊", desc: "Taxi 直奔 ARN 機場。", details: "預訂 Uber 或 Taxi Stockholm，約 40 分鐘直達航廈。Arlanda Express 首班車風險過高。搭乘 Austrian Airlines OS970 (06:35)。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Arlanda+Airport" }
                     ]
                 }
             ],
@@ -467,19 +368,62 @@
             if (tab === 'dashboard') {
                 setTimeout(renderCharts, 100);
             }
+            // Close mobile menu if open
+            if(appData.mobileMenuOpen) toggleMobileMenu();
+        }
+
+        function toggleMobileMenu() {
+            appData.mobileMenuOpen = !appData.mobileMenuOpen;
+            const menu = document.getElementById('mobile-menu');
+            if (appData.mobileMenuOpen) {
+                menu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+            }
         }
 
         function toggleViewMode() {
             appData.viewMode = appData.viewMode === 'simplified' ? 'detailed' : 'simplified';
-            renderContent(); // Re-render itinerary
+            renderContent(); 
         }
 
         function scrollToDay(dayIndex) {
             const element = document.getElementById(`day-${dayIndex}`);
             const mainContainer = document.getElementById('main-content');
             
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (element && mainContainer) {
+                // Get header height
+                const headerHeight = 64; // h-16
+                // If on desktop, date nav is sticky top (approx 50px)
+                const dateNavOffset = window.innerWidth >= 768 ? 60 : 0; 
+                
+                const elementPosition = element.offsetTop;
+                const offsetPosition = elementPosition - headerHeight - dateNavOffset - 20;
+
+                mainContainer.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            }
+        }
+
+        // --- MAP FUNCTIONS ---
+        function updateMap(query, btnId) {
+            const iframe = document.getElementById('google-map-iframe');
+            if (iframe) {
+                // Using generic search embed which usually works without key for simple queries
+                iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=10&ie=UTF8&iwloc=&output=embed`;
+            }
+            
+            // Update active button state
+            document.querySelectorAll('.map-btn').forEach(btn => {
+                btn.classList.remove('map-btn-active', 'bg-indigo-600', 'text-white');
+                btn.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-50');
+            });
+            const activeBtn = document.getElementById(`map-btn-${btnId}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-50');
+                activeBtn.classList.add('map-btn-active', 'bg-indigo-600', 'text-white');
             }
         }
 
@@ -494,22 +438,22 @@
             const desktopHTML = tabs.map(tab => `
                 <button onclick="switchTab('${tab.id}')" 
                     class="${appData.currentTab === tab.id ? 'border-indigo-500 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'} 
-                    inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition duration-150 ease-in-out">
+                    inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition duration-150 ease-in-out h-full">
                     <i class="fa-solid ${tab.icon} mr-2"></i> ${tab.label}
                 </button>
             `).join('');
 
             const mobileHTML = tabs.map(tab => `
                 <button onclick="switchTab('${tab.id}')" 
-                    class="${appData.currentTab === tab.id ? 'text-indigo-600' : 'text-slate-500'} 
-                    flex flex-col items-center justify-center w-full py-1 text-xs font-medium">
-                    <i class="fa-solid ${tab.icon} text-lg mb-1"></i>
+                    class="${appData.currentTab === tab.id ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'} 
+                    block w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center">
+                    <i class="fa-solid ${tab.icon} w-6 text-center mr-2"></i>
                     ${tab.label}
                 </button>
             `).join('');
 
             document.getElementById('desktop-nav').innerHTML = desktopHTML;
-            document.getElementById('mobile-nav').innerHTML = mobileHTML;
+            document.getElementById('mobile-nav-items').innerHTML = mobileHTML;
         }
 
         function renderContent() {
@@ -528,134 +472,158 @@
                 contentHTML = renderFoodMap();
             }
 
-            main.innerHTML = `<div class="fade-in max-w-7xl mx-auto pb-20">${contentHTML}</div>`;
+            main.innerHTML = `<div class="fade-in max-w-7xl mx-auto pb-8">${contentHTML}</div>`;
         }
 
         // --- SECTIONS RENDERING ---
 
         function renderDashboard() {
-            // Weather Cards HTML
             const weatherCards = appData.weatherForecast.map(w => `
-                <div class="flex-none w-32 bg-slate-50 border border-slate-200 rounded-lg p-3 text-center snap-center">
+                <div class="flex-none w-32 bg-white border border-slate-200 rounded-lg p-3 text-center snap-center shadow-sm">
                     <div class="text-xs text-slate-500 mb-1">Day ${w.day}</div>
                     <div class="text-sm font-bold text-slate-800 truncate">${w.loc}</div>
                     <div class="my-2 text-indigo-600"><i class="fa-solid ${w.icon} text-2xl"></i></div>
                     <div class="text-lg font-bold text-slate-900">${w.temp}</div>
                     <div class="text-xs text-slate-500 truncate">${w.cond}</div>
-                    <div class="mt-1 text-[10px] text-slate-400 bg-slate-100 rounded px-1 py-0.5"><i class="fa-regular fa-sun"></i> ${w.sun}</div>
+                    <div class="mt-1 text-[10px] text-slate-400 bg-slate-50 rounded px-1 py-0.5"><i class="fa-regular fa-sun"></i> ${w.sun}</div>
                 </div>
             `).join('');
 
-            return `
-                <!-- Weather Forecast Section -->
-                <div class="bg-white shadow rounded-lg p-6 mb-8">
-                    <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4 flex items-center">
-                        <i class="fa-solid fa-temperature-low text-blue-500 mr-2"></i> 極地氣象預報中心 (Weather Forecast)
-                    </h3>
-                    <div class="flex overflow-x-auto space-x-4 pb-4 snap-x no-scrollbar">
-                        ${weatherCards}
-                    </div>
-                </div>
+            const mapButtons = appData.mapLocations.map(loc => `
+                <button id="map-btn-${loc.id}" onclick="updateMap('${loc.q}', ${loc.id})" 
+                    class="map-btn w-full text-left px-3 py-2 rounded text-xs font-medium border border-slate-200 mb-2 transition-colors bg-white text-slate-700 hover:bg-slate-50">
+                    <i class="fa-solid fa-location-dot mr-2 text-indigo-500"></i>${loc.name}
+                </button>
+            `).join('');
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white overflow-hidden shadow rounded-lg">
-                        <div class="px-4 py-5 sm:p-6">
-                            <dt class="text-sm font-medium text-slate-500 truncate">極光觀測機率</dt>
+            return `
+                <div class="p-4 sm:p-8">
+                    <!-- Weather -->
+                    <div class="bg-white shadow rounded-lg p-6 mb-8">
+                        <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4 flex items-center">
+                            <i class="fa-solid fa-temperature-low text-blue-500 mr-2"></i> 極地氣象預報中心
+                        </h3>
+                        <div class="flex overflow-x-auto space-x-4 pb-4 snap-x no-scrollbar">
+                            ${weatherCards}
+                        </div>
+                    </div>
+
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6">
+                            <dt class="text-sm font-medium text-slate-500">極光觀測機率</dt>
                             <dd class="mt-1 text-3xl font-semibold text-indigo-600">High</dd>
                             <p class="text-xs text-slate-400 mt-1">Solar Maximum Cycle 25</p>
                         </div>
-                    </div>
-                    <div class="bg-white overflow-hidden shadow rounded-lg">
-                        <div class="px-4 py-5 sm:p-6">
-                            <dt class="text-sm font-medium text-slate-500 truncate">總移動距離 (Est.)</dt>
+                        <div class="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6">
+                            <dt class="text-sm font-medium text-slate-500">總移動距離 (Est.)</dt>
                             <dd class="mt-1 text-3xl font-semibold text-slate-900">3,200 km</dd>
                             <p class="text-xs text-slate-400 mt-1">跨越北緯 60° 至 71°</p>
                         </div>
-                    </div>
-                    <div class="bg-white overflow-hidden shadow rounded-lg">
-                        <div class="px-4 py-5 sm:p-6">
-                            <dt class="text-sm font-medium text-slate-500 truncate">戰略執行狀態</dt>
+                        <div class="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6">
+                            <dt class="text-sm font-medium text-slate-500">戰略執行狀態</dt>
                             <dd class="mt-1 text-3xl font-semibold text-emerald-600">Ready</dd>
                             <p class="text-xs text-slate-400 mt-1">所有預訂已確認</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="bg-white shadow rounded-lg p-6">
-                        <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">活動強度與交通時間分析</h3>
-                        <div class="relative h-64 w-full">
-                            <canvas id="activityChart"></canvas>
+                    <!-- Map & Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                        <!-- Strategic Map with Controls -->
+                        <div class="bg-white shadow rounded-lg p-6 lg:col-span-3">
+                            <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">
+                                <i class="fa-solid fa-map text-emerald-600 mr-2"></i>北歐戰略地圖 (Strategic Map)
+                            </h3>
+                            <div class="flex flex-col md:flex-row gap-4">
+                                <!-- Map Controls -->
+                                <div class="w-full md:w-1/4 h-64 md:h-96 overflow-y-auto pr-2 custom-scrollbar">
+                                    <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">每日據點跳轉</h4>
+                                    ${mapButtons}
+                                </div>
+                                <!-- Map Frame -->
+                                <div class="w-full md:w-3/4 relative h-96 rounded-lg overflow-hidden border border-slate-200">
+                                    <iframe 
+                                        id="google-map-iframe"
+                                        src="https://maps.google.com/maps?q=Finland&t=&z=5&ie=UTF8&iwloc=&output=embed" 
+                                        width="100%" 
+                                        height="100%" 
+                                        style="border:0;" 
+                                        allowfullscreen="" 
+                                        loading="lazy">
+                                    </iframe>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white shadow rounded-lg p-6 lg:col-span-2">
+                            <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">活動強度與交通時間</h3>
+                            <div class="relative h-64 w-full">
+                                <canvas id="activityChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-white shadow rounded-lg p-6 lg:col-span-1">
+                            <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">北極圈緯度變化</h3>
+                            <div class="relative h-64 w-full">
+                                <canvas id="latChart"></canvas>
+                            </div>
                         </div>
                     </div>
-
+                    
+                    <!-- Risk Matrix -->
                     <div class="bg-white shadow rounded-lg p-6">
-                        <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">北極圈緯度變化 (Latitude Profile)</h3>
-                        <div class="relative h-64 w-full">
-                            <canvas id="latChart"></canvas>
+                        <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">核心風險監控矩陣</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">風險事件</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">機率</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">應對策略</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-slate-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">Day 10 時間軸崩潰</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-bold">高</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">若 11:45 未離 Voss，放棄卑爾根快閃。</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">Day 9 EV 電量不足</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-orange-600 font-bold">中</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">Eidfjord 強制充電至 95% 以上。</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-                </div>
-                
-                <div class="mt-8 bg-white shadow rounded-lg p-6">
-                    <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">核心風險監控矩陣</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200">
-                            <thead>
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">風險事件</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">機率</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">應對策略</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-slate-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">Day 10 時間軸崩潰</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-bold">高</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">若 11:45 未離 Voss，放棄卑爾根快閃，直奔機場。</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">Day 9 EV 電量不足</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-orange-600 font-bold">中</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">Eidfjord 強制充電至 95% 以上。</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">Day 7 滿月干擾極光</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-bold">100%</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">轉為拍攝「月光下的雪景」，利用月光補光。</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             `;
         }
 
         function renderItinerary() {
-            // Updated Date Nav - Moved to Bottom
             const dateButtons = appData.dailyItinerary.map(day => `
                 <button onclick="scrollToDay(${day.day})" class="flex-none px-3 py-1 rounded-full text-xs font-medium bg-white border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-colors shadow-sm whitespace-nowrap snap-start">
                     D${day.day} <span class="font-normal text-slate-400 ml-1">${day.date.split(' ')[0]}</span>
                 </button>
             `).join('');
 
-            const stickyFooter = `
-                <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] pb-safe-area">
-                    <div class="max-w-7xl mx-auto px-4 py-2 sm:px-6 lg:px-8">
+            // Date Nav: Fixed Bottom on Mobile, Sticky Top on Desktop
+            const dateNav = `
+                <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 shadow-lg md:sticky md:top-0 md:border-b md:border-t-0 md:shadow-sm md:z-30">
+                    <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
                         <div class="flex items-center justify-between mb-2">
                             <h2 class="text-sm font-bold text-slate-900">日期導覽</h2>
                             <div class="flex items-center space-x-2">
                                 <span class="text-[10px] font-medium text-slate-500 ${appData.viewMode === 'simplified' ? 'text-indigo-600' : ''}">簡化</span>
-                                
                                 <button onclick="toggleViewMode()" class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${appData.viewMode === 'detailed' ? 'bg-indigo-600' : 'bg-slate-200'}" role="switch">
                                     <span class="sr-only">切換詳情模式</span>
                                     <span aria-hidden="true" class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${appData.viewMode === 'detailed' ? 'translate-x-4' : 'translate-x-0'}"></span>
                                 </button>
-                                
                                 <span class="text-[10px] font-medium text-slate-500 ${appData.viewMode === 'detailed' ? 'text-indigo-600' : ''}">詳細</span>
                             </div>
                         </div>
-                        <div class="flex space-x-2 overflow-x-auto pb-2 snap-x no-scrollbar">
+                        <div class="flex space-x-2 overflow-x-auto pb-1 snap-x no-scrollbar">
                             ${dateButtons}
                         </div>
                     </div>
@@ -682,7 +650,6 @@
                     ` : '';
 
                     return `
-                        <!-- Increased padding-left on mobile (pl-14) to prevent icon overlap -->
                         <div class="relative pl-14 sm:pl-32 py-4 group">
                             <!-- Time (Desktop) -->
                             <div class="hidden sm:flex flex-col items-end absolute left-0 top-4 w-24 pr-4">
@@ -690,7 +657,7 @@
                                 <span class="text-xs text-slate-500 uppercase tracking-wide">${event.type}</span>
                             </div>
 
-                            <!-- Timeline Marker - Adjusted left position for mobile (left-2) -->
+                            <!-- Timeline Marker -->
                             <div class="absolute left-2 top-5 sm:left-[6.5rem] flex items-center justify-center"> 
                                 <div class="h-8 w-8 rounded-full ${colorClass} flex items-center justify-center ring-4 ring-white z-10">
                                     <i class="fa-solid ${iconClass} ${iconColor} text-sm"></i>
@@ -723,7 +690,7 @@
                 }).join('');
 
                 return `
-                    <div id="day-${day.day}" class="mb-12 relative scroll-mt-24">
+                    <div id="day-${day.day}" class="mb-12 relative">
                         <div class="flex justify-between items-center mb-6">
                             <div>
                                 <h2 class="text-2xl font-bold text-slate-900 flex items-center">
@@ -739,7 +706,7 @@
                             </div>
                         </div>
                         
-                        <!-- Timeline Line - Adjusted left position for mobile (left-6) to match marker -->
+                        <!-- Timeline Line -->
                         <div class="absolute left-6 sm:left-[7.5rem] top-12 bottom-0 w-0.5 bg-slate-200 z-0"></div>
 
                         <div class="space-y-2">
@@ -749,89 +716,77 @@
                 `;
             }).join('');
 
-            return `<div class="max-w-4xl mx-auto pb-32 relative">${itineraryHtml}${stickyFooter}</div>`;
+            // Desktop layout: Nav on top. Mobile layout: Nav at bottom (fixed).
+            return `
+                <div class="relative min-h-screen">
+                    <!-- Nav rendered here for desktop sticky -->
+                    <div class="hidden md:block sticky top-0 z-30">
+                        ${dateNav}
+                    </div>
+                    
+                    <div class="max-w-4xl mx-auto p-4 sm:p-8 pb-32">
+                        ${itineraryHtml}
+                    </div>
+
+                    <!-- Nav rendered here for mobile fixed bottom -->
+                    <div class="md:hidden">
+                        ${dateNav}
+                    </div>
+                </div>
+            `;
         }
 
         function renderLogistics() {
             return `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Flight Card -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center"><i class="fa-solid fa-plane text-blue-500 mr-2"></i> 關鍵航班</h3>
-                        <ul class="space-y-4 text-sm">
-                            <li class="flex justify-between border-b pb-2">
-                                <span>Day 2: HEL -> RVN</span>
-                                <span class="font-mono font-bold">AY0533</span>
-                            </li>
-                            <li class="flex justify-between border-b pb-2">
-                                <span>Day 6: RVN -> TOS</span>
-                                <span class="font-mono font-bold">AY0541</span>
-                            </li>
-                            <li class="flex justify-between border-b pb-2">
-                                <span>Day 8: TOS -> BGO</span>
-                                <span class="font-mono font-bold">WF627 (Widerøe)</span>
-                            </li>
-                            <li class="flex justify-between border-b pb-2">
-                                <span>Day 10: BGO -> ARN</span>
-                                <span class="font-mono font-bold">DY631</span>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Day 13: ARN -> TPE</span>
-                                <span class="font-mono font-bold">OS970 / CI064</span>
-                            </li>
-                        </ul>
-                    </div>
+                <div class="max-w-4xl mx-auto p-4 sm:p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Flight Card -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center"><i class="fa-solid fa-plane text-blue-500 mr-2"></i> 關鍵航班</h3>
+                            <ul class="space-y-4 text-sm">
+                                <li class="flex justify-between border-b pb-2">
+                                    <span>Day 2: HEL -> RVN</span>
+                                    <span class="font-mono font-bold">AY0533</span>
+                                </li>
+                                <li class="flex justify-between border-b pb-2">
+                                    <span>Day 6: RVN -> TOS</span>
+                                    <span class="font-mono font-bold">AY0541</span>
+                                </li>
+                                <li class="flex justify-between border-b pb-2">
+                                    <span>Day 8: TOS -> BGO</span>
+                                    <span class="font-mono font-bold">WF627</span>
+                                </li>
+                                <li class="flex justify-between border-b pb-2">
+                                    <span>Day 10: BGO -> ARN</span>
+                                    <span class="font-mono font-bold">DY631</span>
+                                </li>
+                                <li class="flex justify-between">
+                                    <span>Day 13: ARN -> TPE</span>
+                                    <span class="font-mono font-bold">OS970 / CI064</span>
+                                </li>
+                            </ul>
+                        </div>
 
-                    <!-- Car Rental Card -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center"><i class="fa-solid fa-car text-emerald-500 mr-2"></i> 租車戰略</h3>
-                        <div class="space-y-4">
-                            <div class="p-3 bg-slate-50 rounded border border-slate-200">
-                                <div class="font-semibold text-slate-900">Phase 1: 拉普蘭突襲</div>
-                                <div class="text-sm text-slate-600">Green Motion (RVN) - VW Golf ICE</div>
-                                <div class="text-xs text-red-500 mt-1 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> 必須檢查引擎加熱線與釘胎。</div>
-                            </div>
-                            <div class="p-3 bg-slate-50 rounded border border-slate-200">
-                                <div class="font-semibold text-slate-900">Phase 2: 特羅姆瑟登陸</div>
-                                <div class="text-sm text-slate-600">Thrifty (TOS) - Volvo V40</div>
-                                <div class="text-xs text-slate-500 mt-1">停放於 Fjellet P-hus 地下停車場。</div>
-                            </div>
-                            <div class="p-3 bg-slate-50 rounded border border-slate-200">
-                                <div class="font-semibold text-slate-900">Phase 3: 峽灣 EV</div>
-                                <div class="text-sm text-slate-600">Sixt (BGO) - Audi e-tron</div>
-                                <div class="text-xs text-orange-500 mt-1 font-bold"><i class="fa-solid fa-bolt"></i> Day 9 務必在 Eidfjord 充滿電。</div>
+                        <!-- Car Rental Card -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center"><i class="fa-solid fa-car text-emerald-500 mr-2"></i> 租車戰略</h3>
+                            <div class="space-y-4">
+                                <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                                    <div class="font-semibold text-slate-900">Phase 1: 拉普蘭</div>
+                                    <div class="text-sm text-slate-600">Green Motion (RVN) - VW Golf</div>
+                                    <div class="text-xs text-red-500 mt-1 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> 檢查加熱線與釘胎。</div>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                                    <div class="font-semibold text-slate-900">Phase 2: 特羅姆瑟</div>
+                                    <div class="text-sm text-slate-600">Thrifty (TOS) - Volvo V40</div>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                                    <div class="font-semibold text-slate-900">Phase 3: 峽灣 EV</div>
+                                    <div class="text-sm text-slate-600">Sixt (BGO) - Audi e-tron</div>
+                                    <div class="text-xs text-orange-500 mt-1 font-bold">Day 9 Eidfjord 必充。</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-bold text-slate-900 mb-4">行前裝備檢查表 (部分)</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <label class="flex items-center space-x-3">
-                            <input type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                            <span class="text-sm text-slate-700">實體駕照 + IDP (雪地摩托車用)</span>
-                        </label>
-                        <label class="flex items-center space-x-3">
-                            <input type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                            <span class="text-sm text-slate-700">Type 2 充電線檢查</span>
-                        </label>
-                        <label class="flex items-center space-x-3">
-                            <input type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                            <span class="text-sm text-slate-700">HSL App (赫爾辛基交通)</span>
-                        </label>
-                        <label class="flex items-center space-x-3">
-                            <input type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                            <span class="text-sm text-slate-700">Elton / Mer / Fortum App (充電)</span>
-                        </label>
-                        <label class="flex items-center space-x-3">
-                            <input type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                            <span class="text-sm text-slate-700">解凍噴霧 & 刮冰器</span>
-                        </label>
-                         <label class="flex items-center space-x-3">
-                            <input type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                            <span class="text-sm text-slate-700">腳架 (極光攝影)</span>
-                        </label>
                     </div>
                 </div>
             `;
@@ -903,25 +858,27 @@
             `).join('');
 
             return `
-                <div class="mb-6 space-y-3">
-                    <div class="flex flex-wrap gap-2 items-center">
-                        <span class="text-xs font-bold text-slate-400 uppercase w-12">分類:</span>
-                        ${typeButtons}
+                <div class="max-w-7xl mx-auto p-4 sm:p-8">
+                    <div class="mb-6 space-y-3">
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <span class="text-xs font-bold text-slate-400 uppercase w-12">分類:</span>
+                            ${typeButtons}
+                        </div>
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <span class="text-xs font-bold text-slate-400 uppercase w-12">地區:</span>
+                            ${locationButtons}
+                        </div>
                     </div>
-                    <div class="flex flex-wrap gap-2 items-center">
-                        <span class="text-xs font-bold text-slate-400 uppercase w-12">地區:</span>
-                        ${locationButtons}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${cards}
                     </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    ${cards}
                 </div>
             `;
         }
 
         function setFoodFilter(filter) {
             currentFoodFilter = filter;
-            renderContent(); // Re-render logic
+            renderContent(); 
         }
 
         // --- CHART RENDERING ---
@@ -965,7 +922,7 @@
                     datasets: [{
                         label: '北緯 (°N)',
                         data: [60.1, 66.5, 68.9, 69.7, 69.6, 60.3, 59.3],
-                        borderColor: '#0ea5e9', // Sky blue
+                        borderColor: '#0ea5e9', 
                         backgroundColor: 'rgba(14, 165, 233, 0.1)',
                         fill: true,
                         tension: 0.4
