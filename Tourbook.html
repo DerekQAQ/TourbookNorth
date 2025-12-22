@@ -11,6 +11,12 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Leaflet Polyline Decorator for Arrows -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-polyline-decorator/1.6.0/leaflet.polylineDecorator.min.js"></script>
+
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -67,6 +73,13 @@
             background-color: #4f46e5;
             color: white;
             border-color: #4f46e5;
+        }
+
+        /* Leaflet Map Height */
+        #strategic-map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
         }
     </style>
 </head>
@@ -145,20 +158,20 @@
                 { day: 12, loc: "Stockholm", temp: "-4°C", cond: "Clear", icon: "fa-sun", sun: "08:44 - 15:02" },
                 { day: 13, loc: "Airport", temp: "-5°C", cond: "Cloudy", icon: "fa-plane", sun: "N/A" },
             ],
-            // Map Locations for "Jump" functionality
+            // Geo-coordinates for Leaflet Map
             mapLocations: [
-                { id: 1, name: "Day 1: Helsinki", q: "Helsinki,Finland" },
-                { id: 2, name: "Day 2: Rovaniemi", q: "Rovaniemi,Finland" },
-                { id: 3, name: "Day 3: Kemi/Tornio", q: "Tornio,Finland" },
-                { id: 4, name: "Day 4: Inari", q: "Inari,Finland" },
-                { id: 5, name: "Day 5: Kirkenes", q: "Kirkenes,Norway" },
-                { id: 6, name: "Day 6: Tromsø", q: "Tromso,Norway" },
-                { id: 7, name: "Day 7: Lyngen", q: "Lyngen,Norway" },
-                { id: 8, name: "Day 8: Bergen", q: "Bergen,Norway" },
-                { id: 9, name: "Day 9: Hardanger", q: "Hardangerfjord,Norway" },
-                { id: 10, name: "Day 10: Voss", q: "Voss,Norway" },
-                { id: 11, name: "Day 11: Stockholm (Old Town)", q: "Gamla Stan,Stockholm" },
-                { id: 12, name: "Day 12: Stockholm (City)", q: "Stockholm City Hall" },
+                { id: 1, day: 1, name: "Helsinki", lat: 60.1699, lng: 24.9384 },
+                { id: 2, day: 2, name: "Rovaniemi", lat: 66.5039, lng: 25.7294 },
+                { id: 3, day: 3, name: "Tornio/Kemi", lat: 65.8481, lng: 24.1466 },
+                { id: 4, day: 4, name: "Inari", lat: 68.9059, lng: 27.0285 },
+                { id: 5, day: 5, name: "Kirkenes", lat: 69.7269, lng: 30.0450 },
+                { id: 6, day: 6, name: "Tromsø", lat: 69.6492, lng: 18.9553 },
+                { id: 7, day: 7, name: "Lyngen", lat: 69.5763, lng: 20.2189 },
+                { id: 8, day: 8, name: "Bergen", lat: 60.3913, lng: 5.3221 },
+                { id: 9, day: 9, name: "Hardanger", lat: 60.3708, lng: 6.1451 },
+                { id: 10, day: 10, name: "Voss", lat: 60.6280, lng: 6.4116 },
+                { id: 11, day: 11, name: "Stockholm (Old Town)", lat: 59.3251, lng: 18.0711 },
+                { id: 12, day: 12, name: "Stockholm (City)", lat: 59.3293, lng: 18.0686 },
             ],
             dailyItinerary: [
                 {
@@ -378,7 +391,10 @@
             renderNav();
             renderContent();
             if (appData.currentTab === 'dashboard') {
-                setTimeout(renderCharts, 100);
+                setTimeout(() => {
+                    initMap();
+                    renderCharts();
+                }, 100);
             }
         }
 
@@ -387,7 +403,10 @@
             renderNav();
             renderContent();
             if (tab === 'dashboard') {
-                setTimeout(renderCharts, 100);
+                setTimeout(() => {
+                    initMap();
+                    renderCharts();
+                }, 100);
             }
             // Close mobile menu if open
             if(appData.mobileMenuOpen) toggleMobileMenu();
@@ -428,14 +447,107 @@
             }
         }
 
-        // --- MAP FUNCTIONS ---
-        function updateMap(query, btnId) {
-            const iframe = document.getElementById('google-map-iframe');
-            if (iframe) {
-                // Using generic search embed which usually works without key for simple queries
-                iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=10&ie=UTF8&iwloc=&output=embed`;
+        function goToItinerary(day) {
+            switchTab('itinerary');
+            setTimeout(() => {
+                scrollToDay(day);
+            }, 300); // Slight delay to ensure DOM is ready
+        }
+
+        // --- MAP FUNCTIONS (Leaflet) ---
+        let map;
+        let markers = [];
+
+        function initMap() {
+            if (document.getElementById('strategic-map')) {
+                if (map) {
+                    map.remove();
+                }
+
+                // Coordinates for points
+                const pathCoordinates = appData.mapLocations.map(loc => [loc.lat, loc.lng]);
+
+                // Initialize Map
+                map = L.map('strategic-map'); // No fixed view, will fitBounds later
+
+                // Add OpenStreetMap Tile Layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 18,
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+
+                // Draw Path (Deep Blue Dashed Line)
+                const polyline = L.polyline(pathCoordinates, {
+                    color: '#1e3a8a', // Deep Blue (Tailwind blue-900 equivalent)
+                    weight: 3,
+                    opacity: 0.8,
+                    dashArray: '10, 10',
+                    lineJoin: 'round'
+                }).addTo(map);
+
+                // Add Arrows using Polyline Decorator
+                try {
+                    L.polylineDecorator(polyline, {
+                        patterns: [
+                            {
+                                offset: '5%', 
+                                repeat: '15%', 
+                                symbol: L.Symbol.arrowHead({
+                                    pixelSize: 10,
+                                    polygon: false,
+                                    pathOptions: { stroke: true, color: '#1e3a8a', weight: 2 }
+                                })
+                            }
+                        ]
+                    }).addTo(map);
+                } catch (e) {
+                    console.error("Leaflet Polyline Decorator failed to load:", e);
+                }
+
+                // Add Markers
+                markers = [];
+                appData.mapLocations.forEach(loc => {
+                    const marker = L.marker([loc.lat, loc.lng]).addTo(map);
+                    
+                    // Custom Popup Content
+                    const popupContent = `
+                        <div class="p-2 text-center">
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">${loc.name}</h3>
+                            <div class="text-xs text-slate-500 mb-2">Day ${loc.day}</div>
+                            <button onclick="goToItinerary(${loc.day})" 
+                                class="bg-indigo-600 text-white text-xs px-3 py-1 rounded hover:bg-indigo-700 transition-colors">
+                                前往行程
+                            </button>
+                        </div>
+                    `;
+                    marker.bindPopup(popupContent);
+                    markers.push({ id: loc.id, marker: marker });
+                });
+
+                // Auto-size (Fit Bounds) to show all markers
+                if (pathCoordinates.length > 0) {
+                    const bounds = L.latLngBounds(pathCoordinates);
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                }
             }
-            
+        }
+
+        function updateMap(query, btnId) { 
+            // In Leaflet version, we fly to the marker instead of reloading an iframe
+            const location = appData.mapLocations.find(l => l.id === btnId);
+            if (location && map) {
+                map.flyTo([location.lat, location.lng], 10, {
+                    animate: true,
+                    duration: 1.5
+                });
+                
+                // Open the popup for the target marker
+                const targetMarkerObj = markers.find(m => m.id === btnId);
+                if (targetMarkerObj) {
+                    targetMarkerObj.marker.openPopup();
+                }
+            }
+
             // Update active button state
             document.querySelectorAll('.map-btn').forEach(btn => {
                 btn.classList.remove('map-btn-active', 'bg-indigo-600', 'text-white');
@@ -511,7 +623,7 @@
             `).join('');
 
             const mapButtons = appData.mapLocations.map(loc => `
-                <button id="map-btn-${loc.id}" onclick="updateMap('${loc.q}', ${loc.id})" 
+                <button id="map-btn-${loc.id}" onclick="updateMap('', ${loc.id})" 
                     class="map-btn w-full text-left px-3 py-2 rounded text-xs font-medium border border-slate-200 mb-2 transition-colors bg-white text-slate-700 hover:bg-slate-50">
                     <i class="fa-solid fa-location-dot mr-2 text-indigo-500"></i>${loc.name}
                 </button>
@@ -555,23 +667,15 @@
                             <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">
                                 <i class="fa-solid fa-map text-emerald-600 mr-2"></i>北歐戰略地圖 (Strategic Map)
                             </h3>
-                            <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex flex-col md:flex-row gap-4 h-[500px] md:h-[400px]">
                                 <!-- Map Controls -->
-                                <div class="w-full md:w-1/4 h-64 md:h-96 overflow-y-auto pr-2 custom-scrollbar">
+                                <div class="w-full md:w-1/4 h-32 md:h-full overflow-y-auto pr-2 custom-scrollbar">
                                     <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">每日據點跳轉</h4>
                                     ${mapButtons}
                                 </div>
-                                <!-- Map Frame -->
-                                <div class="w-full md:w-3/4 relative h-96 rounded-lg overflow-hidden border border-slate-200">
-                                    <iframe 
-                                        id="google-map-iframe"
-                                        src="https://maps.google.com/maps?q=Finland&t=&z=5&ie=UTF8&iwloc=&output=embed" 
-                                        width="100%" 
-                                        height="100%" 
-                                        style="border:0;" 
-                                        allowfullscreen="" 
-                                        loading="lazy">
-                                    </iframe>
+                                <!-- Map Frame (Leaflet Container) -->
+                                <div class="w-full md:w-3/4 relative h-full rounded-lg overflow-hidden border border-slate-200 z-0">
+                                    <div id="strategic-map"></div>
                                 </div>
                             </div>
                         </div>
