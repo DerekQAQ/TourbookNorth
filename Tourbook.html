@@ -97,6 +97,13 @@
             width: 100%;
             z-index: 1;
         }
+        
+        #food-map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+            min-height: 400px;
+        }
 
         /* Dark Mode Map Filter - Cool trick to invert standard tiles */
         .dark .leaflet-layer,
@@ -121,7 +128,7 @@
 
         /* Print Styles */
         @media print {
-            header, #mobile-menu-btn, .map-btn, .no-print, #back-to-top, #mobile-menu { 
+            header, #mobile-menu-btn, .map-btn, .no-print, #back-to-top, #mobile-menu, #strategic-map, #food-map-container { 
                 display: none !important; 
             }
             body { 
@@ -531,35 +538,35 @@
                 }
             ],
             restaurants: [
-                { name: "Ravintola Zetor", type: "特色體驗", location: "Helsinki", rating: 4.1, desc: "拖拉機主題，炒馴鹿肉。", tags: ["野味", "特色"], link: "https://www.google.com/maps/search/?api=1&query=Ravintola+Zetor" },
-                { name: "Fazer Café", type: "甜點", location: "Helsinki", rating: 4.3, desc: "國寶級巧克力，熱可可。", tags: ["甜點", "下午茶"], link: "https://www.google.com/maps/search/?api=1&query=Fazer+Café+Kluuvikatu" },
-                { name: "Restaurant Olo", type: "精緻餐飲", location: "Helsinki", rating: 4.6, desc: "米其林一星，現代北歐料理。", tags: ["特色", "晚餐"], link: "https://www.google.com/maps/search/?api=1&query=Restaurant+Olo+Helsinki" },
-                { name: "Löyly Helsinki", type: "特色體驗", location: "Helsinki", rating: 4.4, desc: "結合桑拿與餐廳，海景絕佳。", tags: ["特色", "景觀"], link: "https://www.google.com/maps/search/?api=1&query=Löyly+Helsinki" },
-                { name: "Cafe Ekberg", type: "甜點", location: "Helsinki", rating: 4.2, desc: "赫爾辛基最古老的咖啡館。", tags: ["甜點", "早午餐"], link: "https://www.google.com/maps/search/?api=1&query=Cafe+Ekberg+Helsinki" },
+                { id: "zetor", name: "Ravintola Zetor", type: "特色體驗", location: "Helsinki", rating: 4.1, desc: "拖拉機主題，炒馴鹿肉。", tags: ["野味", "特色"], link: "https://www.google.com/maps/search/?api=1&query=Ravintola+Zetor", lat: 60.170, lng: 24.938 },
+                { id: "fazer", name: "Fazer Café", type: "甜點", location: "Helsinki", rating: 4.3, desc: "國寶級巧克力，熱可可。", tags: ["甜點", "下午茶"], link: "https://www.google.com/maps/search/?api=1&query=Fazer+Café+Kluuvikatu", lat: 60.169, lng: 24.948 },
+                { id: "olo", name: "Restaurant Olo", type: "精緻餐飲", location: "Helsinki", rating: 4.6, desc: "米其林一星，現代北歐料理。", tags: ["特色", "晚餐"], link: "https://www.google.com/maps/search/?api=1&query=Restaurant+Olo+Helsinki", lat: 60.168, lng: 24.953 },
+                { id: "loyly", name: "Löyly Helsinki", type: "特色體驗", location: "Helsinki", rating: 4.4, desc: "結合桑拿與餐廳，海景絕佳。", tags: ["特色", "景觀"], link: "https://www.google.com/maps/search/?api=1&query=Löyly+Helsinki", lat: 60.150, lng: 24.930 },
+                { id: "ekberg", name: "Cafe Ekberg", type: "甜點", location: "Helsinki", rating: 4.2, desc: "赫爾辛基最古老的咖啡館。", tags: ["甜點", "早午餐"], link: "https://www.google.com/maps/search/?api=1&query=Cafe+Ekberg+Helsinki", lat: 60.165, lng: 24.935 },
                 
-                { name: "Santa's Salmon Place", type: "海鮮", location: "Rovaniemi", rating: 4.6, desc: "現烤鮭魚，傳統帳篷。", tags: ["海鮮", "午餐"], link: "https://www.google.com/maps/search/?api=1&query=Santa's+Salmon+Place" },
-                { name: "Restaurant Nili", type: "野味", location: "Rovaniemi", rating: 4.4, desc: "極致野味，熊肉料理。", tags: ["野味", "晚餐"], link: "https://www.google.com/maps/search/?api=1&query=Restaurant+Nili" },
-                { name: "Gustav Kitchen & Bar", type: "特色體驗", location: "Rovaniemi", rating: 4.5, desc: "當地人氣小酒館，創意料理。", tags: ["特色", "晚餐"], link: "https://www.google.com/maps/search/?api=1&query=Gustav+Kitchen+&+Bar+Rovaniemi" },
-                { name: "Cafe & Bar 21", type: "甜點", location: "Rovaniemi", rating: 4.4, desc: "著名的鹹甜華夫餅。", tags: ["甜點", "輕食"], link: "https://www.google.com/maps/search/?api=1&query=Cafe+&+Bar+21+Rovaniemi" },
+                { id: "salmon", name: "Santa's Salmon Place", type: "海鮮", location: "Rovaniemi", rating: 4.6, desc: "現烤鮭魚，傳統帳篷。", tags: ["海鮮", "午餐"], link: "https://www.google.com/maps/search/?api=1&query=Santa's+Salmon+Place", lat: 66.543, lng: 25.847 },
+                { id: "nili", name: "Restaurant Nili", type: "野味", location: "Rovaniemi", rating: 4.4, desc: "極致野味，熊肉料理。", tags: ["野味", "晚餐"], link: "https://www.google.com/maps/search/?api=1&query=Restaurant+Nili", lat: 66.502, lng: 25.730 },
+                { id: "gustav", name: "Gustav Kitchen & Bar", type: "特色體驗", location: "Rovaniemi", rating: 4.5, desc: "當地人氣小酒館，創意料理。", tags: ["特色", "晚餐"], link: "https://www.google.com/maps/search/?api=1&query=Gustav+Kitchen+&+Bar+Rovaniemi", lat: 66.502, lng: 25.728 },
+                { id: "cafe21", name: "Cafe & Bar 21", type: "甜點", location: "Rovaniemi", rating: 4.4, desc: "著名的鹹甜華夫餅。", tags: ["甜點", "輕食"], link: "https://www.google.com/maps/search/?api=1&query=Cafe+&+Bar+21+Rovaniemi", lat: 66.501, lng: 25.731 },
 
-                { name: "Kaamasen Kievari", type: "小吃", location: "Kaamanen", rating: 4.3, desc: "馴鹿派與甜甜圈。", tags: ["小吃", "中途點"], link: "https://www.google.com/maps/search/?api=1&query=Kaamasen+Kievari" },
-                { name: "Restaurant Aanaar", type: "精緻餐飲", location: "Kaamanen", rating: 4.6, desc: "Inari 湖畔的高級薩米料理。", tags: ["野味", "特色"], link: "https://www.google.com/maps/search/?api=1&query=Restaurant+Aanaar" },
-                { name: "Laanilan Kievari", type: "野味", location: "Kaamanen", rating: 4.3, desc: "Saariselkä 附近的傳統木屋餐廳。", tags: ["野味", "晚餐"], link: "https://www.google.com/maps/search/?api=1&query=Laanilan+Kievari" },
+                { id: "kaamanen", name: "Kaamasen Kievari", type: "小吃", location: "Kaamanen", rating: 4.3, desc: "馴鹿派與甜甜圈。", tags: ["小吃", "中途點"], link: "https://www.google.com/maps/search/?api=1&query=Kaamasen+Kievari", lat: 69.143, lng: 27.215 },
+                { id: "aanaar", name: "Restaurant Aanaar", type: "精緻餐飲", location: "Kaamanen", rating: 4.6, desc: "Inari 湖畔的高級薩米料理。", tags: ["野味", "特色"], link: "https://www.google.com/maps/search/?api=1&query=Restaurant+Aanaar", lat: 68.905, lng: 27.018 },
+                { id: "laanilan", name: "Laanilan Kievari", type: "野味", location: "Kaamanen", rating: 4.3, desc: "Saariselkä 附近的傳統木屋餐廳。", tags: ["野味", "晚餐"], link: "https://www.google.com/maps/search/?api=1&query=Laanilan+Kievari", lat: 68.395, lng: 27.430 },
 
-                { name: "Snowhotel Kirkenes", type: "海鮮", location: "Kirkenes", rating: 4.5, desc: "帝王蟹吃到飽。", tags: ["海鮮", "大餐"], link: "https://www.google.com/maps/search/?api=1&query=Snowhotel+Kirkenes" },
-                { name: "Gapahuken Restaurant", type: "特色體驗", location: "Kirkenes", rating: 4.7, desc: "位於俄羅斯邊境，帝王蟹與景觀。", tags: ["海鮮", "景觀"], link: "https://www.google.com/maps/search/?api=1&query=Gapahuken+Restaurant+Kirkenes" },
-                { name: "Ritz", type: "小吃", location: "Kirkenes", rating: 4.2, desc: "當地受歡迎的比薩與義式料理。", tags: ["小吃", "午餐"], link: "https://www.google.com/maps/search/?api=1&query=Ritz+Kirkenes" },
+                { id: "snowhotel", name: "Snowhotel Kirkenes", type: "海鮮", location: "Kirkenes", rating: 4.5, desc: "帝王蟹吃到飽。", tags: ["海鮮", "大餐"], link: "https://www.google.com/maps/search/?api=1&query=Snowhotel+Kirkenes", lat: 69.690, lng: 30.070 },
+                { id: "gapahuken", name: "Gapahuken Restaurant", type: "特色體驗", location: "Kirkenes", rating: 4.7, desc: "位於俄羅斯邊境，帝王蟹與景觀。", tags: ["海鮮", "景觀"], link: "https://www.google.com/maps/search/?api=1&query=Gapahuken+Restaurant+Kirkenes", lat: 69.720, lng: 30.150 },
+                { id: "ritz", name: "Ritz", type: "小吃", location: "Kirkenes", rating: 4.2, desc: "當地受歡迎的比薩與義式料理。", tags: ["小吃", "午餐"], link: "https://www.google.com/maps/search/?api=1&query=Ritz+Kirkenes", lat: 69.727, lng: 30.045 },
 
-                { name: "Full Steam", type: "海鮮", location: "Tromsø", rating: 4.4, desc: "炸鱈魚舌，碼頭旁。", tags: ["海鮮", "特色"], link: "https://www.google.com/maps/search/?api=1&query=Full+Steam+Tromso" },
-                { name: "Bardus Bistro", type: "特色體驗", location: "Tromsø", rating: 4.6, desc: "結合北極食材與南歐風味。", tags: ["特色", "晚餐"], link: "https://www.google.com/maps/search/?api=1&query=Bardus+Bistro+Tromsø" },
-                { name: "Mathallen", type: "海鮮", location: "Tromsø", rating: 4.5, desc: "當地頂級食材市場餐廳。", tags: ["海鮮", "精緻餐飲"], link: "https://www.google.com/maps/search/?api=1&query=Mathallen+Tromsø" },
+                { id: "fullsteam", name: "Full Steam", type: "海鮮", location: "Tromsø", rating: 4.4, desc: "炸鱈魚舌，碼頭旁。", tags: ["海鮮", "特色"], link: "https://www.google.com/maps/search/?api=1&query=Full+Steam+Tromso", lat: 69.648, lng: 18.958 },
+                { id: "bardus", name: "Bardus Bistro", type: "特色體驗", location: "Tromsø", rating: 4.6, desc: "結合北極食材與南歐風味。", tags: ["特色", "晚餐"], link: "https://www.google.com/maps/search/?api=1&query=Bardus+Bistro+Tromsø", lat: 69.649, lng: 18.956 },
+                { id: "mathallen", name: "Mathallen", type: "海鮮", location: "Tromsø", rating: 4.5, desc: "當地頂級食材市場餐廳。", tags: ["海鮮", "精緻餐飲"], link: "https://www.google.com/maps/search/?api=1&query=Mathallen+Tromsø", lat: 69.647, lng: 18.960 },
 
-                { name: "Lisa Elmqvist", type: "海鮮", location: "Stockholm", rating: 4.3, desc: "市場內的頂級鮮蝦吐司。", tags: ["海鮮", "午餐"], link: "https://www.google.com/maps/search/?api=1&query=Lisa+Elmqvist" },
-                { name: "Bakfickan", type: "瑞典料理", location: "Stockholm", rating: 4.4, desc: "皇家歌劇院旁，肉丸。", tags: ["肉丸", "經典"], link: "https://www.google.com/maps/search/?api=1&query=Bakfickan" },
-                { name: "Stockholms Gästabud", type: "瑞典料理", location: "Stockholm", rating: 4.5, desc: "老城區溫馨家常菜。", tags: ["肉丸", "老城"], link: "https://www.google.com/maps/search/?api=1&query=Stockholms+Gästabud" },
-                { name: "Meatballs for the People", type: "瑞典料理", location: "Stockholm", rating: 4.2, desc: "各式各樣的肉丸專賣店。", tags: ["肉丸", "特色"], link: "https://www.google.com/maps/search/?api=1&query=Meatballs+for+the+People" },
-                { name: "Vete-Katten", type: "甜點", location: "Stockholm", rating: 4.3, desc: "經典瑞典 Fika 體驗。", tags: ["甜點", "下午茶"], link: "https://www.google.com/maps/search/?api=1&query=Vete-Katten+Stockholm" },
-                { name: "Fem Små Hus", type: "特色體驗", location: "Stockholm", rating: 4.4, desc: "老城區地下室歷史餐廳。", tags: ["野味", "老城"], link: "https://www.google.com/maps/search/?api=1&query=Fem+Små+Hus" }
+                { id: "lisa", name: "Lisa Elmqvist", type: "海鮮", location: "Stockholm", rating: 4.3, desc: "市場內的頂級鮮蝦吐司。", tags: ["海鮮", "午餐"], link: "https://www.google.com/maps/search/?api=1&query=Lisa+Elmqvist", lat: 59.336, lng: 18.079 },
+                { id: "bakfickan", name: "Bakfickan", type: "瑞典料理", location: "Stockholm", rating: 4.4, desc: "皇家歌劇院旁，肉丸。", tags: ["肉丸", "經典"], link: "https://www.google.com/maps/search/?api=1&query=Bakfickan", lat: 59.330, lng: 18.071 },
+                { id: "gastabud", name: "Stockholms Gästabud", type: "瑞典料理", location: "Stockholm", rating: 4.5, desc: "老城區溫馨家常菜。", tags: ["肉丸", "老城"], link: "https://www.google.com/maps/search/?api=1&query=Stockholms+Gästabud", lat: 59.325, lng: 18.072 },
+                { id: "meatballs", name: "Meatballs for the People", type: "瑞典料理", location: "Stockholm", rating: 4.2, desc: "各式各樣的肉丸專賣店。", tags: ["肉丸", "特色"], link: "https://www.google.com/maps/search/?api=1&query=Meatballs+for+the+People", lat: 59.314, lng: 18.078 },
+                { id: "vetekatten", name: "Vete-Katten", type: "甜點", location: "Stockholm", rating: 4.3, desc: "經典瑞典 Fika 體驗。", tags: ["甜點", "下午茶"], link: "https://www.google.com/maps/search/?api=1&query=Vete-Katten+Stockholm", lat: 59.334, lng: 18.058 },
+                { id: "femsmahus", name: "Fem Små Hus", type: "特色體驗", location: "Stockholm", rating: 4.4, desc: "老城區地下室歷史餐廳。", tags: ["野味", "老城"], link: "https://www.google.com/maps/search/?api=1&query=Fem+Små+Hus", lat: 59.324, lng: 18.073 }
             ]
         };
 
@@ -606,6 +613,10 @@
                     initMap();
                     renderCharts();
                 }, 100);
+            } else if (tab === 'food') {
+                setTimeout(() => {
+                    initFoodMap();
+                }, 100);
             }
             // Close mobile menu if open
             if(appData.mobileMenuOpen) toggleMobileMenu();
@@ -647,7 +658,7 @@
                 localStorage.setItem('nordicExpeditionDarkMode', 'false');
             }
             
-            // Re-render chart if dashboard is active to update colors
+            // Re-render charts or maps if needed
             if (appData.currentTab === 'dashboard') {
                 setTimeout(renderCharts, 100);
             }
@@ -781,6 +792,8 @@
 
         // --- MAP FUNCTIONS (Leaflet) ---
         let map;
+        let foodMap;
+        let foodMarkers = [];
         let markers = [];
 
         function initMap() {
@@ -882,6 +895,93 @@
             if(activeBtn) {
                 activeBtn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-50', 'dark:bg-slate-800', 'dark:text-slate-200');
                 activeBtn.classList.add('map-btn-active', 'bg-indigo-600', 'text-white');
+            }
+        }
+
+        // --- FOOD MAP FUNCTIONS ---
+        function initFoodMap() {
+            if (document.getElementById('food-map')) {
+                if (foodMap) {
+                    foodMap.remove(); // Clean up existing instance
+                    foodMap = null;
+                }
+
+                // Init Leaflet
+                foodMap = L.map('food-map');
+
+                // Add Tile Layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 18,
+                    attribution: '© OpenStreetMap'
+                }).addTo(foodMap);
+
+                updateFoodMarkers();
+            }
+        }
+
+        function updateFoodMarkers() {
+            // Clear existing markers
+            foodMarkers.forEach(m => m.remove());
+            foodMarkers = [];
+
+            // Filter
+            const filteredList = currentFoodFilter === 'all' 
+                ? appData.restaurants 
+                : appData.restaurants.filter(r => 
+                    r.tags.some(t => t.includes(currentFoodFilter)) || 
+                    r.type === currentFoodFilter ||
+                    r.location === currentFoodFilter
+                );
+
+            const bounds = [];
+
+            // Add new markers
+            filteredList.forEach(r => {
+                // Use a distinct icon color if possible (default blue is fine for now)
+                const marker = L.marker([r.lat, r.lng]).addTo(foodMap);
+                
+                const popupContent = `
+                    <div class="text-center p-1">
+                        <h4 class="font-bold text-slate-900 mb-1">${r.name}</h4>
+                        <div class="text-xs text-slate-500 mb-1">${r.type}</div>
+                        <div class="text-xs font-bold text-yellow-600"><i class="fa-solid fa-star"></i> ${r.rating}</div>
+                    </div>
+                `;
+                marker.bindPopup(popupContent);
+                foodMarkers.push(marker);
+                bounds.push([r.lat, r.lng]);
+            });
+
+            // Fit bounds
+            if (bounds.length > 0) {
+                foodMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+            } else {
+                // Default view if no markers
+                foodMap.setView([65, 20], 5);
+            }
+        }
+
+        function panFoodMap(id) {
+            const rest = appData.restaurants.find(r => r.id === id);
+            if (rest && foodMap) {
+                foodMap.flyTo([rest.lat, rest.lng], 16, {
+                    animate: true,
+                    duration: 1
+                });
+                
+                // Find and open popup
+                foodMarkers.forEach(marker => {
+                    const mLat = marker.getLatLng().lat;
+                    const mLng = marker.getLatLng().lng;
+                    if (Math.abs(mLat - rest.lat) < 0.0001 && Math.abs(mLng - rest.lng) < 0.0001) {
+                        marker.openPopup();
+                    }
+                });
+            }
+            // Scroll to map on mobile
+            if (window.innerWidth < 1024) {
+                const container = document.getElementById('food-map-container');
+                if(container) container.scrollIntoView({behavior: 'smooth'});
             }
         }
 
@@ -1072,6 +1172,114 @@
                     </div>
                 </div>
             `;
+        }
+
+        let currentFoodFilter = 'all';
+
+        function renderFoodMap() {
+            const types = [
+                { id: 'all', label: '全部' },
+                { id: '野味', label: '野味/肉類' },
+                { id: '海鮮', label: '極地海鮮' },
+                { id: '甜點', label: '咖啡甜點' },
+                { id: '特色', label: '特色體驗' }
+            ];
+            
+            const locations = [
+                { id: 'Helsinki', label: '赫爾辛基' },
+                { id: 'Rovaniemi', label: '羅瓦涅米' },
+                { id: 'Kaamanen', label: '卡馬寧' },
+                { id: 'Kirkenes', label: '希爾克內斯' },
+                { id: 'Tromsø', label: '特羅姆瑟' },
+                { id: 'Stockholm', label: '斯德哥爾摩' }
+            ];
+
+            const filteredList = currentFoodFilter === 'all' 
+                ? appData.restaurants 
+                : appData.restaurants.filter(r => 
+                    r.tags.some(t => t.includes(currentFoodFilter)) || 
+                    r.type === currentFoodFilter ||
+                    r.location === currentFoodFilter
+                );
+
+            const typeButtons = types.map(f => `
+                <button onclick="setFoodFilter('${f.id}')" 
+                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors border ${currentFoodFilter === f.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-600'}">
+                    ${f.label}
+                </button>
+            `).join('');
+            
+            const locationButtons = locations.map(l => `
+                <button onclick="setFoodFilter('${l.id}')" 
+                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors border ${currentFoodFilter === l.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-600'}">
+                    <i class="fa-solid fa-location-dot mr-1 text-[10px]"></i>${l.label}
+                </button>
+            `).join('');
+
+            const cards = filteredList.map(r => `
+                <div class="bg-white dark:bg-slate-800 rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden flex flex-col cursor-pointer ring-2 ring-transparent hover:ring-indigo-500" onclick="panFoodMap('${r.id}')">
+                    <div class="p-5 flex-1">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">${r.name}</h3>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200">
+                                ${r.type}
+                            </span>
+                        </div>
+                        <div class="flex items-center mt-1 mb-2">
+                            <i class="fa-solid fa-star text-yellow-400 text-xs mr-1"></i>
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-300">${r.rating}</span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-2"><i class="fa-solid fa-location-dot mr-1"></i> ${r.location}</p>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 mt-2">${r.desc}</p>
+                        <div class="mt-3 flex flex-wrap gap-1">
+                            ${r.tags.map(t => `<span class="inline-block bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 text-[10px] px-2 py-0.5 rounded-full">#${t}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-700/50 px-5 py-3 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                        <span class="text-xs text-indigo-500 dark:text-indigo-400 font-bold"><i class="fa-solid fa-crosshairs mr-1"></i> 點擊定位</span>
+                        <a href="${r.link}" target="_blank" onclick="event.stopPropagation()" class="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300 text-sm">
+                            <i class="fa-solid fa-map-location-dot"></i> Google Maps
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="max-w-7xl mx-auto p-4 sm:p-8 h-full flex flex-col lg:flex-row gap-6">
+                    <!-- Left Column: Filters & List -->
+                    <div class="w-full lg:w-1/2 flex flex-col h-full order-2 lg:order-1">
+                        <div class="mb-4 space-y-3">
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <span class="text-xs font-bold text-slate-400 uppercase w-12">分類:</span>
+                                ${typeButtons}
+                            </div>
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <span class="text-xs font-bold text-slate-400 uppercase w-12">地區:</span>
+                                ${locationButtons}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto pb-4 custom-scrollbar">
+                            ${cards}
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Interactive Map -->
+                    <div class="w-full lg:w-1/2 order-1 lg:order-2">
+                        <div class="sticky top-4 h-[400px] lg:h-[600px] bg-slate-100 dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden border border-slate-200 dark:border-slate-700" id="food-map-container">
+                            <div id="food-map"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setFoodFilter(filter) {
+            currentFoodFilter = filter;
+            renderContent(); 
+            // Re-init map after content re-render because the div was destroyed
+            setTimeout(() => {
+                initFoodMap();
+            }, 50);
         }
 
         function renderGuide() {
@@ -1443,99 +1651,6 @@
             `;
         }
 
-        let currentFoodFilter = 'all';
-
-        function renderFoodMap() {
-            const types = [
-                { id: 'all', label: '全部' },
-                { id: '野味', label: '野味/肉類' },
-                { id: '海鮮', label: '極地海鮮' },
-                { id: '甜點', label: '咖啡甜點' },
-                { id: '特色', label: '特色體驗' }
-            ];
-            
-            const locations = [
-                { id: 'Helsinki', label: '赫爾辛基' },
-                { id: 'Rovaniemi', label: '羅瓦涅米' },
-                { id: 'Kaamanen', label: '卡馬寧' },
-                { id: 'Kirkenes', label: '希爾克內斯' },
-                { id: 'Tromsø', label: '特羅姆瑟' },
-                { id: 'Stockholm', label: '斯德哥爾摩' }
-            ];
-
-            const filteredList = currentFoodFilter === 'all' 
-                ? appData.restaurants 
-                : appData.restaurants.filter(r => 
-                    r.tags.some(t => t.includes(currentFoodFilter)) || 
-                    r.type === currentFoodFilter ||
-                    r.location === currentFoodFilter
-                );
-
-            const typeButtons = types.map(f => `
-                <button onclick="setFoodFilter('${f.id}')" 
-                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors border ${currentFoodFilter === f.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-600'}">
-                    ${f.label}
-                </button>
-            `).join('');
-            
-            const locationButtons = locations.map(l => `
-                <button onclick="setFoodFilter('${l.id}')" 
-                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors border ${currentFoodFilter === l.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-600'}">
-                    <i class="fa-solid fa-location-dot mr-1 text-[10px]"></i>${l.label}
-                </button>
-            `).join('');
-
-            const cards = filteredList.map(r => `
-                <div class="bg-white dark:bg-slate-800 rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
-                    <div class="p-5 flex-1">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">${r.name}</h3>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200">
-                                ${r.type}
-                            </span>
-                        </div>
-                        <div class="flex items-center mt-1 mb-2">
-                            <i class="fa-solid fa-star text-yellow-400 text-xs mr-1"></i>
-                            <span class="text-sm font-bold text-slate-700 dark:text-slate-300">${r.rating}</span>
-                        </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-2"><i class="fa-solid fa-location-dot mr-1"></i> ${r.location}</p>
-                        <p class="text-sm text-slate-600 dark:text-slate-300 mt-2">${r.desc}</p>
-                        <div class="mt-3 flex flex-wrap gap-1">
-                            ${r.tags.map(t => `<span class="inline-block bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 text-[10px] px-2 py-0.5 rounded-full">#${t}</span>`).join('')}
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 dark:bg-slate-700/50 px-5 py-3 border-t border-slate-100 dark:border-slate-700">
-                        <a href="${r.link}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium flex items-center justify-center">
-                            <i class="fa-solid fa-map-location-dot mr-2"></i> Google Maps
-                        </a>
-                    </div>
-                </div>
-            `).join('');
-
-            return `
-                <div class="max-w-7xl mx-auto p-4 sm:p-8">
-                    <div class="mb-6 space-y-3">
-                        <div class="flex flex-wrap gap-2 items-center">
-                            <span class="text-xs font-bold text-slate-400 uppercase w-12">分類:</span>
-                            ${typeButtons}
-                        </div>
-                        <div class="flex flex-wrap gap-2 items-center">
-                            <span class="text-xs font-bold text-slate-400 uppercase w-12">地區:</span>
-                            ${locationButtons}
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        ${cards}
-                    </div>
-                </div>
-            `;
-        }
-
-        function setFoodFilter(filter) {
-            currentFoodFilter = filter;
-            renderContent(); 
-        }
-
         // --- CHART RENDERING ---
 
         function renderCharts() {
@@ -1641,7 +1756,9 @@
         }
 
         // --- INIT ---
-        init();
+        window.onload = function() {
+            init();
+        };
 
     </script>
 </body>
