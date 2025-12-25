@@ -1,12 +1,28 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2025-2026 北歐極地跨國遠征戰略指揮中心</title>
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS with Dark Mode Config -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#1e293b', // Custom dark shade
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -26,7 +42,6 @@
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f8fafc; /* Slate 50 */
         }
         
         /* Custom Scrollbar */
@@ -37,9 +52,15 @@
         ::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
@@ -63,15 +84,10 @@
             scrollbar-width: none;  /* Firefox */
         }
         
-        /* Smooth scrolling adjustment */
-        html {
-            scroll-behavior: smooth;
-        }
-        
         /* Active state for map buttons */
         .map-btn-active {
             background-color: #4f46e5;
-            color: white;
+            color: white !important;
             border-color: #4f46e5;
         }
 
@@ -81,20 +97,79 @@
             width: 100%;
             z-index: 1;
         }
+
+        /* Dark Mode Map Filter - Cool trick to invert standard tiles */
+        .dark .leaflet-layer,
+        .dark .leaflet-control-zoom-in,
+        .dark .leaflet-control-zoom-out,
+        .dark .leaflet-control-attribution {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+
+        /* Back to Top Button */
+        #back-to-top {
+            transition: opacity 0.3s, transform 0.3s;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+        }
+        #back-to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        /* Print Styles */
+        @media print {
+            header, #mobile-menu-btn, .map-btn, .no-print, #back-to-top, #mobile-menu { 
+                display: none !important; 
+            }
+            body { 
+                background: white !important; 
+                color: black !important; 
+                height: auto !important;
+                overflow: visible !important;
+            }
+            #main-content { 
+                overflow: visible !important; 
+                height: auto !important; 
+                padding-bottom: 0 !important;
+            }
+            .dark {
+                color-scheme: light;
+            }
+            /* Reset Dark Mode for Print */
+            .dark body, .dark #main-content {
+                background-color: white !important;
+                color: black !important;
+            }
+            .dark .text-slate-200, .dark .text-slate-300, .dark .text-slate-400 {
+                color: #334155 !important; /* slate-700 */
+            }
+            .bg-white, .dark .bg-slate-800 {
+                background-color: white !important;
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: none !important;
+            }
+            /* Break pages nicely */
+            .break-inside-avoid {
+                page-break-inside: avoid;
+            }
+        }
     </style>
 </head>
-<body class="text-slate-800 antialiased flex flex-col h-screen overflow-hidden">
+<body class="text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-950 antialiased flex flex-col h-screen overflow-hidden transition-colors duration-300">
 
     <!-- Top Navigation -->
-    <header class="bg-white shadow-sm z-50 flex-none relative h-16">
+    <header class="bg-white dark:bg-slate-900 shadow-sm z-50 flex-none relative h-16 transition-colors duration-300 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
             <div class="flex justify-between items-center h-full">
                 <!-- Logo Area -->
                 <div class="flex items-center">
                     <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="switchTab('dashboard')">
-                        <i class="fa-solid fa-compass text-2xl text-slate-800"></i>
-                        <span class="font-bold text-xl tracking-tight hidden sm:block">北歐極地遠征 <span class="text-slate-500 font-normal text-sm ml-1">2025-26</span></span>
-                        <span class="font-bold text-xl tracking-tight sm:hidden">Nordic 2026</span>
+                        <i class="fa-solid fa-compass text-2xl text-slate-800 dark:text-white"></i>
+                        <span class="font-bold text-xl tracking-tight hidden sm:block dark:text-white">北歐極地遠征 <span class="text-slate-500 dark:text-slate-400 font-normal text-sm ml-1">2025-26</span></span>
+                        <span class="font-bold text-xl tracking-tight sm:hidden dark:text-white">Nordic 2026</span>
                     </div>
                     <!-- Desktop Menu -->
                     <div class="hidden md:ml-10 md:flex md:space-x-8" id="desktop-nav">
@@ -103,13 +178,18 @@
                 </div>
 
                 <!-- Right Side: Status & Mobile Toggle -->
-                <div class="flex items-center">
-                   <div class="text-sm text-right hidden md:block mr-4">
-                       <div class="font-medium text-slate-900">極地戰略指揮部</div>
-                       <div class="text-slate-500 text-xs">狀態: 準備執行</div>
+                <div class="flex items-center gap-3">
+                   <!-- Dark Mode Toggle -->
+                   <button onclick="toggleDarkMode()" class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:text-yellow-400 dark:hover:bg-slate-800 transition-colors" title="Toggle Aurora Mode">
+                        <i id="dark-mode-icon" class="fa-solid fa-moon text-xl"></i>
+                   </button>
+
+                   <div class="text-sm text-right hidden md:block mr-2">
+                       <div class="font-medium text-slate-900 dark:text-white">極地戰略指揮部</div>
+                       <div class="text-slate-500 dark:text-slate-400 text-xs">狀態: 準備執行</div>
                    </div>
                    <!-- Mobile Menu Button -->
-                   <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                   <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                         <span class="sr-only">Open main menu</span>
                         <i class="fa-solid fa-bars text-xl"></i>
                    </button>
@@ -118,7 +198,7 @@
         </div>
 
         <!-- Mobile Menu Dropdown (Absolute Positioning Fix) -->
-        <div id="mobile-menu" class="hidden absolute top-16 left-0 w-full bg-white shadow-lg border-t border-slate-100 z-50 fade-in md:hidden">
+        <div id="mobile-menu" class="hidden absolute top-16 left-0 w-full bg-white dark:bg-slate-900 shadow-lg border-t border-slate-100 dark:border-slate-800 z-50 fade-in md:hidden">
              <div class="px-2 pt-2 pb-3 space-y-1" id="mobile-nav-items">
                  <!-- Mobile Nav items injected by JS -->
              </div>
@@ -126,9 +206,14 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto bg-slate-50 scroll-smooth pb-24 relative" id="main-content">
+    <main class="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 scroll-smooth pb-24 relative transition-colors duration-300" id="main-content">
         <!-- Dynamic Content Injected Here -->
     </main>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" onclick="scrollToTop()" class="fixed bottom-6 right-6 z-50 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-lg focus:outline-none transition-colors no-print" title="回到頂端">
+        <i class="fa-solid fa-arrow-up text-lg"></i>
+    </button>
 
     <!-- JavaScript Logic -->
     <script>
@@ -137,12 +222,104 @@
             currentTab: 'dashboard',
             viewMode: 'detailed', 
             mobileMenuOpen: false,
+            darkMode: false,
+            missionStartDate: new Date("2025-12-28T00:00:00").getTime(),
+            // Exchange Rates (Approximate)
+            exchangeRates: {
+                EUR: 34.5, // Euro
+                SEK: 3.0,  // Swedish Krona
+                NOK: 2.9   // Norwegian Krone
+            },
             tripStats: {
                 totalDays: 13,
                 countries: ['芬蘭', '瑞典', '挪威'],
                 totalDistanceKm: 3200,
                 auroraChance: 'High (Solar Max)',
             },
+            gearChecklist: [
+                {
+                    category: "核心文件與金流 (Critical Documents)",
+                    icon: "fa-passport",
+                    items: [
+                        { name: "護照 (效期6個月以上)", checked: false },
+                        { name: "駕照正本 + 國際駕照", checked: false },
+                        { name: "信用卡 (需申請預借現金密碼 PIN Code)", checked: false },
+                        { name: "租車/住宿確認憑證 (紙本備份)", checked: false },
+                        { name: "申根保險證明", checked: false }
+                    ]
+                },
+                {
+                    category: "極地人身部品 (Arctic Gear)",
+                    icon: "fa-mitten",
+                    items: [
+                        { name: "底層：美麗諾羊毛衣/褲 (Merino Wool)", checked: false },
+                        { name: "中層：刷毛衣/羊毛衣 (Fleece/Wool)", checked: false },
+                        { name: "外層：防風防水外套 (Gore-Tex)", checked: false },
+                        { name: "下身：防風防水滑雪褲", checked: false },
+                        { name: "配件：羊毛襪 (多雙)", checked: false },
+                        { name: "配件：防風手套 + 觸控內手套", checked: false },
+                        { name: "配件：毛帽 (遮耳) + 圍脖", checked: false },
+                        { name: "鞋類：高筒防水雪靴/登山鞋", checked: false },
+                        { name: "裝備：簡易冰爪 (Crampons)", checked: false }
+                    ]
+                },
+                {
+                    category: "電子與攝影 (Tech & Photo)",
+                    icon: "fa-camera",
+                    items: [
+                        { name: "相機 + 大光圈廣角鏡", checked: false },
+                        { name: "穩固腳架 (極光必備)", checked: false },
+                        { name: "備用電池 x3 (低溫耗電快)", checked: false },
+                        { name: "快門線 (防手震)", checked: false },
+                        { name: "行動電源 (Power Bank)", checked: false },
+                        { name: "萬用轉接頭 (歐規)", checked: false }
+                    ]
+                },
+                {
+                    category: "車用與生活 (Car & Misc)",
+                    icon: "fa-car-side",
+                    items: [
+                        { name: "手機車用支架", checked: false },
+                        { name: "車充 (USB/Type-C)", checked: false },
+                        { name: "墨鏡 (雪地防眩光)", checked: false },
+                        { name: "保溫瓶 (隨時喝熱水)", checked: false },
+                        { name: "高保濕乳液/護唇膏", checked: false },
+                        { name: "個人藥品/暖暖包", checked: false }
+                    ]
+                }
+            ],
+            phrases: [
+                {
+                    lang: "芬蘭語 (Finnish)",
+                    flag: "🇫🇮",
+                    items: [
+                        { src: "你好", tgt: "Hei (嘿) / Moi (摸以)" },
+                        { src: "謝謝", tgt: "Kiitos (ki-tos)" },
+                        { src: "乾杯", tgt: "Kippis (ki-pis)" },
+                        { src: "我不懂", tgt: "En ymmärrä" }
+                    ]
+                },
+                {
+                    lang: "瑞典語 (Swedish)",
+                    flag: "🇸🇪",
+                    items: [
+                        { src: "你好", tgt: "Hej (嘿)" },
+                        { src: "謝謝", tgt: "Tack (踏克)" },
+                        { src: "乾杯", tgt: "Skål (skol)" },
+                        { src: "廁所在哪", tgt: "Var är toaletten?" }
+                    ]
+                },
+                {
+                    lang: "挪威語 (Norwegian)",
+                    flag: "🇳🇴",
+                    items: [
+                        { src: "你好", tgt: "Hei (嘿)" },
+                        { src: "謝謝", tgt: "Takk (踏克)" },
+                        { src: "對不起", tgt: "Unnskyld (un-shil)" },
+                        { src: "這多少錢", tgt: "Hvor mye koster det?" }
+                    ]
+                }
+            ],
             weatherForecast: [
                 { day: 1, loc: "Helsinki", temp: "-5°C", cond: "Snow Showers", icon: "fa-snowflake", sun: "09:24 - 15:18" },
                 { day: 2, loc: "Rovaniemi", temp: "-15°C", cond: "Partly Cloudy", icon: "fa-cloud-moon", sun: "10:50 - 13:30" },
@@ -237,6 +414,7 @@
                     aurora: "高 (回程 971 公路)",
                     events: [
                         { time: "09:30 (FI)", type: "transport", title: "最美公路 971", desc: "前往挪威。薩米文化核心區。", details: "途經 Sevetin Baari 咖啡補給。通過 Neiden 邊境進入挪威。這條路蜿蜒穿過無數小湖泊與岩石丘陵。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Road+971+Finland" },
+                        { time: "10:45 (FI)", type: "activity", title: "斯科爾特薩米村", desc: "Sevettijärvi 停留，參觀東正教木造教堂。", details: "這裡是獨特的 Skolt Sámi 文化中心 (二戰後從 Petsamo 遷徙而來)。教堂建築簡單卻充滿歷史感，周圍是荒涼的湖泊景觀。", tips: "適合在此稍作伸展，拍攝雪地教堂。", link: "https://www.google.com/maps/search/?api=1&query=Sevettijärvi+Orthodox+Church" },
                         { time: "12:00 (NO)", type: "activity", title: "Neiden 瀑布與時差", desc: "暫停 Skoltefossen 瀑布。", details: "跨越峽谷的橋樑景觀壯觀。注意時差：芬蘭 (UTC+2) -> 挪威 (UTC+1)，手機時間倒退 1 小時。進入挪威後物價翻倍。", tips: "", link: "https://www.google.com/maps/search/?api=1&query=Skoltefossen" },
                         { time: "13:00 (NO)", type: "food", title: "帝王蟹狩獵", desc: "Snowhotel Kirkenes。", details: "搭乘雪地摩托車雪橇前往冰封峽灣，親手拉起巨大的蟹籠。享用現煮帝王蟹腿吃到飽。紅色帝王蟹是蘇聯引入的外來種。", tips: "高蛋白易想睡。", link: "https://www.google.com/maps/search/?api=1&query=Snowhotel+Kirkenes" },
                         { time: "17:00 (NO)", type: "transport", title: "戰略撤退", desc: "夜間駕駛返回芬蘭。", details: "高蛋白飲食易導致飯後嗜睡 (Food Coma)，加上全程黑暗駕駛，風險極高。對策：離開前喝濃咖啡，車內溫度勿過高。", tips: "", link: "" },
@@ -389,7 +567,28 @@
 
         function init() {
             renderNav();
+            loadGearState(); // Load saved checked state
             renderContent();
+            updateCountdown();
+            setInterval(updateCountdown, 60000);
+            
+            // Check for saved dark mode preference
+            if (localStorage.getItem('nordicExpeditionDarkMode') === 'true') {
+                toggleDarkMode(true);
+            }
+
+            // Scroll listener for back-to-top
+            window.addEventListener('scroll', () => {
+                const btn = document.getElementById('back-to-top');
+                if (btn) {
+                    if (window.scrollY > 300) {
+                        btn.classList.add('visible');
+                    } else {
+                        btn.classList.remove('visible');
+                    }
+                }
+            });
+
             if (appData.currentTab === 'dashboard') {
                 setTimeout(() => {
                     initMap();
@@ -422,6 +621,38 @@
             }
         }
 
+        function toggleDarkMode(forceState) {
+            if (forceState !== undefined) {
+                appData.darkMode = forceState;
+            } else {
+                appData.darkMode = !appData.darkMode;
+            }
+            
+            const html = document.documentElement;
+            const icon = document.getElementById('dark-mode-icon');
+            
+            if (appData.darkMode) {
+                html.classList.add('dark');
+                if(icon) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                }
+                localStorage.setItem('nordicExpeditionDarkMode', 'true');
+            } else {
+                html.classList.remove('dark');
+                if(icon) {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+                localStorage.setItem('nordicExpeditionDarkMode', 'false');
+            }
+            
+            // Re-render chart if dashboard is active to update colors
+            if (appData.currentTab === 'dashboard') {
+                setTimeout(renderCharts, 100);
+            }
+        }
+
         function toggleViewMode() {
             appData.viewMode = appData.viewMode === 'simplified' ? 'detailed' : 'simplified';
             renderContent(); 
@@ -447,11 +678,105 @@
             }
         }
 
+        function scrollToTop() {
+            const mainContainer = document.getElementById('main-content');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (mainContainer) {
+                mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
         function goToItinerary(day) {
             switchTab('itinerary');
             setTimeout(() => {
                 scrollToDay(day);
             }, 300); // Slight delay to ensure DOM is ready
+        }
+
+        function toggleGearItem(catIndex, itemIndex) {
+            appData.gearChecklist[catIndex].items[itemIndex].checked = !appData.gearChecklist[catIndex].items[itemIndex].checked;
+            saveGearState(); // Save to localStorage
+            renderContent();
+        }
+
+        // --- PERSISTENCE ---
+        function saveGearState() {
+            const state = appData.gearChecklist.map(cat => cat.items.map(item => item.checked));
+            localStorage.setItem('nordicExpeditionGear', JSON.stringify(state));
+        }
+
+        function loadGearState() {
+            const saved = localStorage.getItem('nordicExpeditionGear');
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    appData.gearChecklist.forEach((cat, cIdx) => {
+                        if (state[cIdx]) {
+                            cat.items.forEach((item, iIdx) => {
+                                if (state[cIdx][iIdx] !== undefined) {
+                                    item.checked = state[cIdx][iIdx];
+                                }
+                            });
+                        }
+                    });
+                } catch (e) {
+                    console.error("Failed to load gear state", e);
+                }
+            }
+        }
+
+        function copyDayPlan(dayIndex) {
+            const day = appData.dailyItinerary[dayIndex];
+            let text = `📅 ${day.date} - ${day.location}\n`;
+            text += `主題: ${day.theme}\n\n`;
+            day.events.forEach(e => {
+                text += `⏰ ${e.time} ${e.title}\n`;
+                text += `   ${e.desc}\n`;
+            });
+            text += `\n北歐極地遠征 2026`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById(`copy-btn-${dayIndex}`);
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> 已複製';
+                btn.classList.add('bg-green-600', 'text-white');
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('bg-green-600', 'text-white');
+                }, 2000);
+            });
+        }
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = appData.missionStartDate - now;
+            
+            if (document.getElementById('countdown-timer')) {
+                if (distance < 0) {
+                    document.getElementById('countdown-timer').innerHTML = "MISSION ACTIVE";
+                    return;
+                }
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                
+                document.getElementById('countdown-timer').innerHTML = `T-${days}d ${hours}h ${minutes}m`;
+            }
+        }
+
+        function convertCurrency() {
+            const amount = document.getElementById('curr-amount').value;
+            const currency = document.getElementById('curr-select').value;
+            const resultEl = document.getElementById('curr-result');
+            
+            if (amount && !isNaN(amount)) {
+                const rate = appData.exchangeRates[currency];
+                const result = (amount * rate).toFixed(0);
+                resultEl.innerHTML = `≈ NT$ ${result}`;
+            } else {
+                resultEl.innerHTML = "---";
+            }
         }
 
         // --- MAP FUNCTIONS (Leaflet) ---
@@ -551,11 +876,11 @@
             // Update active button state
             document.querySelectorAll('.map-btn').forEach(btn => {
                 btn.classList.remove('map-btn-active', 'bg-indigo-600', 'text-white');
-                btn.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-50');
+                btn.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-50', 'dark:bg-slate-800', 'dark:text-slate-200');
             });
             const activeBtn = document.getElementById(`map-btn-${btnId}`);
             if(activeBtn) {
-                activeBtn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-50');
+                activeBtn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-50', 'dark:bg-slate-800', 'dark:text-slate-200');
                 activeBtn.classList.add('map-btn-active', 'bg-indigo-600', 'text-white');
             }
         }
@@ -564,13 +889,15 @@
             const tabs = [
                 { id: 'dashboard', icon: 'fa-chart-line', label: '戰略儀表盤' },
                 { id: 'itinerary', icon: 'fa-list-ol', label: '每日戰略行程' },
+                { id: 'gear', icon: 'fa-suitcase-rolling', label: '裝備整備' },
                 { id: 'logistics', icon: 'fa-truck-plane', label: '後勤與交通' },
                 { id: 'food', icon: 'fa-utensils', label: '美食地圖' },
+                { id: 'guide', icon: 'fa-book-medical', label: '生存指南' }, // New Tab
             ];
 
             const desktopHTML = tabs.map(tab => `
                 <button onclick="switchTab('${tab.id}')" 
-                    class="${appData.currentTab === tab.id ? 'border-indigo-500 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'} 
+                    class="${appData.currentTab === tab.id ? 'border-indigo-500 text-slate-900 dark:text-white dark:border-indigo-400' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300'} 
                     inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition duration-150 ease-in-out h-full">
                     <i class="fa-solid ${tab.icon} mr-2"></i> ${tab.label}
                 </button>
@@ -578,7 +905,7 @@
 
             const mobileHTML = tabs.map(tab => `
                 <button onclick="switchTab('${tab.id}')" 
-                    class="${appData.currentTab === tab.id ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'} 
+                    class="${appData.currentTab === tab.id ? 'bg-indigo-50 text-indigo-700 dark:bg-slate-800 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900'} 
                     block w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center">
                     <i class="fa-solid ${tab.icon} w-6 text-center mr-2"></i>
                     ${tab.label}
@@ -599,10 +926,14 @@
                 contentHTML = renderDashboard();
             } else if (appData.currentTab === 'itinerary') {
                 contentHTML = renderItinerary();
+            } else if (appData.currentTab === 'gear') {
+                contentHTML = renderGear();
             } else if (appData.currentTab === 'logistics') {
                 contentHTML = renderLogistics();
             } else if (appData.currentTab === 'food') {
                 contentHTML = renderFoodMap();
+            } else if (appData.currentTab === 'guide') {
+                contentHTML = renderGuide();
             }
 
             main.innerHTML = `<div class="fade-in max-w-7xl mx-auto pb-8">${contentHTML}</div>`;
@@ -612,28 +943,45 @@
 
         function renderDashboard() {
             const weatherCards = appData.weatherForecast.map(w => `
-                <div class="flex-none w-32 bg-white border border-slate-200 rounded-lg p-3 text-center snap-center shadow-sm">
-                    <div class="text-xs text-slate-500 mb-1">Day ${w.day}</div>
-                    <div class="text-sm font-bold text-slate-800 truncate">${w.loc}</div>
-                    <div class="my-2 text-indigo-600"><i class="fa-solid ${w.icon} text-2xl"></i></div>
-                    <div class="text-lg font-bold text-slate-900">${w.temp}</div>
-                    <div class="text-xs text-slate-500 truncate">${w.cond}</div>
-                    <div class="mt-1 text-[10px] text-slate-400 bg-slate-50 rounded px-1 py-0.5"><i class="fa-regular fa-sun"></i> ${w.sun}</div>
+                <div class="flex-none w-32 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-center snap-center shadow-sm">
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">Day ${w.day}</div>
+                    <div class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">${w.loc}</div>
+                    <div class="my-2 text-indigo-600 dark:text-indigo-400"><i class="fa-solid ${w.icon} text-2xl"></i></div>
+                    <div class="text-lg font-bold text-slate-900 dark:text-white">${w.temp}</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 truncate">${w.cond}</div>
+                    <div class="mt-1 text-[10px] text-slate-400 bg-slate-50 dark:bg-slate-900 rounded px-1 py-0.5"><i class="fa-regular fa-sun"></i> ${w.sun}</div>
                 </div>
             `).join('');
 
             const mapButtons = appData.mapLocations.map(loc => `
                 <button id="map-btn-${loc.id}" onclick="updateMap('', ${loc.id})" 
-                    class="map-btn w-full text-left px-3 py-2 rounded text-xs font-medium border border-slate-200 mb-2 transition-colors bg-white text-slate-700 hover:bg-slate-50">
-                    <i class="fa-solid fa-location-dot mr-2 text-indigo-500"></i>${loc.name}
+                    class="map-btn w-full text-left px-3 py-2 rounded text-xs font-medium border border-slate-200 dark:border-slate-700 mb-2 transition-colors bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700">
+                    <i class="fa-solid fa-location-dot mr-2 text-indigo-500 dark:text-indigo-400"></i>${loc.name}
                 </button>
             `).join('');
 
+            // Chart Colors based on dark mode
+            const gridColor = appData.darkMode ? '#334155' : '#e2e8f0';
+            const tickColor = appData.darkMode ? '#94a3b8' : '#64748b';
+
             return `
                 <div class="p-4 sm:p-8">
+                    <!-- Countdown Header -->
+                    <div class="bg-indigo-900 rounded-lg shadow-lg p-6 mb-8 text-white flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+                        <div class="z-10 text-center md:text-left">
+                            <h2 class="text-xl font-bold uppercase tracking-wider mb-1"><i class="fa-solid fa-shuttle-space mr-2"></i> Mission Countdown</h2>
+                            <p class="text-indigo-200 text-sm">Target: 2025-12-28 | Helsinki Injection</p>
+                        </div>
+                        <div class="z-10 mt-4 md:mt-0">
+                            <div id="countdown-timer" class="text-4xl font-mono font-bold tracking-widest text-emerald-400">Loading...</div>
+                        </div>
+                        <div class="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-indigo-800 to-transparent opacity-30"></div>
+                        <div class="absolute -bottom-10 -right-10 text-9xl text-white opacity-5"><i class="fa-solid fa-stopwatch"></i></div>
+                    </div>
+
                     <!-- Weather -->
-                    <div class="bg-white shadow rounded-lg p-6 mb-8">
-                        <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4 flex items-center">
+                    <div class="bg-white dark:bg-slate-800 shadow rounded-lg p-6 mb-8">
+                        <h3 class="text-lg leading-6 font-medium text-slate-900 dark:text-white mb-4 flex items-center">
                             <i class="fa-solid fa-temperature-low text-blue-500 mr-2"></i> 極地氣象預報中心
                         </h3>
                         <div class="flex overflow-x-auto space-x-4 pb-4 snap-x no-scrollbar">
@@ -643,52 +991,52 @@
 
                     <!-- KPI Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div class="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6">
-                            <dt class="text-sm font-medium text-slate-500">極光觀測機率</dt>
-                            <dd class="mt-1 text-3xl font-semibold text-indigo-600">High</dd>
-                            <p class="text-xs text-slate-400 mt-1">Solar Maximum Cycle 25</p>
+                        <div class="bg-white dark:bg-slate-800 overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6">
+                            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">極光觀測機率</dt>
+                            <dd class="mt-1 text-3xl font-semibold text-indigo-600 dark:text-indigo-400">High</dd>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Solar Maximum Cycle 25</p>
                         </div>
-                        <div class="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6">
-                            <dt class="text-sm font-medium text-slate-500">總移動距離 (Est.)</dt>
-                            <dd class="mt-1 text-3xl font-semibold text-slate-900">3,200 km</dd>
-                            <p class="text-xs text-slate-400 mt-1">跨越北緯 60° 至 71°</p>
+                        <div class="bg-white dark:bg-slate-800 overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6">
+                            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">總移動距離 (Est.)</dt>
+                            <dd class="mt-1 text-3xl font-semibold text-slate-900 dark:text-white">3,200 km</dd>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">跨越北緯 60° 至 71°</p>
                         </div>
-                        <div class="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6">
-                            <dt class="text-sm font-medium text-slate-500">戰略執行狀態</dt>
-                            <dd class="mt-1 text-3xl font-semibold text-emerald-600">Ready</dd>
-                            <p class="text-xs text-slate-400 mt-1">所有預訂已確認</p>
+                        <div class="bg-white dark:bg-slate-800 overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6">
+                            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">戰略執行狀態</dt>
+                            <dd class="mt-1 text-3xl font-semibold text-emerald-600 dark:text-emerald-400">Ready</dd>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">所有預訂已確認</p>
                         </div>
                     </div>
 
                     <!-- Map & Charts -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
                         <!-- Strategic Map with Controls -->
-                        <div class="bg-white shadow rounded-lg p-6 lg:col-span-3">
-                            <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">
-                                <i class="fa-solid fa-map text-emerald-600 mr-2"></i>北歐戰略地圖 (Strategic Map)
+                        <div class="bg-white dark:bg-slate-800 shadow rounded-lg p-6 lg:col-span-3">
+                            <h3 class="text-lg leading-6 font-medium text-slate-900 dark:text-white mb-4">
+                                <i class="fa-solid fa-map text-emerald-600 dark:text-emerald-400 mr-2"></i>北歐戰略地圖 (Strategic Map)
                             </h3>
                             <div class="flex flex-col md:flex-row gap-4 h-[500px] md:h-[400px]">
                                 <!-- Map Controls -->
                                 <div class="w-full md:w-1/4 h-32 md:h-full overflow-y-auto pr-2 custom-scrollbar">
-                                    <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">每日據點跳轉</h4>
+                                    <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-3">每日據點跳轉</h4>
                                     ${mapButtons}
                                 </div>
                                 <!-- Map Frame (Leaflet Container) -->
-                                <div class="w-full md:w-3/4 relative h-full rounded-lg overflow-hidden border border-slate-200 z-0">
+                                <div class="w-full md:w-3/4 relative h-full rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 z-0 bg-slate-100">
                                     <div id="strategic-map"></div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-white shadow rounded-lg p-6 lg:col-span-2">
-                            <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">活動強度與交通時間</h3>
+                        <div class="bg-white dark:bg-slate-800 shadow rounded-lg p-6 lg:col-span-2">
+                            <h3 class="text-lg leading-6 font-medium text-slate-900 dark:text-white mb-4">活動強度與交通時間</h3>
                             <div class="relative h-64 w-full">
                                 <canvas id="activityChart"></canvas>
                             </div>
                         </div>
 
-                        <div class="bg-white shadow rounded-lg p-6 lg:col-span-1">
-                            <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">北極圈緯度變化</h3>
+                        <div class="bg-white dark:bg-slate-800 shadow rounded-lg p-6 lg:col-span-1">
+                            <h3 class="text-lg leading-6 font-medium text-slate-900 dark:text-white mb-4">北極圈緯度變化</h3>
                             <div class="relative h-64 w-full">
                                 <canvas id="latChart"></canvas>
                             </div>
@@ -696,27 +1044,27 @@
                     </div>
                     
                     <!-- Risk Matrix -->
-                    <div class="bg-white shadow rounded-lg p-6">
-                        <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4">核心風險監控矩陣</h3>
+                    <div class="bg-white dark:bg-slate-800 shadow rounded-lg p-6">
+                        <h3 class="text-lg leading-6 font-medium text-slate-900 dark:text-white mb-4">核心風險監控矩陣</h3>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-200">
+                            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
                                 <thead>
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">風險事件</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">機率</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">應對策略</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">風險事件</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">機率</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">應對策略</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-slate-200">
+                                <tbody class="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">Day 10 時間軸崩潰</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-bold">高</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">若 11:45 未離 Voss，放棄卑爾根快閃。</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-slate-200">Day 10 時間軸崩潰</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 dark:text-red-400 font-bold">高</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">若 11:45 未離 Voss，放棄卑爾根快閃。</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">Day 9 EV 電量不足</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-orange-600 font-bold">中</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">Eidfjord 強制充電至 95% 以上。</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-slate-200">Day 9 EV 電量不足</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-orange-600 dark:text-orange-400 font-bold">中</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">Eidfjord 強制充電至 95% 以上。</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -726,26 +1074,137 @@
             `;
         }
 
+        function renderGuide() {
+            const cards = appData.phrases.map(p => `
+                <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6 border-l-4 border-indigo-500">
+                    <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-100 dark:border-slate-700">
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white">${p.flag} ${p.lang}</h3>
+                        <span class="text-xs text-slate-400 uppercase tracking-wide">Survival Phrase</span>
+                    </div>
+                    <div class="grid gap-3">
+                        ${p.items.map(item => `
+                            <div class="flex justify-between items-center group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 p-2 rounded transition-colors" title="Click to practice">
+                                <span class="font-medium text-slate-500 dark:text-slate-400">${item.src}</span>
+                                <span class="font-bold text-indigo-700 dark:text-indigo-300 text-lg">${item.tgt}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="max-w-4xl mx-auto p-4 sm:p-8">
+                    <div class="mb-8 text-center">
+                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">北歐生存指南 (Survival Guide)</h2>
+                        <p class="text-slate-500 dark:text-slate-400 mt-2">遇到困難時的關鍵語言與緊急聯絡資訊。</p>
+                    </div>
+                    
+                    <div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-8 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-red-100 dark:bg-red-800 rounded-full p-3">
+                                <i class="fa-solid fa-phone-volume text-red-600 dark:text-red-200 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-bold text-red-800 dark:text-red-200">緊急救難電話 (通用)</h3>
+                                <p class="text-sm text-red-600 dark:text-red-300">警察 / 消防 / 救護車 (點擊撥號)</p>
+                            </div>
+                        </div>
+                        <a href="tel:112" class="text-4xl font-black text-red-600 dark:text-red-400 tracking-wider hover:text-red-800 dark:hover:text-red-300 transition-colors">112</a>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${cards}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGear() {
+            const checklistHtml = appData.gearChecklist.map((category, catIndex) => {
+                const itemsHtml = category.items.map((item, itemIndex) => {
+                    return `
+                        <div class="flex items-start py-3 border-b border-slate-100 dark:border-slate-700 last:border-0 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors px-2 rounded" onclick="toggleGearItem(${catIndex}, ${itemIndex})">
+                            <div class="flex-shrink-0 h-5 w-5 flex items-center justify-center rounded border ${item.checked ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-800'} transition-colors mt-0.5">
+                                ${item.checked ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
+                            </div>
+                            <div class="ml-3 text-sm ${item.checked ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-200 font-medium'}">
+                                ${item.name}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                const progress = Math.round((category.items.filter(i => i.checked).length / category.items.length) * 100);
+
+                return `
+                    <div class="bg-white dark:bg-slate-800 overflow-hidden shadow rounded-lg mb-6 break-inside-avoid">
+                        <div class="px-4 py-5 sm:px-6 bg-slate-50 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600 flex justify-between items-center">
+                            <h3 class="text-lg leading-6 font-medium text-slate-900 dark:text-white flex items-center">
+                                <i class="fa-solid ${category.icon} text-indigo-500 dark:text-indigo-400 w-8"></i> ${category.category}
+                            </h3>
+                            <span class="text-xs font-bold px-2 py-1 rounded-full ${progress === 100 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-slate-200 text-slate-600 dark:bg-slate-600 dark:text-slate-300'}">
+                                ${progress}% Ready
+                            </span>
+                        </div>
+                        <div class="px-4 py-2">
+                            ${itemsHtml}
+                        </div>
+                        <div class="h-1 w-full bg-slate-100 dark:bg-slate-900">
+                            <div class="h-1 ${progress === 100 ? 'bg-emerald-500' : 'bg-indigo-500'}" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const totalItems = appData.gearChecklist.reduce((acc, cat) => acc + cat.items.length, 0);
+            const checkedItems = appData.gearChecklist.reduce((acc, cat) => acc + cat.items.filter(i => i.checked).length, 0);
+            const totalProgress = Math.round((checkedItems / totalItems) * 100);
+
+            return `
+                <div class="max-w-4xl mx-auto p-4 sm:p-8">
+                    <div class="mb-8 text-center">
+                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">極地裝備整備 (Gear Check)</h2>
+                        <p class="text-slate-500 dark:text-slate-400 mt-2">生存在極地的關鍵在於細節。進度會自動儲存。</p>
+                        <div class="mt-4 max-w-xs mx-auto">
+                            <div class="flex justify-between text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
+                                <span>總進度</span>
+                                <span>${totalProgress}%</span>
+                            </div>
+                            <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
+                                <div class="bg-indigo-600 dark:bg-indigo-500 h-2.5 rounded-full transition-all duration-500" style="width: ${totalProgress}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        ${checklistHtml}
+                    </div>
+                </div>
+            `;
+        }
+
         function renderItinerary() {
             const dateButtons = appData.dailyItinerary.map(day => `
-                <button onclick="scrollToDay(${day.day})" class="flex-none px-3 py-1 rounded-full text-xs font-medium bg-white border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-colors shadow-sm whitespace-nowrap snap-start">
+                <button onclick="scrollToDay(${day.day})" class="flex-none px-3 py-1 rounded-full text-xs font-medium bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 hover:text-indigo-600 hover:border-indigo-300 transition-colors shadow-sm whitespace-nowrap snap-start">
                     D${day.day} <span class="font-normal text-slate-400 ml-1">${day.date.split(' ')[0]}</span>
                 </button>
             `).join('');
 
             // Date Nav: Fixed Bottom on Mobile, Sticky Top on Desktop
             const dateNav = `
-                <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 shadow-lg md:sticky md:top-0 md:border-b md:border-t-0 md:shadow-sm md:z-30">
+                <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-slate-200 dark:border-slate-800 shadow-lg md:sticky md:top-0 md:border-b md:border-t-0 md:shadow-sm md:z-30 transition-colors duration-300 no-print">
                     <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
                         <div class="flex items-center justify-between mb-2">
-                            <h2 class="text-sm font-bold text-slate-900">日期導覽</h2>
+                            <h2 class="text-sm font-bold text-slate-900 dark:text-white">日期導覽</h2>
                             <div class="flex items-center space-x-2">
-                                <span class="text-[10px] font-medium text-slate-500 ${appData.viewMode === 'simplified' ? 'text-indigo-600' : ''}">簡化</span>
-                                <button onclick="toggleViewMode()" class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${appData.viewMode === 'detailed' ? 'bg-indigo-600' : 'bg-slate-200'}" role="switch">
+                                <button onclick="window.print()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded transition-colors mr-2 border border-slate-300">
+                                    <i class="fa-solid fa-print mr-1"></i> 列印行程
+                                </button>
+                                <span class="text-[10px] font-medium text-slate-500 dark:text-slate-400 ${appData.viewMode === 'simplified' ? 'text-indigo-600 dark:text-indigo-400' : ''}">簡化</span>
+                                <button onclick="toggleViewMode()" class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${appData.viewMode === 'detailed' ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'}" role="switch">
                                     <span class="sr-only">切換詳情模式</span>
                                     <span aria-hidden="true" class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${appData.viewMode === 'detailed' ? 'translate-x-4' : 'translate-x-0'}"></span>
                                 </button>
-                                <span class="text-[10px] font-medium text-slate-500 ${appData.viewMode === 'detailed' ? 'text-indigo-600' : ''}">詳細</span>
+                                <span class="text-[10px] font-medium text-slate-500 dark:text-slate-400 ${appData.viewMode === 'detailed' ? 'text-indigo-600 dark:text-indigo-400' : ''}">詳細</span>
                             </div>
                         </div>
                         <div class="flex space-x-2 overflow-x-auto pb-1 snap-x no-scrollbar">
@@ -758,52 +1217,52 @@
             const itineraryHtml = appData.dailyItinerary.map((day, index) => {
                 const eventsHtml = day.events.map(event => {
                     let iconClass = 'fa-circle';
-                    let colorClass = 'bg-slate-200';
-                    let iconColor = 'text-slate-500';
+                    let colorClass = 'bg-slate-200 dark:bg-slate-700';
+                    let iconColor = 'text-slate-500 dark:text-slate-400';
 
-                    if (event.type === 'transport') { iconClass = 'fa-plane-departure'; colorClass = 'bg-blue-100'; iconColor = 'text-blue-600'; }
-                    else if (event.type === 'stay') { iconClass = 'fa-bed'; colorClass = 'bg-indigo-100'; iconColor = 'text-indigo-600'; }
-                    else if (event.type === 'food') { iconClass = 'fa-utensils'; colorClass = 'bg-orange-100'; iconColor = 'text-orange-600'; }
-                    else if (event.type === 'activity') { iconClass = 'fa-camera'; colorClass = 'bg-emerald-100'; iconColor = 'text-emerald-600'; }
-                    else if (event.type === 'aurora') { iconClass = 'fa-star'; colorClass = 'bg-purple-100'; iconColor = 'text-purple-600'; }
+                    if (event.type === 'transport') { iconClass = 'fa-plane-departure'; colorClass = 'bg-blue-100 dark:bg-blue-900/30'; iconColor = 'text-blue-600 dark:text-blue-400'; }
+                    else if (event.type === 'stay') { iconClass = 'fa-bed'; colorClass = 'bg-indigo-100 dark:bg-indigo-900/30'; iconColor = 'text-indigo-600 dark:text-indigo-400'; }
+                    else if (event.type === 'food') { iconClass = 'fa-utensils'; colorClass = 'bg-orange-100 dark:bg-orange-900/30'; iconColor = 'text-orange-600 dark:text-orange-400'; }
+                    else if (event.type === 'activity') { iconClass = 'fa-camera'; colorClass = 'bg-emerald-100 dark:bg-emerald-900/30'; iconColor = 'text-emerald-600 dark:text-emerald-400'; }
+                    else if (event.type === 'aurora') { iconClass = 'fa-star'; colorClass = 'bg-purple-100 dark:bg-purple-900/30'; iconColor = 'text-purple-600 dark:text-purple-400'; }
 
                     const detailsSection = appData.viewMode === 'detailed' ? `
-                        <div class="mt-3 pt-3 border-t border-slate-100 text-sm text-slate-700 bg-slate-50 -mx-4 px-4 py-3 sm:-mx-0 sm:rounded-b-lg">
-                            <div class="mb-2"><span class="font-semibold text-slate-900">詳細操作：</span> ${event.details || '無詳細資料'}</div>
-                            ${event.tips ? `<div class="text-red-600 bg-red-50 p-2 rounded border border-red-100"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ${event.tips}</div>` : ''}
+                        <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 -mx-4 px-4 py-3 sm:-mx-0 sm:rounded-b-lg">
+                            <div class="mb-2"><span class="font-semibold text-slate-900 dark:text-slate-100">詳細操作：</span> ${event.details || '無詳細資料'}</div>
+                            ${event.tips ? `<div class="text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-100 dark:border-red-900/50"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ${event.tips}</div>` : ''}
                         </div>
                     ` : '';
 
                     return `
-                        <div class="relative pl-14 sm:pl-32 py-4 group">
+                        <div class="relative pl-14 sm:pl-32 py-4 group break-inside-avoid">
                             <!-- Time (Desktop) -->
                             <div class="hidden sm:flex flex-col items-end absolute left-0 top-4 w-24 pr-4">
-                                <span class="text-sm font-bold text-slate-900">${event.time}</span>
-                                <span class="text-xs text-slate-500 uppercase tracking-wide">${event.type}</span>
+                                <span class="text-sm font-bold text-slate-900 dark:text-white">${event.time}</span>
+                                <span class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">${event.type}</span>
                             </div>
 
                             <!-- Timeline Marker -->
                             <div class="absolute left-2 top-5 sm:left-[6.5rem] flex items-center justify-center"> 
-                                <div class="h-8 w-8 rounded-full ${colorClass} flex items-center justify-center ring-4 ring-white z-10">
+                                <div class="h-8 w-8 rounded-full ${colorClass} flex items-center justify-center ring-4 ring-white dark:ring-slate-950 z-10 transition-colors">
                                     <i class="fa-solid ${iconClass} ${iconColor} text-sm"></i>
                                 </div>
                             </div>
                             
                             <!-- Content Card -->
-                            <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow relative ${appData.viewMode === 'detailed' ? 'pb-0 sm:pb-0 overflow-hidden' : ''}">
+                            <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4 shadow-sm hover:shadow-md transition-all relative ${appData.viewMode === 'detailed' ? 'pb-0 sm:pb-0 overflow-hidden' : ''}">
                                 <!-- Time (Mobile) -->
-                                <div class="sm:hidden text-xs font-bold text-slate-500 mb-1 flex justify-between">
+                                <div class="sm:hidden text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 flex justify-between">
                                     <span>${event.time}</span>
                                     <span class="uppercase">${event.type}</span>
                                 </div>
                                 
                                 <div class="flex justify-between items-start">
                                     <div class="w-full">
-                                        <h4 class="text-base font-semibold text-slate-900">${event.title}</h4>
-                                        <p class="text-sm text-slate-600 mt-1">${event.desc}</p>
+                                        <h4 class="text-base font-semibold text-slate-900 dark:text-white">${event.title}</h4>
+                                        <p class="text-sm text-slate-600 dark:text-slate-300 mt-1">${event.desc}</p>
                                     </div>
                                     ${event.link ? `
-                                        <a href="${event.link}" target="_blank" class="flex-none ml-3 text-slate-400 hover:text-blue-600 transition-colors">
+                                        <a href="${event.link}" target="_blank" class="flex-none ml-3 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors no-print">
                                             <i class="fa-solid fa-map-location-dot text-lg"></i>
                                         </a>
                                     ` : ''}
@@ -815,24 +1274,27 @@
                 }).join('');
 
                 return `
-                    <div id="day-${day.day}" class="mb-12 relative">
+                    <div id="day-${day.day}" class="mb-12 relative break-inside-avoid">
                         <div class="flex justify-between items-center mb-6">
                             <div>
-                                <h2 class="text-2xl font-bold text-slate-900 flex items-center">
-                                    <span class="bg-slate-900 text-white text-sm px-2 py-1 rounded mr-3">Day ${day.day}</span>
+                                <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center">
+                                    <span class="bg-slate-900 dark:bg-indigo-600 text-white text-sm px-2 py-1 rounded mr-3">Day ${day.day}</span>
                                     ${day.location}
                                 </h2>
-                                <p class="text-sm text-slate-500 mt-1 ml-12">${day.fullDate} | ${day.theme}</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 ml-12">${day.fullDate} | ${day.theme}</p>
                             </div>
-                            <div class="text-right hidden sm:block">
-                                <div class="text-xs text-purple-600 mt-1 font-semibold bg-purple-50 px-3 py-1 rounded-full border border-purple-100">
+                            <div class="text-right hidden sm:block no-print">
+                                <div class="text-xs text-purple-600 dark:text-purple-300 mt-1 font-semibold bg-purple-50 dark:bg-purple-900/40 px-3 py-1 rounded-full border border-purple-100 dark:border-purple-800 mb-2">
                                     <i class="fa-solid fa-bolt mr-1"></i> 極光: ${day.aurora}
                                 </div>
+                                <button id="copy-btn-${index}" onclick="copyDayPlan(${index})" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 px-3 py-1 rounded transition-colors">
+                                    <i class="fa-regular fa-copy mr-1"></i> 複製行程
+                                </button>
                             </div>
                         </div>
                         
                         <!-- Timeline Line -->
-                        <div class="absolute left-6 sm:left-[7.5rem] top-12 bottom-0 w-0.5 bg-slate-200 z-0"></div>
+                        <div class="absolute left-6 sm:left-[7.5rem] top-12 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700 z-0"></div>
 
                         <div class="space-y-2">
                             ${eventsHtml}
@@ -864,28 +1326,51 @@
         function renderLogistics() {
             return `
                 <div class="max-w-4xl mx-auto p-4 sm:p-8">
+                    <!-- Currency Converter (New) -->
+                    <div class="bg-indigo-600 dark:bg-indigo-900 rounded-lg shadow-lg p-6 mb-6 text-white no-print">
+                        <h3 class="text-lg font-bold mb-4 flex items-center"><i class="fa-solid fa-coins mr-2"></i> 極地匯率換算器 (Polar Currency Converter)</h3>
+                        <div class="flex items-center gap-4">
+                            <div class="flex-1">
+                                <label class="block text-xs text-indigo-200 mb-1">金額</label>
+                                <input type="number" id="curr-amount" placeholder="100" class="w-full rounded p-2 text-slate-900" oninput="convertCurrency()">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-xs text-indigo-200 mb-1">幣別</label>
+                                <select id="curr-select" class="w-full rounded p-2 text-slate-900" onchange="convertCurrency()">
+                                    <option value="EUR">歐元 (EUR) - 芬蘭</option>
+                                    <option value="SEK">瑞典克朗 (SEK)</option>
+                                    <option value="NOK">挪威克朗 (NOK)</option>
+                                </select>
+                            </div>
+                            <div class="flex-1 text-right">
+                                <label class="block text-xs text-indigo-200 mb-1">約合台幣 (TWD)</label>
+                                <div id="curr-result" class="text-2xl font-bold">---</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Flight Card -->
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center"><i class="fa-solid fa-plane text-blue-500 mr-2"></i> 關鍵航班</h3>
-                            <ul class="space-y-4 text-sm">
-                                <li class="flex justify-between border-b pb-2">
+                        <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center"><i class="fa-solid fa-plane text-blue-500 mr-2"></i> 關鍵航班</h3>
+                            <ul class="space-y-4 text-sm text-slate-700 dark:text-slate-300">
+                                <li class="flex justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
                                     <span>Day 1: TPE -> AMS -> HEL</span>
                                     <span class="font-mono font-bold">KL0808 / KL1251</span>
                                 </li>
-                                <li class="flex justify-between border-b pb-2">
+                                <li class="flex justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
                                     <span>Day 2: HEL -> RVN</span>
                                     <span class="font-mono font-bold">AY0533</span>
                                 </li>
-                                <li class="flex justify-between border-b pb-2">
+                                <li class="flex justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
                                     <span>Day 6: RVN -> TOS</span>
                                     <span class="font-mono font-bold">AY0541</span>
                                 </li>
-                                <li class="flex justify-between border-b pb-2">
+                                <li class="flex justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
                                     <span>Day 8: TOS -> BGO</span>
                                     <span class="font-mono font-bold">WF627</span>
                                 </li>
-                                <li class="flex justify-between border-b pb-2">
+                                <li class="flex justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
                                     <span>Day 10: BGO -> ARN</span>
                                     <span class="font-mono font-bold">DY631</span>
                                 </li>
@@ -897,34 +1382,34 @@
                         </div>
 
                         <!-- Car Rental Card -->
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center"><i class="fa-solid fa-car text-emerald-500 mr-2"></i> 租車戰略</h3>
+                        <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center"><i class="fa-solid fa-car text-emerald-500 mr-2"></i> 租車戰略</h3>
                             <div class="space-y-4">
-                                <div class="p-3 bg-slate-50 rounded border border-slate-200">
-                                    <div class="font-semibold text-slate-900">Phase 1: 拉普蘭</div>
-                                    <div class="text-sm text-slate-600">Green Motion (RVN) - VW Golf</div>
-                                    <div class="text-xs text-red-500 mt-1 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> 檢查加熱線與釘胎。</div>
+                                <div class="p-3 bg-slate-50 dark:bg-slate-700 rounded border border-slate-200 dark:border-slate-600">
+                                    <div class="font-semibold text-slate-900 dark:text-white">Phase 1: 拉普蘭</div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-300">Green Motion (RVN) - VW Golf</div>
+                                    <div class="text-xs text-red-500 dark:text-red-400 mt-1 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> 檢查加熱線與釘胎。</div>
                                 </div>
-                                <div class="p-3 bg-slate-50 rounded border border-slate-200">
-                                    <div class="font-semibold text-slate-900">Phase 2: 特羅姆瑟</div>
-                                    <div class="text-sm text-slate-600">Thrifty (TOS) - Volvo V40</div>
+                                <div class="p-3 bg-slate-50 dark:bg-slate-700 rounded border border-slate-200 dark:border-slate-600">
+                                    <div class="font-semibold text-slate-900 dark:text-white">Phase 2: 特羅姆瑟</div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-300">Thrifty (TOS) - Volvo V40</div>
                                 </div>
-                                <div class="p-3 bg-slate-50 rounded border border-slate-200">
-                                    <div class="font-semibold text-slate-900">Phase 3: 峽灣 EV</div>
-                                    <div class="text-sm text-slate-600">Sixt (BGO) - Audi e-tron</div>
-                                    <div class="text-xs text-orange-500 mt-1 font-bold">Day 9 Eidfjord 必充。</div>
+                                <div class="p-3 bg-slate-50 dark:bg-slate-700 rounded border border-slate-200 dark:border-slate-600">
+                                    <div class="font-semibold text-slate-900 dark:text-white">Phase 3: 峽灣 EV</div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-300">Sixt (BGO) - Audi e-tron</div>
+                                    <div class="text-xs text-orange-500 dark:text-orange-400 mt-1 font-bold">Day 9 Eidfjord 必充。</div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Apps & Cards Section (NEW) -->
-                        <div class="bg-white rounded-lg shadow p-6 md:col-span-2">
-                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center"><i class="fa-solid fa-mobile-screen-button text-purple-500 mr-2"></i> 戰術應用程式與支付 (Apps & Cards)</h3>
+                        <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6 md:col-span-2">
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center"><i class="fa-solid fa-mobile-screen-button text-purple-500 mr-2"></i> 戰術應用程式與支付 (Apps & Cards)</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <!-- Finland -->
-                                <div class="p-3 bg-blue-50 rounded border border-blue-100">
-                                    <div class="font-bold text-blue-800 mb-2 border-b border-blue-200 pb-1">🇫🇮 芬蘭 (Finland)</div>
-                                    <ul class="text-sm text-slate-700 space-y-1">
+                                <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-100 dark:border-blue-900">
+                                    <div class="font-bold text-blue-800 dark:text-blue-300 mb-2 border-b border-blue-200 dark:border-blue-800 pb-1">🇫🇮 芬蘭 (Finland)</div>
+                                    <ul class="text-sm text-slate-700 dark:text-slate-300 space-y-1">
                                         <li><span class="font-semibold">停車:</span> EasyPark, ParkMan</li>
                                         <li><span class="font-semibold">交通:</span> HSL (赫爾辛基公車/地鐵)</li>
                                         <li><span class="font-semibold">充電/加油:</span> ABC-mobiili, K-Lataus</li>
@@ -932,9 +1417,9 @@
                                     </ul>
                                 </div>
                                 <!-- Sweden -->
-                                <div class="p-3 bg-yellow-50 rounded border border-yellow-100">
-                                    <div class="font-bold text-yellow-800 mb-2 border-b border-yellow-200 pb-1">🇸🇪 瑞典 (Sweden)</div>
-                                    <ul class="text-sm text-slate-700 space-y-1">
+                                <div class="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-100 dark:border-yellow-900">
+                                    <div class="font-bold text-yellow-800 dark:text-yellow-300 mb-2 border-b border-yellow-200 dark:border-yellow-800 pb-1">🇸🇪 瑞典 (Sweden)</div>
+                                    <ul class="text-sm text-slate-700 dark:text-slate-300 space-y-1">
                                         <li><span class="font-semibold">停車:</span> EasyPark, Betala P (斯德哥爾摩)</li>
                                         <li><span class="font-semibold">交通:</span> SL (斯德哥爾摩大眾運輸)</li>
                                         <li><span class="font-semibold">充電:</span> InCharge, Mer Connect</li>
@@ -942,10 +1427,10 @@
                                     </ul>
                                 </div>
                                 <!-- Norway -->
-                                <div class="p-3 bg-red-50 rounded border border-red-100">
-                                    <div class="font-bold text-red-800 mb-2 border-b border-red-200 pb-1">🇳🇴 挪威 (Norway)</div>
-                                    <ul class="text-sm text-slate-700 space-y-1">
-                                        <li><span class="font-semibold">EV 充電:</span> <span class="text-red-600 font-bold">Elton</span> (整合App, 必載), Mer</li>
+                                <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded border border-red-100 dark:border-red-900">
+                                    <div class="font-bold text-red-800 dark:text-red-300 mb-2 border-b border-red-200 dark:border-red-800 pb-1">🇳🇴 挪威 (Norway)</div>
+                                    <ul class="text-sm text-slate-700 dark:text-slate-300 space-y-1">
+                                        <li><span class="font-semibold">EV 充電:</span> <span class="text-red-600 dark:text-red-400 font-bold">Elton</span> (整合App, 必載), Mer</li>
                                         <li><span class="font-semibold">停車:</span> EasyPark, Bil i Oslo</li>
                                         <li><span class="font-semibold">交通:</span> Skyss (卑爾根/Voss), Vy</li>
                                         <li><span class="font-semibold">過路費:</span> Epass24 / FerryPay (備用)</li>
@@ -988,39 +1473,39 @@
 
             const typeButtons = types.map(f => `
                 <button onclick="setFoodFilter('${f.id}')" 
-                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors border ${currentFoodFilter === f.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 hover:bg-slate-50 border-slate-200'}">
+                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors border ${currentFoodFilter === f.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-600'}">
                     ${f.label}
                 </button>
             `).join('');
             
             const locationButtons = locations.map(l => `
                 <button onclick="setFoodFilter('${l.id}')" 
-                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors border ${currentFoodFilter === l.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 hover:bg-slate-50 border-slate-200'}">
+                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors border ${currentFoodFilter === l.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-600'}">
                     <i class="fa-solid fa-location-dot mr-1 text-[10px]"></i>${l.label}
                 </button>
             `).join('');
 
             const cards = filteredList.map(r => `
-                <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
+                <div class="bg-white dark:bg-slate-800 rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
                     <div class="p-5 flex-1">
                         <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-slate-900">${r.name}</h3>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800">
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">${r.name}</h3>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200">
                                 ${r.type}
                             </span>
                         </div>
                         <div class="flex items-center mt-1 mb-2">
                             <i class="fa-solid fa-star text-yellow-400 text-xs mr-1"></i>
-                            <span class="text-sm font-bold text-slate-700">${r.rating}</span>
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-300">${r.rating}</span>
                         </div>
-                        <p class="text-xs text-slate-500 mb-2"><i class="fa-solid fa-location-dot mr-1"></i> ${r.location}</p>
-                        <p class="text-sm text-slate-600 mt-2">${r.desc}</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-2"><i class="fa-solid fa-location-dot mr-1"></i> ${r.location}</p>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 mt-2">${r.desc}</p>
                         <div class="mt-3 flex flex-wrap gap-1">
-                            ${r.tags.map(t => `<span class="inline-block bg-slate-50 border border-slate-200 text-slate-500 text-[10px] px-2 py-0.5 rounded-full">#${t}</span>`).join('')}
+                            ${r.tags.map(t => `<span class="inline-block bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 text-[10px] px-2 py-0.5 rounded-full">#${t}</span>`).join('')}
                         </div>
                     </div>
-                    <div class="bg-slate-50 px-5 py-3 border-t border-slate-100">
-                        <a href="${r.link}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center justify-center">
+                    <div class="bg-slate-50 dark:bg-slate-700/50 px-5 py-3 border-t border-slate-100 dark:border-slate-700">
+                        <a href="${r.link}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium flex items-center justify-center">
                             <i class="fa-solid fa-map-location-dot mr-2"></i> Google Maps
                         </a>
                     </div>
@@ -1054,8 +1539,17 @@
         // --- CHART RENDERING ---
 
         function renderCharts() {
+            // Re-fetch context (important for chartJS when canvas is recreated)
+            const ctx1 = document.getElementById('activityChart')?.getContext('2d');
+            const ctx2 = document.getElementById('latChart')?.getContext('2d');
+            
+            if(!ctx1 || !ctx2) return;
+
+            // Colors adapting to dark mode
+            const labelColor = appData.darkMode ? '#cbd5e1' : '#64748b';
+            const gridColor = appData.darkMode ? '#334155' : '#e2e8f0';
+
             // Chart 1: Activity vs Transport
-            const ctx1 = document.getElementById('activityChart').getContext('2d');
             new Chart(ctx1, {
                 type: 'bar',
                 data: {
@@ -1077,14 +1571,26 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { stacked: true },
-                        y: { stacked: true, beginAtZero: true, title: {display: true, text: '小時'} }
+                        x: { 
+                            stacked: true,
+                            ticks: { color: labelColor },
+                            grid: { color: gridColor }
+                        },
+                        y: { 
+                            stacked: true, 
+                            beginAtZero: true, 
+                            title: {display: true, text: '小時', color: labelColor},
+                            ticks: { color: labelColor },
+                            grid: { color: gridColor }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: labelColor } }
                     }
                 }
             });
 
             // Chart 2: Latitude Profile
-            const ctx2 = document.getElementById('latChart').getContext('2d');
             new Chart(ctx2, {
                 type: 'line',
                 data: {
@@ -1105,10 +1611,17 @@
                         y: { 
                             min: 55, 
                             max: 72,
-                            title: {display: true, text: '緯度'}
+                            title: {display: true, text: '緯度', color: labelColor},
+                            ticks: { color: labelColor },
+                            grid: { color: gridColor }
+                        },
+                        x: {
+                            ticks: { color: labelColor },
+                            grid: { color: gridColor }
                         }
                     },
                     plugins: {
+                        legend: { labels: { color: labelColor } },
                         annotation: {
                             annotations: {
                                 line1: {
@@ -1118,7 +1631,7 @@
                                     borderColor: 'rgb(255, 99, 132)',
                                     borderWidth: 2,
                                     borderDash: [5, 5],
-                                    label: { content: '北極圈 (Arctic Circle)', enabled: true }
+                                    label: { content: '北極圈 (Arctic Circle)', enabled: true, color: labelColor }
                                 }
                             }
                         }
