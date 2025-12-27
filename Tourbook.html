@@ -1555,6 +1555,7 @@
                 `;
             }).join('');
 
+            // Desktop layout: Nav on top. Mobile layout: Nav at bottom (fixed).
             return `
                 <div class="relative min-h-screen">
                     <!-- Nav rendered here for desktop sticky -->
@@ -1608,7 +1609,7 @@
                                 <li class="border-b border-slate-100 dark:border-slate-700 pb-3 last:border-0">
                                     <div class="flex justify-between items-center mb-1">
                                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded">Day 1</span>
-                                        <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">KL0808 / KL1251</span>
+                                        <a href="https://www.flightaware.com/live/flight/KLM808" target="_blank" class="font-mono text-indigo-600 dark:text-indigo-400 font-bold hover:underline decoration-dotted" title="追蹤 KL808">KL0808</a> / <a href="https://www.flightaware.com/live/flight/KLM1251" target="_blank" class="font-mono text-indigo-600 dark:text-indigo-400 font-bold hover:underline decoration-dotted" title="追蹤 KL1251">KL1251</a>
                                     </div>
                                     <div class="flex justify-between text-sm">
                                         <div class="flex flex-col">
@@ -1624,7 +1625,7 @@
                                 <li class="border-b border-slate-100 dark:border-slate-700 pb-3 last:border-0">
                                     <div class="flex justify-between items-center mb-1">
                                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded">Day 2</span>
-                                        <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">AY0533</span>
+                                        <a href="https://www.flightaware.com/live/flight/FIN533" target="_blank" class="font-mono text-indigo-600 dark:text-indigo-400 font-bold hover:underline decoration-dotted" title="追蹤 AY533">AY0533</a>
                                     </div>
                                     <div class="flex justify-between text-sm">
                                         <div class="flex flex-col">
@@ -1640,7 +1641,7 @@
                                 <li class="border-b border-slate-100 dark:border-slate-700 pb-3 last:border-0">
                                     <div class="flex justify-between items-center mb-1">
                                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded">Day 6</span>
-                                        <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">AY0541</span>
+                                        <a href="https://www.flightaware.com/live/flight/FIN541" target="_blank" class="font-mono text-indigo-600 dark:text-indigo-400 font-bold hover:underline decoration-dotted" title="追蹤 AY541">AY0541</a>
                                     </div>
                                     <div class="flex justify-between text-sm">
                                         <div class="flex flex-col">
@@ -1656,7 +1657,7 @@
                                 <li class="border-b border-slate-100 dark:border-slate-700 pb-3 last:border-0">
                                     <div class="flex justify-between items-center mb-1">
                                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded">Day 8</span>
-                                        <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">WF627</span>
+                                        <a href="https://www.flightaware.com/live/flight/WIF627" target="_blank" class="font-mono text-indigo-600 dark:text-indigo-400 font-bold hover:underline decoration-dotted" title="追蹤 WF627">WF627</a>
                                     </div>
                                     <div class="flex justify-between text-sm">
                                         <div class="flex flex-col">
@@ -1672,7 +1673,7 @@
                                 <li class="border-b border-slate-100 dark:border-slate-700 pb-3 last:border-0">
                                     <div class="flex justify-between items-center mb-1">
                                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded">Day 10</span>
-                                        <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">DY631</span>
+                                        <a href="https://www.flightaware.com/live/flight/NAX631" target="_blank" class="font-mono text-indigo-600 dark:text-indigo-400 font-bold hover:underline decoration-dotted" title="追蹤 DY631">DY631</a>
                                     </div>
                                     <div class="flex justify-between text-sm">
                                         <div class="flex flex-col">
@@ -1688,7 +1689,7 @@
                                 <li class="border-b border-slate-100 dark:border-slate-700 pb-3 last:border-0">
                                     <div class="flex justify-between items-center mb-1">
                                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded">Day 13</span>
-                                        <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">OS970 / CI064</span>
+                                        <a href="https://www.flightaware.com/live/flight/AUA970" target="_blank" class="font-mono text-indigo-600 dark:text-indigo-400 font-bold hover:underline decoration-dotted" title="追蹤 OS970">OS970</a> / <a href="https://www.flightaware.com/live/flight/CAL64" target="_blank" class="font-mono text-indigo-600 dark:text-indigo-400 font-bold hover:underline decoration-dotted" title="追蹤 CI64">CI064</a>
                                     </div>
                                     <div class="flex justify-between text-sm">
                                         <div class="flex flex-col">
