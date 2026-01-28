@@ -390,7 +390,8 @@
             "Gnomesville": [-33.4633, 115.9328],
             "Forrestfield": [-31.984, 116.006],
             "Dunsborough": [-33.617, 115.111],
-            "Lathlain": [-31.973, 115.905]
+            "Lathlain": [-31.973, 115.905],
+            "Lake Clifton": [-32.7433, 115.6500] // Added for Thrombolites
         };
 
         const itinerary = [
@@ -445,18 +446,18 @@
                         link: "https://www.google.com/maps/search/?api=1&query=Pinnacles+Desert+Discovery+Centre" 
                     },
                     { 
-                        time: "16:30", loc: "Jurien Bay", icon: "🌅", item: "棧橋夕陽", 
-                        stayTime: "自由活動", departTime: "-",
-                        route: "抵達 Jurien Bay 辦理入住。傍晚去 Jurien Bay Jetty 散步，這裡的海水是著名的蒂芬妮藍。", 
-                        note: "🍽️ 晚餐：Jurien Bay Hotel (當地熱鬧酒吧，有牛排/炸魚) 或 IGA 超市買食材回小木屋煮。\n❌ 避雷：網友強烈建議不要去 Tanti's Restaurant。", 
-                        link: "https://www.google.com/maps/search/?api=1&query=Jurien+Bay+Jetty" 
+                        time: "16:30", loc: "Jurien Bay", icon: "🏠", item: "抵達住宿 (Check-in)", 
+                        stayTime: "30分鐘", departTime: "17:00",
+                        route: "先前往 Jurien Bay Motel Apartments 辦理入住 (7 Murray St)，卸下行李。", 
+                        note: "⚠️ 必做：櫃台 Check-in 時間為 14:00-17:00，請務必準時抵達辦理。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=Jurien+Bay+Motel+Apartments" 
                     },
                     { 
-                        time: "17:30", loc: "Jurien Bay", icon: "🏠", item: "抵達住宿", 
-                        stayTime: "住宿一晚", departTime: "-",
-                        route: "前往 Jurien Bay Motel Apartments 辦理入住 (7 Murray St)。", 
-                        note: "⚠️ Check-in: 14:00-17:00 (若晚於17:00請提前聯繫)。", 
-                        link: "https://www.google.com/maps/search/?api=1&query=Jurien+Bay+Motel+Apartments" 
+                        time: "17:30", loc: "Jurien Bay", icon: "🌅", item: "棧橋夕陽", 
+                        stayTime: "自由活動", departTime: "-",
+                        route: "步行或開車前往 Jurien Bay Jetty 散步看夕陽，這裡的海水是著名的蒂芬妮藍。", 
+                        note: "🍽️ 晚餐：Jurien Bay Hotel (當地熱鬧酒吧，有牛排/炸魚) 或 IGA 超市買食材回小木屋煮。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=Jurien+Bay+Jetty" 
                     }
                 ]
             },
@@ -490,6 +491,13 @@
                         link: "https://www.google.com/maps/search/?api=1&query=Hutt+Lagoon+Pink+Lake+Lookout" 
                     },
                     { 
+                        time: "15:00", loc: "Kalbarri", icon: "🏠", item: "抵達住宿 (Check-in)", 
+                        stayTime: "45分鐘", departTime: "15:45",
+                        route: "前往 Gecko Lodge Kalbarri 辦理入住 (9 Glass St)。卸下行李，稍作休息避開午後烈日。", 
+                        note: "⚠️ Check-in: 14:00-22:00。稍微休息一下再出發去國家公園。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=Gecko+Lodge+Kalbarri" 
+                    },
+                    { 
                         time: "16:00", loc: "Kalbarri", icon: "🪟", item: "世界之窗 & Kalbarri Skywalk", 
                         stayTime: "2小時", departTime: "18:00",
                         route: "Kalbarri National Park (內陸區)。\n1. Nature's Window：透過紅岩框看壯闊峽谷，必拍。\n2. Kalbarri Skywalk：令人驚嘆的懸空步道，突出於峽谷邊緣，視野極佳。", 
@@ -502,13 +510,6 @@
                         route: "Finlay's Kalbarri。這是一個露天大院子餐廳，有自釀啤酒和新鮮海鮮，氣氛極佳。", 
                         note: "🍽️ 晚餐：必吃生蠔、烤魚。\n⚠️ 務必提前訂位，非常熱門。", 
                         link: "https://www.google.com/maps/search/?api=1&query=Finlay's+Kalbarri" 
-                    },
-                    { 
-                        time: "20:00", loc: "Kalbarri", icon: "🏠", item: "抵達住宿", 
-                        stayTime: "住宿一晚", departTime: "-",
-                        route: "前往 Gecko Lodge Kalbarri 辦理入住 (9 Glass St)。", 
-                        note: "⚠️ Check-in: 14:00-22:00。", 
-                        link: "https://www.google.com/maps/search/?api=1&query=Gecko+Lodge+Kalbarri" 
                     }
                 ]
             },
@@ -571,23 +572,16 @@
                     },
                     { 
                         time: "20:30", loc: "Perth", icon: "🍜", item: "暖胃中餐", 
-                        stayTime: "晚餐", departTime: "21:30",
+                        stayTime: "1小時", departTime: "21:30",
                         route: "抵達市區，連吃幾天西餐後，這餐安排熱騰騰的中菜。", 
                         note: "🍽️ 晚餐：Kung Fu Kitchen (北橋) 酸菜魚/火鍋 或 Tai Wei Wei (泰偉偉) 蘭州牛肉麵。", 
                         link: "https://www.google.com/maps/search/?api=1&query=Kung+Fu+Kitchen+Northbridge" 
                     },
                     { 
-                        time: "21:30", loc: "Northbridge", icon: "🎭", item: "藝穗節", 
-                        stayTime: "1.5小時", departTime: "23:00",
-                        route: "Fringe World Festival。就在北橋 (Northbridge) 晚餐餐廳附近，步行即可體驗熱鬧的街頭表演與藝術氛圍。", 
-                        note: "💡 這是西澳最盛大的年度藝術慶典 (通常在1-2月)，非常值得一逛。", 
-                        link: "https://www.google.com/maps/search/?api=1&query=The+Pleasure+Garden+Northbridge" 
-                    },
-                    { 
-                        time: "23:30", loc: "Forrestfield", icon: "🏠", item: "抵達住宿", 
+                        time: "22:00", loc: "Forrestfield", icon: "🏠", item: "抵達住宿", 
                         stayTime: "住宿 (Day 3-5)", departTime: "-",
-                        route: "前往 Forrestfield Airbnb (Perth Hills) 辦理入住。", 
-                        note: "⚠️ Check-in: 14:00 後。", 
+                        route: "晚餐後前往 Forrestfield Airbnb (Perth Hills) 辦理入住。", 
+                        note: "⚠️ Check-in: 14:00 後。已預留晚歸時間，請保持安靜。", 
                         link: "https://www.google.com/maps/search/?api=1&query=Forrestfield+Perth" 
                     }
                 ]
@@ -733,15 +727,22 @@
                         link: "" 
                     },
                     { 
-                        time: "10:00", loc: "Mandurah", icon: "🛥️", item: "抓龍蝦船", 
-                        stayTime: "3小時", departTime: "13:00",
-                        route: "Wild Seafood Experience。出海 3 小時收龍蝦籠，船長現煮海鮮 BBQ 大餐 (含龍蝦/螃蟹/生蠔)。", 
-                        note: "⚠️ 預訂：務必預訂 10:00 場次，才能接下午行程。", 
-                        link: "https://www.google.com/maps/search/?api=1&query=Mandurah+Wild+Seafood+Experience" 
+                        time: "10:00", loc: "Mandurah", icon: "🛥️", item: "Eco BBQ Boats (自駕甜甜圈船)", 
+                        stayTime: "1.5小時", departTime: "11:30",
+                        route: "租用圓形電動烤肉船，自駕航行於 Mandurah 運河，邊看海豚邊享用 BBQ (需自備食材)。", 
+                        note: "💡 需提前預訂。自備食材上船烤肉，體驗獨特水上野餐。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=Eco+BBQ+Boats+Mandurah" 
                     },
                     { 
-                        time: "13:00", loc: "Bunbury", icon: "🥕", item: "農夫市集", 
-                        stayTime: "1小時", departTime: "14:00",
+                        time: "12:00", loc: "Lake Clifton", icon: "🦠", item: "Thrombolites (疊層石)", 
+                        stayTime: "40分鐘", departTime: "12:40",
+                        route: "Lake Clifton Thrombolites。觀賞地球上最古老的生物之一「活化石」疊層石，就在木棧道旁。", 
+                        note: "💡 位於 Yalgorup National Park 內，是前往 Bunbury 的順路景點。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=Lake+Clifton+Thrombolites" 
+                    },
+                    { 
+                        time: "13:20", loc: "Bunbury", icon: "🥕", item: "農夫市集", 
+                        stayTime: "1小時", departTime: "14:20",
                         route: "Bunbury Farmers Market (順路經過)。網友激推：「強迫症天堂」，東西排超整齊。", 
                         note: "🍰 必吃：Carrot Cake (胡蘿蔔蛋糕)、水果杯。買些熟食、壽司、水果當晚上的宵夜或點心。", 
                         link: "https://www.google.com/maps/search/?api=1&query=Bunbury+Farmers+Market" 
@@ -842,15 +843,22 @@
                     },
                     { 
                         time: "20:10", loc: "Perth", icon: "🏨", item: "返回入住", 
-                        stayTime: "晚餐", departTime: "21:30",
+                        stayTime: "1小時 20分", departTime: "21:30",
                         route: "抵達伯斯辦理入住。", 
                         note: "🍽️ 晚餐：Dragon Palace (龍門) 飲茶 或 The Cray Seafood。", 
                         link: "https://www.google.com/maps/search/?api=1&query=Dragon+Palace+Northbridge" 
                     },
                     { 
-                        time: "22:00", loc: "Lathlain", icon: "🏠", item: "抵達住宿", 
+                        time: "21:30", loc: "Northbridge", icon: "🎭", item: "藝穗節", 
+                        stayTime: "1小時", departTime: "22:30",
+                        route: "Fringe World Festival。就在北橋 (Northbridge) 晚餐餐廳附近，步行即可體驗熱鬧的街頭表演與藝術氛圍。", 
+                        note: "💡 這是西澳最盛大的年度藝術慶典 (通常在1-2月)，非常值得一逛。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=The+Pleasure+Garden+Northbridge" 
+                    },
+                    { 
+                        time: "22:45", loc: "Lathlain", icon: "🏠", item: "抵達住宿", 
                         stayTime: "住宿 (Day 7-8)", departTime: "-",
-                        route: "前往 Lathlain Airbnb (11A Midgley St) 休息。", 
+                        route: "結束後前往 Lathlain Airbnb (11A Midgley St) 休息。", 
                         note: "⚠️ Check-in: 14:00 後。", 
                         link: "https://www.google.com/maps/search/?api=1&query=11A+Midgley+Street+Lathlain" 
                     }
