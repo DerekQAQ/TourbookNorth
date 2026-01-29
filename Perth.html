@@ -173,7 +173,7 @@
                                 <span class="bg-green-100 text-green-600 px-1.5 rounded">D7</span> Pemberton & 寶石洞
                             </div>
                             <div class="flex items-center gap-2 p-1.5 hover:bg-slate-50 rounded cursor-pointer" onclick="scrollToDay(7)">
-                                <span class="bg-orange-100 text-orange-600 px-1.5 rounded">D8</span> 鑄幣廠 & 直升機
+                                <span class="bg-orange-100 text-orange-600 px-1.5 rounded">D8</span> 鑄幣廠 & 國王公園
                             </div>
                         </div>
                         <button onclick="switchTab('daily')" class="w-full mt-3 bg-slate-800 text-white py-2 rounded-lg text-xs font-bold hover:bg-slate-700 transition">查看詳細行程 👉</button>
@@ -748,10 +748,24 @@
                         link: "https://www.google.com/maps/search/?api=1&query=Bunbury+Farmers+Market" 
                     },
                     { 
-                        time: "15:30", loc: "Busselton", icon: "🚂", item: "棧橋小火車", 
-                        stayTime: "2小時", departTime: "17:30",
-                        route: "Busselton Jetty。搭乘紅色小火車到 1.8km 外的海中央，參觀 Underwater Observatory (海底觀測站)，深入水下 8 米看野生珊瑚。", 
-                        note: "💡 網友形容：像《千與千尋》的海上火車。\n🎫 門票：買火車+觀測站套票。", 
+                        time: "15:20", loc: "Busselton", icon: "🐟", item: "Marine Discovery Centre", 
+                        stayTime: "30分鐘", departTime: "15:50",
+                        route: "持 Discovery Express Pass 先參觀岸上的海洋探索中心（需在16:00前入場）。", 
+                        note: "💡 位於遊客中心建築內。請務必在火車出發前參觀完畢。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=Busselton+Visitor+Centre" 
+                    },
+                    { 
+                        time: "16:30", loc: "Busselton", icon: "🚂", item: "棧橋小火車報到", 
+                        stayTime: "30分鐘", departTime: "17:00",
+                        route: "前往棧橋入口處 (Interpretive Centre) 辦理報到，準備搭乘 17:00 的火車。", 
+                        note: "⚠️ 務必提早 30 分鐘報到。請注意 Discovery Express Pass 不含海底觀測站。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=Busselton+Jetty" 
+                    },
+                    { 
+                        time: "17:00", loc: "Busselton", icon: "🌅", item: "Jetty Train (火車體驗)", 
+                        stayTime: "45分鐘", departTime: "17:45",
+                        route: "搭乘紅色小火車往返 1.8km 的棧橋，享受海上風光與夕陽美景。", 
+                        note: "💡 預約時段：17:00 - 17:45。", 
                         link: "https://www.google.com/maps/search/?api=1&query=Busselton+Jetty" 
                     },
                     { 
@@ -870,7 +884,7 @@
                 title: "無尾熊補考與海陸空",
                 stay: "Airbnb: Lathlain (Near Crown)",
                 mapCoord: "Perth",
-                weather: { icon: "🚁", temp: "29°C", text: "絕佳視野" },
+                weather: { icon: "🌿", temp: "29°C", text: "絕佳視野" },
                 events: [
                     { 
                         time: "09:00", loc: "Caversham", icon: "🐨", item: "抱無尾熊", 
@@ -894,21 +908,21 @@
                         link: "https://www.google.com/maps/search/?api=1&query=London+Court+Perth" 
                     },
                     { 
-                        time: "14:00", loc: "Burswood", icon: "🚁", item: "直升機體驗", 
-                        stayTime: "1小時", departTime: "15:00",
-                        route: "Helicopter Flight。前往皇冠賭場旁停機坪，體驗 15 分鐘飛行，俯瞰天鵝河與伯斯市景。", 
-                        note: "💡 父母的驚喜亮點！", 
-                        link: "https://www.google.com/maps/search/?api=1&query=Crown+Perth" 
+                        time: "14:00", loc: "Kings Park", icon: "🌳", item: "Kings Park (深度遊)", 
+                        stayTime: "1.5小時", departTime: "15:30",
+                        route: "前往 Kings Park and Botanic Garden。參觀 State War Memorial, 走一段 Lotterywest Federation Walkway (樹頂步道)，欣賞天鵝河與城市全景。", 
+                        note: "💡 這是伯斯必遊景點，佔地巨大，適合悠閒散步拍照。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=Kings+Park+and+Botanic+Garden" 
                     },
                     { 
-                        time: "15:30", loc: "City", icon: "💙", item: "市區觀光", 
-                        stayTime: "1小時", departTime: "16:30",
-                        route: "1. Blue Boat House：藍色小屋拍照 (路邊暫停)。\n2. Kings Park：若還有體力可去走玻璃橋。", 
-                        note: "", 
+                        time: "15:45", loc: "City", icon: "💙", item: "藍色小屋", 
+                        stayTime: "30分鐘", departTime: "16:15",
+                        route: "Blue Boat House (Crawley Edge Boatshed)。位於 Kings Park 山腳下，是伯斯最著名的打卡地標。", 
+                        note: "💡 路邊暫停拍照即可。", 
                         link: "https://www.google.com/maps/search/?api=1&query=Blue+Boat+House" 
                     },
                     { 
-                        time: "17:00", loc: "Cottesloe", icon: "🌅", item: "最美夕陽", 
+                        time: "16:45", loc: "Cottesloe", icon: "🌅", item: "最美夕陽", 
                         stayTime: "1.5小時", departTime: "18:30",
                         route: "Cottesloe Beach。參觀 Indiana Teahouse 建築，在草地上看印度洋夕陽。", 
                         note: "💡 西澳最經典的日落點。", 
