@@ -25,6 +25,7 @@
         body {
             font-family: "Noto Sans TC", sans-serif;
             background-color: #f8fafc; /* Slate 50 */
+            scroll-behavior: smooth;
         }
         .timeline-line {
             position: absolute;
@@ -71,9 +72,36 @@
         .safe-area-pb {
             padding-bottom: env(safe-area-inset-bottom, 20px);
         }
+        /* Glassmorphism Back to top button */
+        #back-to-top {
+            background: rgba(15, 23, 42, 0.4); /* Slate 900 with low opacity */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+        #back-to-top:hover {
+            background: rgba(15, 23, 42, 0.7);
+            transform: translateY(-5px);
+        }
+        /* Bottom Control Panel */
+        .bottom-panel {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.05);
+        }
     </style>
 </head>
-<body class="text-slate-700 bg-slate-50">
+<body class="text-slate-700 bg-slate-50 relative">
+
+    <!-- Back to Top Button (Glassmorphism) -->
+    <button id="back-to-top" onclick="window.scrollTo(0,0)" class="fixed bottom-28 right-4 z-40 text-white p-3 rounded-full shadow-lg opacity-0 pointer-events-none flex items-center justify-center w-12 h-12" aria-label="Back to top">
+        <!-- Chevron Up Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
 
     <!-- Navigation -->
     <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur shadow-sm border-b border-slate-200">
@@ -89,7 +117,8 @@
                     <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active-nav px-3 py-2 text-sm font-medium transition-colors hover:text-sky-500">行程儀表盤</button>
                     <button onclick="switchTab('daily')" id="nav-daily" class="nav-item px-3 py-2 text-sm font-medium transition-colors hover:text-sky-500">每日行程細節</button>
                     <button onclick="switchTab('food')" id="nav-food" class="nav-item px-3 py-2 text-sm font-medium transition-colors hover:text-sky-500">美食地圖</button>
-                    <button onclick="switchTab('info')" id="nav-info" class="nav-item px-3 py-2 text-sm font-medium transition-colors hover:text-sky-500">交通與準備</button>
+                    <button onclick="switchTab('tools')" id="nav-tools" class="nav-item px-3 py-2 text-sm font-medium transition-colors hover:text-sky-500">實用工具</button>
+                    <button onclick="switchTab('info')" id="nav-info" class="nav-item px-3 py-2 text-sm font-medium transition-colors hover:text-sky-500">準備與資訊</button>
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -105,12 +134,13 @@
             <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="block w-full text-left px-6 py-4 text-base font-medium hover:bg-slate-50 border-b border-slate-100">📊 行程儀表盤</button>
             <button onclick="switchTab('daily'); toggleMobileMenu()" class="block w-full text-left px-6 py-4 text-base font-medium hover:bg-slate-50 border-b border-slate-100">📅 每日行程細節</button>
             <button onclick="switchTab('food'); toggleMobileMenu()" class="block w-full text-left px-6 py-4 text-base font-medium hover:bg-slate-50 border-b border-slate-100">🦞 美食地圖</button>
-            <button onclick="switchTab('info'); toggleMobileMenu()" class="block w-full text-left px-6 py-4 text-base font-medium hover:bg-slate-50">🧳 交通與準備</button>
+            <button onclick="switchTab('tools'); toggleMobileMenu()" class="block w-full text-left px-6 py-4 text-base font-medium hover:bg-slate-50 border-b border-slate-100">🧰 實用工具</button>
+            <button onclick="switchTab('info'); toggleMobileMenu()" class="block w-full text-left px-6 py-4 text-base font-medium hover:bg-slate-50">🧳 準備與資訊</button>
         </div>
     </nav>
 
     <!-- Main Content Area -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-32">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-40">
 
         <!-- VIEW: DASHBOARD -->
         <div id="view-dashboard" class="space-y-6 fade-in">
@@ -135,7 +165,7 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Map Section (Top on Mobile if needed, or Main Focus) -->
+                <!-- Map Section -->
                 <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-100 lg:col-span-2 order-2 lg:order-1 h-80 sm:h-96">
                     <h3 class="text-lg font-bold mb-2 px-2 flex items-center gap-2">🗺️ 行程總覽地圖 <span class="text-xs font-normal text-slate-400">互動式地圖 (OSM)</span></h3>
                     <div class="h-[calc(100%-2rem)] w-full rounded-lg overflow-hidden relative border border-slate-200">
@@ -182,29 +212,31 @@
             </div>
         </div>
 
-        <!-- VIEW: DAILY ITINERARY (SINGLE PAGE) -->
+        <!-- VIEW: DAILY ITINERARY -->
         <div id="view-daily" class="hidden space-y-12">
-            
             <div class="sticky top-16 z-30 bg-white/95 backdrop-blur-sm py-3 px-4 border-b border-slate-200 shadow-sm flex justify-between items-center">
                 <span class="text-sm font-bold text-slate-500">全行程檢視</span>
-                <div class="flex items-center gap-3 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-                    <span class="text-xs font-semibold text-slate-600">詳細模式</span>
-                    <button id="mode-toggle" class="relative inline-flex h-5 w-9 items-center rounded-full bg-sky-500 transition-colors focus:outline-none" onclick="toggleDetailMode()">
-                        <span class="sr-only">Toggle detail mode</span>
-                        <span id="mode-knob" class="inline-block h-3 w-3 transform rounded-full bg-white transition-transform translate-x-5 shadow-sm"></span>
-                    </button>
-                </div>
             </div>
-
             <!-- All Days Container -->
             <div id="all-days-container" class="space-y-16 px-2 sm:px-0">
                 <!-- Injected via JS -->
             </div>
-            
-            <!-- Bottom Date Navigator -->
-            <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-slate-200 p-3 z-50 overflow-x-auto hide-scrollbar safe-area-pb shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                <div class="flex justify-start md:justify-center gap-3 min-w-max px-2" id="date-nav">
-                    <!-- Buttons Injected via JS -->
+            <!-- Bottom Control Panel -->
+            <div class="fixed bottom-0 left-0 right-0 bottom-panel z-50 safe-area-pb">
+                <div class="flex items-center px-2 py-2 gap-2">
+                    <!-- Mode Toggle Button (Default ON) -->
+                    <button id="bottom-mode-toggle" onclick="toggleDetailMode()" class="flex flex-col items-center justify-center w-16 h-14 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 transition-colors shrink-0">
+                        <div class="relative inline-flex h-4 w-8 items-center rounded-full bg-sky-500 transition-colors" id="btn-toggle-bg">
+                            <span id="btn-toggle-knob" class="inline-block h-3 w-3 transform rounded-full bg-white transition-transform translate-x-5 shadow-sm"></span>
+                        </div>
+                        <span class="text-[10px] font-bold mt-1">詳細模式</span>
+                    </button>
+                    <!-- Divider -->
+                    <div class="w-px h-10 bg-slate-200 shrink-0"></div>
+                    <!-- Date Scroller (Centered on Desktop) -->
+                    <div class="flex-1 overflow-x-auto hide-scrollbar flex gap-2 md:justify-center items-center" id="date-nav">
+                        <!-- Buttons Injected via JS -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -214,7 +246,6 @@
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                 <h2 class="text-2xl font-bold mb-4">🦞 美食攻略地圖</h2>
                 <p class="text-slate-500 mb-6">依據行程精選的必吃餐廳，包含海鮮、澳式早午餐與中式慰藉。</p>
-                
                 <!-- Filters -->
                 <div class="flex flex-wrap gap-2 mb-6">
                     <button onclick="filterFood('all')" class="food-filter active bg-slate-800 text-white px-4 py-1.5 rounded-full text-sm transition font-medium shadow-sm">全部</button>
@@ -223,7 +254,6 @@
                     <button onclick="filterFood('chinese')" class="food-filter bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-sm hover:bg-slate-200 transition font-medium">🥢 中式/亞州</button>
                     <button onclick="filterFood('snack')" class="food-filter bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-sm hover:bg-slate-200 transition font-medium">🍦 小吃甜點</button>
                 </div>
-
                 <!-- Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="food-grid">
                     <!-- Cards Injected via JS -->
@@ -231,10 +261,51 @@
             </div>
         </div>
 
+        <!-- VIEW: TOOLS (NEW) -->
+        <div id="view-tools" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Currency Converter -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">💱 匯率換算</h3>
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center gap-2">
+                            <label class="w-16 text-sm font-bold text-slate-500">匯率</label>
+                            <input type="number" id="rate-input" value="21.5" class="flex-1 bg-slate-50 border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500" oninput="convertCurrency('AUD')">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="w-16 text-sm font-bold text-slate-500">AUD</label>
+                            <input type="number" id="aud-input" placeholder="澳幣" class="flex-1 border border-slate-300 rounded px-3 py-2 text-lg font-bold text-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500" oninput="convertCurrency('AUD')">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="w-16 text-sm font-bold text-slate-500">TWD</label>
+                            <input type="number" id="twd-input" placeholder="台幣" class="flex-1 border border-slate-300 rounded px-3 py-2 text-lg font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500" oninput="convertCurrency('TWD')">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expense Tracker -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col h-full">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">💰 簡易記帳本</h3>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="expense-name" placeholder="項目 (如: 晚餐)" class="flex-1 border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none">
+                        <input type="number" id="expense-amount" placeholder="AUD" class="w-24 border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none">
+                        <button onclick="addExpense()" class="bg-sky-500 text-white px-4 rounded hover:bg-sky-600">+</button>
+                    </div>
+                    <ul id="expense-list" class="flex-1 overflow-y-auto max-h-64 space-y-2 text-sm text-slate-600 mb-3 border-t border-slate-100 pt-2">
+                        <li class="text-center text-slate-400 py-2">尚未新增項目</li>
+                    </ul>
+                    <div class="mt-auto border-t border-slate-200 pt-2 flex justify-between font-bold">
+                        <span>總計:</span>
+                        <span class="text-sky-600">AUD <span id="total-aud">0</span> <span class="text-slate-400 text-xs font-normal">≈ TWD <span id="total-twd">0</span></span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- VIEW: INFO & PREP -->
         <div id="view-info" class="hidden space-y-6">
             
-            <!-- Flight Info (NEW) -->
+            <!-- Flight Info -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 relative overflow-hidden">
                 <div class="absolute right-0 top-0 text-9xl opacity-5 transform translate-x-10 -translate-y-2 pointer-events-none">✈️</div>
                 <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🛫 關鍵航班資訊</h3>
@@ -248,35 +319,19 @@
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             <tr>
-                                <td class="px-4 py-3 font-bold text-slate-800">
-                                    <a href="https://zh-tw.flightaware.com/live/flight/TGW899" target="_blank" class="text-sky-500 hover:text-sky-700 hover:underline flex items-center gap-1 transition">
-                                        TR 899 <span class="text-xs">🔗</span>
-                                    </a>
-                                </td>
+                                <td class="px-4 py-3 font-bold text-slate-800"><a href="https://zh-tw.flightaware.com/live/flight/TGW899" target="_blank" class="text-sky-500 hover:text-sky-700 hover:underline flex items-center gap-1 transition">TR 899 <span class="text-xs">🔗</span></a></td>
                                 <td class="px-4 py-3">TPE ➔ SIN (去程轉機)</td>
                             </tr>
                             <tr>
-                                <td class="px-4 py-3 font-bold text-slate-800">
-                                    <a href="https://zh-tw.flightaware.com/live/flight/TGW28" target="_blank" class="text-sky-500 hover:text-sky-700 hover:underline flex items-center gap-1 transition">
-                                        TR 28 <span class="text-xs">🔗</span>
-                                    </a>
-                                </td>
+                                <td class="px-4 py-3 font-bold text-slate-800"><a href="https://zh-tw.flightaware.com/live/flight/TGW28" target="_blank" class="text-sky-500 hover:text-sky-700 hover:underline flex items-center gap-1 transition">TR 28 <span class="text-xs">🔗</span></a></td>
                                 <td class="px-4 py-3">SIN ➔ PER (抵達伯斯)</td>
                             </tr>
                             <tr class="bg-slate-50/50">
-                                <td class="px-4 py-3 font-bold text-slate-800">
-                                    <a href="https://zh-tw.flightaware.com/live/flight/TGW9" target="_blank" class="text-sky-500 hover:text-sky-700 hover:underline flex items-center gap-1 transition">
-                                        TR 9 <span class="text-xs">🔗</span>
-                                    </a>
-                                </td>
+                                <td class="px-4 py-3 font-bold text-slate-800"><a href="https://zh-tw.flightaware.com/live/flight/TGW9" target="_blank" class="text-sky-500 hover:text-sky-700 hover:underline flex items-center gap-1 transition">TR 9 <span class="text-xs">🔗</span></a></td>
                                 <td class="px-4 py-3">PER ➔ SIN (返程)</td>
                             </tr>
                             <tr>
-                                <td class="px-4 py-3 font-bold text-slate-800">
-                                    <a href="https://zh-tw.flightaware.com/live/flight/TGW892" target="_blank" class="text-sky-500 hover:text-sky-700 hover:underline flex items-center gap-1 transition">
-                                        TR 892 <span class="text-xs">🔗</span>
-                                    </a>
-                                </td>
+                                <td class="px-4 py-3 font-bold text-slate-800"><a href="https://zh-tw.flightaware.com/live/flight/TGW892" target="_blank" class="text-sky-500 hover:text-sky-700 hover:underline flex items-center gap-1 transition">TR 892 <span class="text-xs">🔗</span></a></td>
                                 <td class="px-4 py-3">SIN ➔ TPE (返家)</td>
                             </tr>
                         </tbody>
@@ -340,31 +395,53 @@
                     </div>
                 </div>
 
-                <!-- Transport -->
+                <!-- Packing List (Enhanced) -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🚗 租車資訊</h3>
-                    <div class="bg-slate-50 p-4 rounded-lg mb-4 border border-slate-200">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="font-semibold text-slate-700">車型</span>
-                            <span class="bg-sky-100 text-sky-700 text-xs font-bold px-2 py-1 rounded">8 人座</span>
-                        </div>
-                        <p class="text-2xl font-bold text-slate-800">Kia Carnival</p>
-                        <p class="text-sm text-slate-500 mt-1">空間寬敞，適合長途與長輩。</p>
-                    </div>
-                    <ul class="space-y-3 text-sm text-slate-600 list-none pl-1">
-                        <li class="flex gap-2"><span class="text-red-500 font-bold">⚠️</span> <span>保險：務必購買 <strong>Zero Excess (全險)</strong>。</span></li>
-                        <li class="flex gap-2"><span class="text-green-500 font-bold">✅</span> <span>里程：確認包含 <strong>Unlimited KM (無限里程)</strong>。</span></li>
-                        <li class="flex gap-2"><span class="text-blue-500 font-bold">💧</span> <span>補給：機場 WHSmith 買兩桶 5L 水放車上。</span></li>
-                        <li class="flex gap-2"><span class="text-amber-500 font-bold">🦘</span> <span>安全：郊區開車避開夜間 (袋鼠出沒)。</span></li>
-                    </ul>
+                     <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🧳 智慧行李清單</h3>
+                     <div class="space-y-4" id="packing-list-container">
+                        <!-- Packing categories injected via JS -->
+                     </div>
                 </div>
-
-                <!-- Checklist -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 md:col-span-2">
-                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">✅ 必做預訂清單 (Action List)</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="checklist-grid">
-                        <!-- Checklist Items via JS -->
+            </div>
+            
+            <!-- Transport -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mt-6">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🚗 租車資訊</h3>
+                <div class="bg-slate-50 p-4 rounded-lg mb-4 border border-slate-200">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-semibold text-slate-700">車型</span>
+                        <span class="bg-sky-100 text-sky-700 text-xs font-bold px-2 py-1 rounded">8 人座</span>
                     </div>
+                    <p class="text-2xl font-bold text-slate-800">Kia Carnival</p>
+                    <p class="text-sm text-slate-500 mt-1">空間寬敞，適合長途與長輩。</p>
+                </div>
+                <ul class="space-y-3 text-sm text-slate-600 list-none pl-1">
+                    <li class="flex gap-2"><span class="text-red-500 font-bold">⚠️</span> <span>保險：務必購買 <strong>Zero Excess (全險)</strong>。</span></li>
+                    <li class="flex gap-2"><span class="text-green-500 font-bold">✅</span> <span>里程：確認包含 <strong>Unlimited KM (無限里程)</strong>。</span></li>
+                    <li class="flex gap-2"><span class="text-blue-500 font-bold">💧</span> <span>補給：機場 WHSmith 買兩桶 5L 水放車上。</span></li>
+                    <li class="flex gap-2"><span class="text-amber-500 font-bold">🦘</span> <span>安全：郊區開車避開夜間 (袋鼠出沒)。</span></li>
+                </ul>
+            </div>
+
+            <!-- Emergency Card (Moved to bottom) -->
+            <div class="bg-red-50 p-6 rounded-xl shadow-sm border border-red-100 relative mt-6">
+                <h3 class="text-xl font-bold mb-4 text-red-700 flex items-center gap-2">🆘 緊急救援</h3>
+                <div class="space-y-3">
+                    <a href="tel:000" class="flex items-center gap-3 bg-white p-3 rounded-lg border border-red-200 hover:shadow-md transition">
+                        <span class="text-2xl">👮</span>
+                        <div>
+                            <p class="font-bold text-slate-800">澳洲緊急報案 (000)</p>
+                            <p class="text-xs text-slate-500">警察、救護車、消防</p>
+                        </div>
+                    </a>
+                        <a href="tel:+61418284531" class="flex items-center gap-3 bg-white p-3 rounded-lg border border-red-200 hover:shadow-md transition">
+                        <span class="text-2xl">🇹🇼</span>
+                        <div>
+                            <p class="font-bold text-slate-800">駐澳洲代表處急難救助</p>
+                            <p class="text-xs text-slate-500">+61-418-284-531</p>
+                        </div>
+                    </a>
+                    <a href="https://www.google.com/maps/search/hospital+near+me" target="_blank" class="block text-center text-xs text-red-600 hover:underline mt-2">📍 搜尋附近醫院</a>
                 </div>
             </div>
         </div>
@@ -1008,21 +1085,31 @@
             { name: "Coventry Village", type: "chinese", area: "Morley", desc: "亞洲美食街，便宜選擇多 (Laksa/雞飯)。", link: "https://www.google.com/maps/search/?api=1&query=Coventry+Village+Morley" }
         ];
 
-        const checklist = [
-            "Day 2: Jurien Bay 海獅同游 (需預約)",
-            "Day 4: Rottnest Island 船票 (Fremantle 往返)",
-            "Day 6: Mandurah 抓龍蝦船 (10:00 場次)",
-            "Day 6: Busselton 小火車+觀測站 (15:30 場次)",
-            "Day 7: Jewel Cave 導覽 (09:30/10:00)",
-            "Day 8: 直升機體驗 (需預約)",
-            "Day 8: Crown Epicurean 自助餐 (需提前1-2月)",
-            "住宿: Day 6 南部住宿 (Busselton)",
-            "網卡: 機場 Optus/Telstra",
-            "租車: 確認保險 Zero Excess",
-            "裝備: 防蠅網 (重要!)、墨鏡、頸枕"
+        const checklistCategories = [
+            {
+                title: "🪪 證件與重要文件",
+                items: ["護照 (效期6個月以上)", "ETA 電子簽證 (列印備用)", "國際駕照 + 台灣駕照", "機票行程單", "住宿確認單", "租車訂單 + 信用卡", "旅遊保險單"]
+            },
+            {
+                title: "👕 衣物 (洋蔥式穿法)",
+                items: ["短袖上衣", "薄外套 (早晚溫差大)", "防風/保暖外套 (南部海風大)", "長褲 (防蚊蟲)", "泳衣/泳褲", "遮陽帽 & 墨鏡", "好走的鞋 & 拖鞋"]
+            },
+            {
+                title: "💊 個人藥品 & 衛生",
+                items: ["暈車藥 (長途車程/船)", "腸胃藥", "感冒藥/止痛藥", "防蚊液 (重要!)", "防曬乳 (高係數)", "個人盥洗用品 (牙刷/牙膏)", "保濕乳液 (西澳乾燥)"]
+            },
+            {
+                title: "🔌 電子產品",
+                items: ["手機 & 充電線", "行動電源", "澳規轉接頭 (八字型)", "車充 (USB/Type-C)", "車用手機架", "相機/Gopro & 記憶卡", "澳洲網卡/Sim卡針"]
+            },
+            {
+                title: "🚗 自駕與其他必備",
+                items: ["防蠅網 (Pinnacles/Kalbarri 必備!)", "頸枕 (長途車程)", "保溫瓶/水壺", "環保購物袋 (超市不提供免費袋)", "AUX 音源線 (備用)", "濕紙巾/乾洗手", "雨具 (備用)"]
+            }
         ];
 
         let detailMode = true;
+        let expenses = [];
         let map;
 
         // --- INIT ---
@@ -1031,16 +1118,110 @@
             renderAllDaily(); 
             renderDateNav();
             renderFood('all');
-            renderInfo();
+            // Init Packing List
+            renderPackingList();
             initChart();
             initMap(); // Init Leaflet
+            
+            // Back to top button logic
+            const backToTopBtn = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
+                } else {
+                    backToTopBtn.classList.add('opacity-0', 'pointer-events-none');
+                }
+            });
         };
 
         // --- RENDER FUNCTIONS ---
+
+        function renderPackingList() {
+            const container = document.getElementById('packing-list-container');
+            container.innerHTML = checklistCategories.map((cat, idx) => `
+                <div class="border border-slate-200 rounded-lg overflow-hidden">
+                    <button onclick="togglePackingCategory(${idx})" class="w-full flex justify-between items-center bg-slate-50 px-4 py-3 text-left font-bold text-slate-700 hover:bg-slate-100 transition">
+                        <span>${cat.title}</span>
+                        <span id="cat-icon-${idx}" class="transform transition-transform text-slate-400">▼</span>
+                    </button>
+                    <div id="cat-content-${idx}" class="hidden bg-white p-4 space-y-2">
+                        ${cat.items.map(item => `
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <div class="relative flex items-center">
+                                    <input type="checkbox" class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-slate-300 shadow-sm checked:border-sky-500 checked:bg-sky-500 hover:border-sky-400 transition-all">
+                                    <svg class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-white w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
+                                        <path d="M3 8L6 11L11 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-sm text-slate-600 group-hover:text-slate-900 transition select-none">${item}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function togglePackingCategory(idx) {
+            const content = document.getElementById(`cat-content-${idx}`);
+            const icon = document.getElementById(`cat-icon-${idx}`);
+            content.classList.toggle('hidden');
+            icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        // --- Expense Logic ---
+        function addExpense() {
+            const nameInput = document.getElementById('expense-name');
+            const amountInput = document.getElementById('expense-amount');
+            const name = nameInput.value.trim();
+            const amount = parseFloat(amountInput.value);
+
+            if (name && !isNaN(amount)) {
+                expenses.push({ name, amount });
+                nameInput.value = '';
+                amountInput.value = '';
+                updateExpenseList();
+            }
+        }
+
+        function updateExpenseList() {
+            const list = document.getElementById('expense-list');
+            const totalAudEl = document.getElementById('total-aud');
+            const totalTwdEl = document.getElementById('total-twd');
+            const rate = parseFloat(document.getElementById('rate-input').value) || 21.5;
+
+            if (expenses.length === 0) {
+                list.innerHTML = '<li class="text-center text-slate-400 py-2">尚未新增項目</li>';
+                totalAudEl.innerText = '0';
+                totalTwdEl.innerText = '0';
+                return;
+            }
+
+            let totalAud = 0;
+            list.innerHTML = expenses.map((item, idx) => {
+                totalAud += item.amount;
+                return `
+                <li class="flex justify-between items-center border-b border-slate-50 last:border-0 pb-1">
+                    <span>${item.name}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="font-mono text-slate-700">$${item.amount}</span>
+                        <button onclick="removeExpense(${idx})" class="text-red-400 hover:text-red-600 text-xs">✕</button>
+                    </div>
+                </li>
+                `;
+            }).join('');
+
+            totalAudEl.innerText = totalAud.toFixed(2);
+            totalTwdEl.innerText = (totalAud * rate).toFixed(0);
+        }
+
+        function removeExpense(idx) {
+            expenses.splice(idx, 1);
+            updateExpenseList();
+        }
         
         function switchTab(tabId) {
             // Hide all
-            ['view-dashboard', 'view-daily', 'view-food', 'view-info'].forEach(id => {
+            ['view-dashboard', 'view-daily', 'view-food', 'view-info', 'view-tools'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
             // Show target
@@ -1192,19 +1373,19 @@
 
         function toggleDetailMode() {
             detailMode = !detailMode;
-            const knob = document.getElementById('mode-knob');
-            const btn = document.getElementById('mode-toggle');
+            const knob = document.getElementById('btn-toggle-knob');
+            const bg = document.getElementById('btn-toggle-bg');
             
             if (detailMode) {
                 knob.classList.add('translate-x-5');
                 knob.classList.remove('translate-x-1');
-                btn.classList.add('bg-sky-500');
-                btn.classList.remove('bg-slate-300');
+                bg.classList.add('bg-sky-500');
+                bg.classList.remove('bg-slate-300');
             } else {
                 knob.classList.remove('translate-x-5');
                 knob.classList.add('translate-x-1');
-                btn.classList.remove('bg-sky-500');
-                btn.classList.add('bg-slate-300');
+                bg.classList.remove('bg-sky-500');
+                bg.classList.add('bg-slate-300');
             }
             renderAllDaily();
         }
@@ -1241,13 +1422,32 @@
         window.filterFood = renderFood;
 
         function renderInfo() {
-            const list = document.getElementById('checklist-grid');
-            list.innerHTML = checklist.map(item => `
-                <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100 hover:bg-slate-100 transition">
-                    <input type="checkbox" class="mt-1 w-5 h-5 text-sky-600 rounded focus:ring-sky-500 border-gray-300 cursor-pointer">
-                    <span class="text-sm text-slate-700 select-none cursor-pointer">${item}</span>
-                </div>
-            `).join('');
+            // Replaced by renderPackingList in onload
+        }
+
+        // --- Currency Converter Logic ---
+        function convertCurrency(source) {
+            const audInput = document.getElementById('aud-input');
+            const twdInput = document.getElementById('twd-input');
+            const rateInput = document.getElementById('rate-input');
+            
+            const rate = parseFloat(rateInput.value) || 21.5; // Default fallback
+
+            if (source === 'AUD') {
+                const aud = parseFloat(audInput.value);
+                if (!isNaN(aud)) {
+                    twdInput.value = (aud * rate).toFixed(0);
+                } else {
+                    twdInput.value = '';
+                }
+            } else {
+                const twd = parseFloat(twdInput.value);
+                if (!isNaN(twd)) {
+                    audInput.value = (twd / rate).toFixed(2);
+                } else {
+                    audInput.value = '';
+                }
+            }
         }
 
         function initChart() {
