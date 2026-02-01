@@ -672,11 +672,25 @@
                 weather: { icon: "☀️", temp: "28°C", text: "海島晴朗" },
                 events: [
                     { 
-                        time: "08:30", loc: "Fremantle", icon: "⛴️", item: "搭船", 
-                        stayTime: "30分鐘", departTime: "09:00",
-                        route: "前往 Fremantle B Shed 碼頭。出發前去彩虹貨櫃 (Rainbow Containers) 拍照。", 
-                        note: "🚗 停車攻略：導航 Zone 3 Parking，一天只要 $12，走路去碼頭約 5-10 分鐘。\n🎫 船票：務必提前網上訂購 (Rottnest Express)。", 
+                        time: "07:30", loc: "Fremantle", icon: "⛴️", item: "碼頭報到", 
+                        stayTime: "30分鐘", departTime: "08:00",
+                        route: "前往 Fremantle B Shed 碼頭辦理報到，準備搭乘 08:00 的船班。", 
+                        note: "🚗 停車攻略：導航 Zone 3 Parking，一天只要 $12，走路去碼頭約 5-10 分鐘。\n🎫 船票：務必提前網上訂購 (SeaLink)。", 
                         link: "https://www.google.com/maps/search/?api=1&query=Victoria+Quay+Parking+Zone+3+Fremantle" 
+                    },
+                    { 
+                        time: "08:00", loc: "Fremantle", icon: "🌊", item: "搭船前往 Rottnest", 
+                        stayTime: "30分鐘", departTime: "08:30",
+                        route: "搭乘 SeaLink 渡輪前往羅特尼斯島。", 
+                        note: "", 
+                        link: "" 
+                    },
+                    { 
+                        time: "09:00", loc: "Rottnest", icon: "🍳", item: "早餐 & Quokka", 
+                        stayTime: "1.5小時", departTime: "10:30",
+                        route: "抵達後先享用早餐，並在 Settlement 商店街附近的樹下尋找 Quokka。", 
+                        note: "📸 技巧：由下往上拍，Quokka 看起來會像在笑。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=Rottnest+Bakery" 
                     },
                     { 
                         time: "10:30", loc: "Rottnest", icon: "🚌", item: "環島巴士", 
@@ -686,31 +700,38 @@
                         link: "https://www.google.com/maps/search/?api=1&query=Little+Salmon+Bay+Rottnest+Island" 
                     },
                     { 
-                        time: "12:30", loc: "Settlement", icon: "🐹", item: "Quokka & 午餐", 
-                        stayTime: "2.5小時", departTime: "15:00",
-                        route: "在 Settlement 商店街附近的樹下尋找 Quokka。", 
-                        note: "📸 技巧：由下往上拍，Quokka 看起來會像在笑。\n🍽️ 午餐：Isola Bar (海景義式料理) 或 Rottnest Bakery (肉派/甜甜圈)。", 
-                        link: "https://www.google.com/maps/search/?api=1&query=Rottnest+Bakery" 
+                        time: "12:30", loc: "Settlement", icon: "🍝", item: "午餐", 
+                        stayTime: "1.5小時", departTime: "14:00",
+                        route: "返回 Settlement 區享用午餐。", 
+                        note: "🍽️ 午餐：Isola Bar (海景義式料理) 或 Rottnest Bakery (肉派/甜甜圈)。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=Isola+Bar+Rottnest" 
                     },
                     { 
-                        time: "15:00", loc: "Pier", icon: "🔙", item: "搭船返回", 
-                        stayTime: "30分鐘", departTime: "15:30",
-                        route: "建議搭乘 15:00 左右的船班返回 Fremantle，以便參觀海事博物館。", 
+                        time: "14:00", loc: "Rottnest", icon: "🏖️", item: "自由活動/休息", 
+                        stayTime: "1.5小時", departTime: "15:30",
+                        route: "在 Pinky Beach 散步或在 The Basin 發呆。", 
                         note: "", 
                         link: "" 
                     },
                     { 
-                        time: "15:45", loc: "Fremantle", icon: "⚓", item: "海事博物館", 
-                        stayTime: "1小時", departTime: "17:00",
-                        route: "WA Maritime Museum。參觀這座現代化博物館，了解西澳的海洋歷史（包含西北大陸架相關的海洋工業展示）與潛水艇 HMAS Ovens。", 
-                        note: "💡 就在碼頭旁邊 (Victoria Quay)。博物館 17:00 閉館。", 
+                        time: "16:00", loc: "Rottnest", icon: "🔙", item: "搭船返回", 
+                        stayTime: "30分鐘", departTime: "16:30",
+                        route: "搭乘 16:00 的 SeaLink 船班返回 Fremantle。", 
+                        note: "", 
+                        link: "" 
+                    },
+                    { 
+                        time: "16:45", loc: "Fremantle", icon: "⚓", item: "海事博物館 (外觀)", 
+                        stayTime: "30分鐘", departTime: "17:15",
+                        route: "抵達 Fremantle 後，步行至旁邊的 WA Maritime Museum 參觀外觀與潛水艇 (此時已閉館)。", 
+                        note: "💡 17:00 閉館，僅能快速瀏覽外部。", 
                         link: "https://www.google.com/maps/search/?api=1&query=WA+Maritime+Museum" 
                     },
                     { 
-                        time: "17:15", loc: "Fremantle", icon: "🔒", item: "監獄外觀", 
+                        time: "17:30", loc: "Fremantle", icon: "🔒", item: "監獄外觀", 
                         stayTime: "30分鐘", departTime: "18:00",
                         route: "Fremantle Prison。前往這座世界遺產建築，參觀其壯觀的 Gatehouse 外觀並拍照留念。", 
-                        note: "💡 內部導覽通常需白天預約，若有興趣參加 Torchlight Tour (夜間導覽) 可查詢當日是否有場次。", 
+                        note: "", 
                         link: "https://www.google.com/maps/search/?api=1&query=Fremantle+Prison" 
                     },
                     { 
@@ -804,7 +825,7 @@
                         link: "" 
                     },
                     { 
-                        time: "10:00", loc: "Mandurah", icon: "🛥️", item: "Eco BBQ Boats (自駕甜甜圈船)", 
+                        time: "10:00", loc: "Mandurah", icon: "🛥️", item: "6 Person Premium Pontoon", 
                         stayTime: "1.5小時", departTime: "11:30",
                         route: "租用圓形電動烤肉船，自駕航行於 Mandurah 運河，邊看海豚邊享用 BBQ (需自備食材)。", 
                         note: "💡 需提前預訂。自備食材上船烤肉，體驗獨特水上野餐。", 
@@ -971,39 +992,39 @@
                         link: "https://www.google.com/maps/search/?api=1&query=Caversham+Wildlife+Park" 
                     },
                     { 
-                        time: "11:30", loc: "East Perth", icon: "💰", item: "伯斯鑄幣廠", 
-                        stayTime: "1小時", departTime: "12:30",
-                        route: "The Perth Mint。參觀這座歷史悠久的鑄幣廠，千萬別錯過 12:00 左右的黃金澆鑄表演 (Gold Pour)。", 
+                        time: "11:30", loc: "East Perth", icon: "💰", item: "午餐 & 英倫拱廊", 
+                        stayTime: "2小時", departTime: "13:30",
+                        route: "先在 City 或 East Perth 享用午餐，然後快速逛逛 London Court (英倫拱廊) 拍這。", 
+                        note: "🍽️ 建議找這附近的簡單午餐，預留時間前往鑄幣廠。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=London+Court+Perth" 
+                    },
+                    { 
+                        time: "14:15", loc: "East Perth", icon: "💰", item: "伯斯鑄幣廠 (報到)", 
+                        stayTime: "15分鐘", departTime: "14:30",
+                        route: "The Perth Mint。請務必在 14:15 前抵達並完成報到手續。", 
+                        note: "⚠️ 預訂場次：14:30。請準時。", 
+                        link: "https://www.google.com/maps/search/?api=1&query=The+Perth+Mint" 
+                    },
+                    { 
+                        time: "14:30", loc: "East Perth", icon: "🥇", item: "鑄幣廠導覽 & 澆鑄", 
+                        stayTime: "1小時", departTime: "15:30",
+                        route: "參加 Gold Tour，觀賞著名的黃金澆鑄表演 (Gold Pour)，並參觀金庫。", 
                         note: "💡 可以親手觸摸價值不菲的金條。", 
                         link: "https://www.google.com/maps/search/?api=1&query=The+Perth+Mint" 
                     },
                     { 
-                        time: "12:45", loc: "City", icon: "🇬🇧", item: "英倫拱廊 & 午餐", 
-                        stayTime: "1小時", departTime: "13:45",
-                        route: "London Court。逛街買伴手禮，拍哈利波特風格照片。", 
-                        note: "🍽️ 午餐：市區簡單吃 (如 Petition Kitchen)。", 
-                        link: "https://www.google.com/maps/search/?api=1&query=London+Court+Perth" 
-                    },
-                    { 
-                        time: "14:00", loc: "Kings Park", icon: "🌳", item: "Kings Park (深度遊)", 
-                        stayTime: "1.5小時", departTime: "15:30",
+                        time: "16:00", loc: "Kings Park", icon: "🌳", item: "Kings Park (深度遊)", 
+                        stayTime: "1.5小時", departTime: "17:30",
                         route: "前往 Kings Park and Botanic Garden。參觀 State War Memorial, 走一段 Lotterywest Federation Walkway (樹頂步道)，欣賞天鵝河與城市全景。", 
                         note: "💡 這是伯斯必遊景點，佔地巨大，適合悠閒散步拍照。", 
                         link: "https://www.google.com/maps/search/?api=1&query=Kings+Park+and+Botanic+Garden" 
                     },
                     { 
-                        time: "15:45", loc: "City", icon: "💙", item: "藍色小屋", 
-                        stayTime: "30分鐘", departTime: "16:15",
+                        time: "17:45", loc: "City", icon: "💙", item: "藍色小屋", 
+                        stayTime: "30分鐘", departTime: "18:15",
                         route: "Blue Boat House (Crawley Edge Boatshed)。位於 Kings Park 山腳下，是伯斯最著名的打卡地標。", 
                         note: "💡 路邊暫停拍照即可。", 
                         link: "https://www.google.com/maps/search/?api=1&query=Blue+Boat+House" 
-                    },
-                    { 
-                        time: "16:45", loc: "Cottesloe", icon: "🌅", item: "最美夕陽", 
-                        stayTime: "1.5小時", departTime: "18:30",
-                        route: "Cottesloe Beach。參觀 Indiana Teahouse 建築，在草地上看印度洋夕陽。", 
-                        note: "💡 西澳最經典的日落點。", 
-                        link: "https://www.google.com/maps/search/?api=1&query=Cottesloe+Beach" 
                     },
                     { 
                         time: "19:00", loc: "Crown", icon: "🍽️", item: "豪華慶功宴", 
