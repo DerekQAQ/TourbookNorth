@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北海道自駕之旅規劃 | 7天6夜</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' },
+                        slate: { 750: '#293548', 850: '#151f32' }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet JS (地圖) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Chart.js (圖表) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* 自訂樣式與過渡動畫 */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        
+        /* 隱藏滾動條但保留功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 地圖修正 z-index 避免覆蓋選單 */
+        #strategicMap { z-index: 10; }
+        .leaflet-top, .leaflet-bottom { z-index: 10; }
+        
+        /* Checkbox 客製化 */
+        input[type="checkbox"]:checked + label { text-decoration: line-through; opacity: 0.6; }
+
+        /* 垂直時間軸的線條樣式 */
+        .timeline-line {
+            position: absolute;
+            left: 1.5rem; /* 24px */
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e2e8f0; /* Slate 200 */
+            z-index: 0;
+        }
+        .dark .timeline-line {
+            background-color: #334155; /* Slate 700 */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-200 transition-colors duration-300 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <i class="fa-solid fa-mountain-sun text-brand-500 text-2xl mr-2"></i>
+                    <span class="font-bold text-lg tracking-wide">HOKKAIDO <span class="font-light text-sm text-slate-500 dark:text-slate-400">TRIP</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-4 py-2 rounded-md font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-slate-700 transition"><i class="fa-solid fa-chart-line mr-2"></i>行程儀表盤</button>
+                    <button onclick="switchTab('itinerary')" id="nav-itinerary" class="nav-btn px-4 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-route mr-2"></i>每日行程</button>
+                    <button onclick="switchTab('budget')" id="nav-budget" class="nav-btn px-4 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-wallet mr-2"></i>財務預算</button>
+                    <button onclick="switchTab('food')" id="nav-food" class="nav-btn px-4 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-utensils mr-2"></i>美食地圖</button>
+                    <button onclick="switchTab('logistics')" id="nav-logistics" class="nav-btn px-4 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-box-open mr-2"></i>後勤準備</button>
+                    <div class="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
+                    <!-- Dark Mode Toggle -->
+                    <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                        <i id="darkModeIcon" class="fa-solid fa-sun text-amber-500"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="flex items-center md:hidden">
+                    <button onclick="toggleDarkMode()" class="p-2 mr-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                        <i id="darkModeIconMobile" class="fa-solid fa-sun text-amber-500"></i>
+                    </button>
+                    <button onclick="toggleMobileMenu()" class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 flex flex-col">
+                <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="text-left px-3 py-2 rounded-md text-base font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-slate-700"><i class="fa-solid fa-chart-line w-6"></i> 行程儀表盤</button>
+                <button onclick="switchTab('itinerary'); toggleMobileMenu()" class="text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"><i class="fa-solid fa-route w-6"></i> 每日行程</button>
+                <button onclick="switchTab('budget'); toggleMobileMenu()" class="text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"><i class="fa-solid fa-wallet w-6"></i> 財務預算</button>
+                <button onclick="switchTab('food'); toggleMobileMenu()" class="text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"><i class="fa-solid fa-utensils w-6"></i> 美食地圖</button>
+                <button onclick="switchTab('logistics'); toggleMobileMenu()" class="text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"><i class="fa-solid fa-box-open w-6"></i> 後勤準備</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <!-- ================= 模組 1: 行程儀表盤 ================= -->
+        <section id="dashboard" class="tab-content active">
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold mb-2">八月北海道自駕行程總覽</h1>
+                <p class="text-slate-500 dark:text-slate-400">輕鬆掌握 7天6夜 核心數據，涵蓋道央至道南的絕美自駕路線。</p>
+            </div>
+
+            <!-- 關鍵數據卡片 -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                    <div class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">旅程主題</div>
+                    <div class="text-xl font-bold text-brand-600 dark:text-brand-400">夏日追花之旅</div>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                    <div class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">總遊玩天數</div>
+                    <div class="text-xl font-bold">7 天 6 夜</div>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                    <div class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">預估總里程</div>
+                    <div class="text-xl font-bold">約 720 km</div>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                    <div class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">進出機場</div>
+                    <div class="text-lg font-bold">千歲進 / 函館出</div>
+                </div>
+            </div>
+
+            <!-- 地圖與圖表區塊 -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <!-- 互動地圖 -->
+                <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col">
+                    <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-750">
+                        <h2 class="font-bold"><i class="fa-solid fa-map-location-dot mr-2 text-emerald-500"></i>自駕路線地圖</h2>
+                        <div class="space-x-1" id="map-jump-buttons">
+                            <!-- Buttons generated by JS -->
+                        </div>
+                    </div>
+                    <div id="strategicMap" class="h-80 w-full relative z-10"></div>
+                </div>
+
+                <!-- 長條圖 -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-4 flex flex-col">
+                    <h2 class="font-bold mb-4"><i class="fa-solid fa-chart-column mr-2 text-brand-500"></i>活動強度與交通耗時</h2>
+                    <div class="relative flex-grow min-h-[250px]">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 每日天氣預報 (可點擊跳轉) -->
+            <div class="mb-6">
+                <h3 class="font-bold text-slate-800 dark:text-slate-200 mb-3"><i class="fa-solid fa-cloud-sun mr-2 text-brand-500"></i>各地區逐日天氣情報 (點擊卡片查看當日行程)</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3" id="weather-container">
+                    <!-- JS Generated Weather Cards -->
+                </div>
+            </div>
+
+            <!-- 注意事項 -->
+            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-5 border border-amber-200 dark:border-amber-700/50">
+                <h3 class="font-bold text-amber-800 dark:text-amber-400 mb-3"><i class="fa-solid fa-circle-info mr-2"></i>行車注意事項</h3>
+                <ul class="space-y-2 text-sm text-amber-700 dark:text-amber-300/80">
+                    <li><i class="fa-solid fa-circle-right text-xs mr-2"></i><strong>長途駕駛：</strong> Day 2 (往札幌) 及 Day 4 (往洞爺湖) 沿途風景優美但車程較長，建議在休息站買些點心並換手駕駛。</li>
+                    <li><i class="fa-solid fa-circle-right text-xs mr-2"></i><strong>適應右駕：</strong> Day 1 剛下飛機，可以放慢車速、帶著輕鬆的心情適應日本交通標誌與右駕習慣。</li>
+                    <li><i class="fa-solid fa-circle-right text-xs mr-2"></i><strong>野生動物：</strong> 郊外山路 (特別是積丹半島及往洞爺湖路上) 偶爾會有可愛的狐狸或鹿出沒，請多加留意。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ================= 模組 2: 每日行程 ================= -->
+        <section id="itinerary" class="tab-content">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">旅行時間軸</h1>
+                    <p class="text-slate-500 dark:text-slate-400">7天6夜 行程細節與攻略</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="toggleDetails()" id="btn-toggle-details" class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+                        <i class="fa-solid fa-compress mr-2"></i>隱藏詳細資訊
+                    </button>
+                </div>
+            </div>
+
+            <!-- 置頂日期導覽列 -->
+            <div class="sticky top-16 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm py-3 mb-6 border-b border-slate-200 dark:border-slate-700 overflow-x-auto no-scrollbar">
+                <div class="flex space-x-2 min-w-max px-1" id="date-nav">
+                    <!-- Date Nav Buttons generated by JS -->
+                </div>
+            </div>
+
+            <!-- 時間軸容器 -->
+            <div id="timeline-container" class="max-w-4xl mx-auto px-2 sm:px-0">
+                <!-- Timeline generated by JS -->
+            </div>
+        </section>
+
+        <!-- ================= 模組 3: 財務預算 ================= -->
+        <section id="budget" class="tab-content">
+            <h1 class="text-3xl font-bold mb-2">財務與預算分析</h1>
+            <p class="text-slate-500 dark:text-slate-400 mb-6">雙人配置預估基準 (單位：新台幣 TWD)</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- 預算圖表 -->
+                <div class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+                    <h3 class="font-bold text-center mb-4">預算結構分析</h3>
+                    <div class="relative max-w-[250px] mx-auto">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">總預估花費</div>
+                        <div class="text-3xl font-bold text-brand-600 dark:text-brand-400" id="total-budget-display">NT$ 0</div>
+                    </div>
+                </div>
+
+                <!-- 預算明細表 & 匯率工具 -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-700">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-750 text-slate-600 dark:text-slate-300 text-sm">
+                                    <th class="p-4 border-b dark:border-slate-700">項目</th>
+                                    <th class="p-4 border-b dark:border-slate-700">預估金額 (TWD)</th>
+                                    <th class="p-4 border-b dark:border-slate-700">備註</th>
+                                </tr>
+                            </thead>
+                            <tbody id="budget-table-body" class="text-sm divide-y divide-slate-100 dark:divide-slate-700">
+                                <!-- Generated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 匯率換算器 -->
+                    <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-6 border border-indigo-100 dark:border-indigo-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-300 p-3 rounded-full">
+                                <i class="fa-solid fa-calculator text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-indigo-900 dark:text-indigo-100">當地匯率換算</h4>
+                                <p class="text-xs text-indigo-600 dark:text-indigo-400">當前預設基準: 1 JPY ≈ 0.215 TWD</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
+                            <input type="number" id="jpy-input" placeholder="日幣 (JPY)" class="w-24 bg-transparent outline-none px-2 text-right dark:text-white" oninput="convertCurrency()">
+                            <span class="text-slate-400 font-bold">¥</span>
+                            <i class="fa-solid fa-arrow-right-arrow-left text-slate-300 dark:text-slate-600 text-sm"></i>
+                            <span class="text-slate-400 font-bold">$</span>
+                            <input type="text" id="twd-output" placeholder="台幣 (TWD)" class="w-24 bg-transparent outline-none px-2 text-brand-600 dark:text-brand-400 font-bold" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 模組 4: 美食地圖 ================= -->
+        <section id="food" class="tab-content">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">精選美食地圖</h1>
+                    <p class="text-slate-500 dark:text-slate-400">依據每日行程為您嚴選的必吃餐廳清單，包含高分評價與地圖導航。</p>
+                </div>
+                <!-- 標籤篩選器 -->
+                <div class="flex flex-wrap gap-2" id="food-filters">
+                    <button onclick="filterFood('all')" class="food-filter-btn px-4 py-2 text-sm font-medium rounded-full bg-slate-800 text-white dark:bg-brand-600 transition shadow-sm">全部</button>
+                    <button onclick="filterFood('札幌')" class="food-filter-btn px-4 py-2 text-sm font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">札幌</button>
+                    <button onclick="filterFood('小樽')" class="food-filter-btn px-4 py-2 text-sm font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">小樽</button>
+                    <button onclick="filterFood('函館')" class="food-filter-btn px-4 py-2 text-sm font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">函館</button>
+                    <button onclick="filterFood('富良野')" class="food-filter-btn px-4 py-2 text-sm font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">富良野</button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="food-grid">
+                <!-- JS Generated Food Cards -->
+            </div>
+        </section>
+
+        <!-- ================= 模組 5: 後勤準備 ================= -->
+        <section id="logistics" class="tab-content">
+            <h1 class="text-3xl font-bold mb-6">租車與行李準備清單</h1>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- 租車攻略 -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+                    <h3 class="font-bold border-b border-slate-100 dark:border-slate-700 pb-3 mb-4 flex items-center text-lg"><i class="fa-solid fa-car-side text-brand-500 mr-3 text-xl"></i>租車攻略</h3>
+                    <ul class="text-base space-y-4 text-slate-600 dark:text-slate-300">
+                        <li class="flex items-start"><i class="fa-solid fa-location-arrow text-emerald-500 mt-1 mr-3"></i><div><strong>取還車地點：</strong> 新千歲機場 (CTS) 取車 / 函館機場 (HKD) 還車，方便不走回頭路 (需付甲租乙還費用)。</div></li>
+                        <li class="flex items-start"><i class="fa-solid fa-file-lines text-emerald-500 mt-1 mr-3"></i><div><strong>必備文件：</strong> 護照、台灣駕照正本、駕照日文譯本 (缺一不可！)。</div></li>
+                        <li class="flex items-start"><i class="fa-solid fa-road text-emerald-500 mt-1 mr-3"></i><div><strong>ETC與HEP：</strong> 強烈建議租借 ETC 卡並購買 Hokkaido Expressway Pass (HEP) 吃到飽方案，長途移動必備。</div></li>
+                        <li class="flex items-start"><i class="fa-solid fa-gas-pump text-emerald-500 mt-1 mr-3"></i><div><strong>滿油還車：</strong> 還車前請在機場附近的加油站加滿油 (Regular レギュラー)，並保留收據給店員確認。</div></li>
+                    </ul>
+                </div>
+
+                <!-- 裝備檢查表 -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+                    <h3 class="font-bold border-b border-slate-100 dark:border-slate-700 pb-3 mb-4 flex items-center text-lg"><i class="fa-solid fa-suitcase-rolling text-indigo-500 mr-3 text-xl"></i>行李檢核表</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">點擊方框打勾，確認物品是否帶齊！</p>
+                    <div class="space-y-3 text-base" id="checklist-container">
+                        <!-- JS Generated Checkboxes -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-100 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-6 text-center text-sm text-slate-500 dark:text-slate-400 mt-auto">
+        <p>Hokkaido Summer Road Trip &copy; 2024 | Created for Beautiful Memories.</p>
+    </footer>
+
+    <!-- JavaScript Data & Logic -->
+    <script>
+        // ================= 資料庫 (App Data) =================
+        const appData = {
+            weather: [
+                { day: 1, location: "富良野", icon: "fa-sun", temp: "26°C", desc: "晴天微風", color: "text-amber-500" },
+                { day: 2, location: "美瑛/札幌", icon: "fa-cloud-sun", temp: "25°C", desc: "多雲時晴", color: "text-amber-400" },
+                { day: 3, location: "札幌", icon: "fa-sun", temp: "27°C", desc: "陽光普照", color: "text-amber-500" },
+                { day: 4, location: "積丹/小樽", icon: "fa-sun", temp: "26°C", desc: "晴朗海岸", color: "text-amber-500" },
+                { day: 5, location: "洞爺/函館", icon: "fa-cloud-sun-rain", temp: "23°C", desc: "午後短暫陣雨", color: "text-blue-400" },
+                { day: 6, location: "函館", icon: "fa-sun", temp: "25°C", desc: "晴空萬里", color: "text-amber-500" },
+                { day: 7, location: "函館機場", icon: "fa-cloud-sun", temp: "26°C", desc: "適合飛行", color: "text-amber-400" }
+            ],
+            mapData: {
+                points: [
+                    { day: 1, name: "新千歲機場", coords: [42.796, 141.673], desc: "抵達、租車" },
+                    { day: 1, name: "精靈露臺 (富良野)", coords: [43.323, 142.354], desc: "童話木屋" },
+                    { day: 2, name: "富田農場 & 哈密瓜", coords: [43.418, 142.427], desc: "賞花海吃甜點" },
+                    { day: 2, name: "白金青池 (美瑛)", coords: [43.473, 142.614], desc: "絕美青池" },
+                    { day: 3, name: "札幌市區", coords: [43.061, 141.354], desc: "市區漫遊、大通公園" },
+                    { day: 4, name: "小樽運河", coords: [43.190, 141.002], desc: "運河、甜點" },
+                    { day: 4, name: "神威岬 (積丹半島)", coords: [43.3308, 140.3475], desc: "積丹藍海岸" },
+                    { day: 4, name: "洞爺湖", coords: [42.585, 140.835], desc: "湖畔溫泉" },
+                    { day: 5, name: "函館山", coords: [41.760, 140.704], desc: "百萬夜景" },
+                    { day: 6, name: "五稜郭", coords: [41.796, 140.756], desc: "星形碉堡" },
+                    { day: 7, name: "函館機場", coords: [41.777, 140.823], desc: "還車、賦歸" }
+                ],
+                center: [43.0, 141.0]
+            },
+            itinerary: [
+                {
+                    day: 1, date: "8/12 (一)", title: "抵達北海道 ➔ 前往富良野", route: "新千歲機場 ➔ 富良野", 
+                    hours: 2, intensity: 4, stay: "富良野 / 美瑛",
+                    summary: "抵達新千歲機場辦理租車，帶著期待的心情直接開車前往富良野，開啟第一天的探索。",
+                    details: [
+                        { 
+                            time: "14:00", action: "抵達新千歲機場 (CTS)", type: "plane",
+                            duration: "1 小時", departure: "15:00", 
+                            route: "出海關領行李 ➔ 國內線航廈1樓租車櫃台報到 ➔ 搭乘接駁車至租車營業所",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=New+Chitose+Airport",
+                            tips: "出關後可由副駕看顧行李，主駕帶著護照與譯本先去排隊辦理手續，能大幅節省時間！記得加購 HEP 高速公路吃到飽。"
+                        },
+                        { 
+                            time: "15:30", action: "悠閒上路前往富良野", type: "car",
+                            duration: "2 小時 (車程)", departure: "17:30 抵達", 
+                            route: "新千歲機場 ➔ 道東自動車道 ➔ 占冠IC ➔ 國道237號 ➔ 富良野",
+                            tips: "剛上路慢慢開，放鬆適應一下右駕。車上導航建議優先設定目的地的「電話號碼」最精準。"
+                        },
+                        { 
+                            time: "17:40", action: "森林精靈露臺 (Ningle Terrace)", type: "camera",
+                            duration: "1.5 小時", departure: "19:10", 
+                            route: "新富良野王子大飯店旁停車場步行前往",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Ningle+Terrace",
+                            tips: "傍晚點燈後氣氛就像童話故事一樣！木屋裡有各式手工藝品，建議在這裡喝杯「森之時計」咖啡放鬆。"
+                        },
+                        { 
+                            time: "19:30", action: "富良野市區晚餐與入住", type: "bed",
+                            duration: "-", departure: "-", 
+                            route: "飯店周邊商圈",
+                            tips: "晚餐推薦品嚐「唯我獨尊」特色咖哩飯，或是找間車站周邊的居酒屋吃富良野和牛。"
+                        }
+                    ],
+                    risk: "首日取車手續可能稍微耗時，記得保持輕鬆心情。右駕需適應，轉彎時請多留意口訣「左轉小、右轉大」。"
+                },
+                {
+                    day: 2, date: "8/13 (二)", title: "美瑛花海、哈密瓜 ➔ 札幌", route: "富良野/美瑛 ➔ 札幌", 
+                    hours: 2.5, intensity: 7, stay: "札幌市區",
+                    summary: "上午暢遊經典花海與青池，享用香甜哈密瓜，下午帶著滿滿美照開車前往札幌。",
+                    details: [
+                        { 
+                            time: "08:30", action: "富田農場 (Farm Tomita)", type: "camera",
+                            duration: "1.5 小時", departure: "10:00", 
+                            route: "國道237號 ➔ 依指標進入農場免費專用停車場",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Farm+Tomita",
+                            tips: "早點到避開遊覽車人潮。夏季向日葵與彩色花田非常美，盡情拍照吧！"
+                        },
+                        { 
+                            time: "10:15", action: "富田哈密瓜工房", type: "utensils",
+                            duration: "45 分鐘", departure: "11:00", 
+                            route: "富田農場旁步行即達",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Tomita+Melon+House",
+                            tips: "賞完花直接走過來！必吃現切的赤肉哈密瓜片和超級濃郁的哈密瓜霜淇淋，甜度爆表，幸福感滿滿。"
+                        },
+                        { 
+                            time: "11:30", action: "白金青池 & 白鬚瀑布", type: "camera",
+                            duration: "2 小時", departure: "13:30", 
+                            route: "全景之路 ➔ 白金溫泉鄉方向 ➔ 青池付費停車場",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Shirogane+Blue+Pond",
+                            tips: "青池周邊有時會稍微塞車。陽光直射時池水會呈現迷人的蒂芬妮藍，順遊旁邊的「白鬚瀑布」非常涼爽。"
+                        },
+                        { 
+                            time: "14:00", action: "美瑛市區午餐", type: "utensils",
+                            duration: "1 小時", departure: "15:00", 
+                            route: "美瑛車站周邊商圈",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Junpei+Biei",
+                            tips: "推薦「純平洋食 (Junpei)」的炸蝦丼，人潮多建議提早預約或做好排隊準備。"
+                        },
+                        { 
+                            time: "15:15", action: "驅車前往札幌", type: "car",
+                            duration: "2.5 小時 (車程)", departure: "17:45 抵達", 
+                            route: "旭川鷹栖IC ➔ 道央自動車道 ➔ 札幌IC ➔ 札幌市區",
+                            tips: "長途高速公路容易想睡，建議中途於「砂川SA」休息站買些點心、換手駕駛。"
+                        },
+                        { 
+                            time: "18:15", action: "札幌飯店 Check-in & 歡樂晚餐", type: "utensils",
+                            duration: "自由活動", departure: "-", 
+                            route: "薄野 (Susukino) 商圈",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Daruma+Sapporo",
+                            tips: "大推名店「達摩 (Daruma)」成吉思汗烤肉，大口吃肉配上生啤酒，洗去拉車的疲勞！"
+                        }
+                    ],
+                    risk: "花季期間遊客仍多，景點周邊車流較大。長途行駛務必注意精神狀態，累了就去休息站喘口氣。"
+                },
+                {
+                    day: 3, date: "8/14 (三)", title: "札幌市區漫遊", route: "札幌市區 (大眾運輸)", 
+                    hours: 0, intensity: 5, stay: "札幌市區",
+                    summary: "把車停在飯店好好休息，今天搭乘地鐵輕鬆探索札幌市區精華景點。",
+                    details: [
+                        { 
+                            time: "09:30", action: "大通公園 & 札幌電視塔", type: "camera",
+                            duration: "1.5 小時", departure: "11:00", 
+                            route: "搭乘地下鐵至「大通站」出站即達",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Odori+Park",
+                            tips: "夏天的大通公園綠意盎然，有時會舉辦啤酒節或有烤玉米攤位，非常愜意悠閒。"
+                        },
+                        { 
+                            time: "11:30", action: "北海道神宮參拜", type: "camera",
+                            duration: "1 小時", departure: "12:30", 
+                            route: "地下鐵東西線「圓山公園站」步行 15 分鐘",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Hokkaido+Shrine",
+                            tips: "可以求個交通安全御守保佑後續自駕平安。別忘了到神宮內的「六花亭」品嚐免費熱茶與現烤判官餅！"
+                        },
+                        { 
+                            time: "14:00", action: "白色戀人觀光工廠", type: "camera",
+                            duration: "2 小時", departure: "16:00", 
+                            route: "地下鐵東西線「宮之澤站」步行 10 分鐘",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Shiroi+Koibito+Park",
+                            tips: "戶外的歐風建築與花園超級好拍，記得點一支招牌的白色戀人霜淇淋解暑。"
+                        },
+                        { 
+                            time: "16:30", action: "狸小路商店街血拚", type: "shopping-bag",
+                            duration: "2.5 小時", departure: "19:00", 
+                            route: "地下鐵「大通站」或「薄野站」步行",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Tanukikoji+Shopping+Street",
+                            tips: "從 1 丁目一路逛到 7 丁目，藥妝、零食伴手禮一次買齊，買完直接扛回飯店放最方便。"
+                        },
+                        { 
+                            time: "19:30", action: "美味湯咖哩晚餐", type: "utensils",
+                            duration: "1.5 小時", departure: "-", 
+                            route: "薄野周邊 (如 Suage+ 或 GARAKU)",
+                            tips: "北海道靈魂美食！蔬菜甜度極高，建議點炸雞腿或野菜總匯口味，保證吃過會懷念。"
+                        }
+                    ],
+                    risk: "市區停車費昂貴且單行道多，今天將車停在飯店，購買地鐵一日券是最聰明輕鬆的選擇。"
+                },
+                {
+                    day: 4, date: "8/15 (四)", title: "小樽漫遊與積丹藍神威岬 ➔ 洞爺湖", route: "札幌 ➔ 小樽 ➔ 神威岬 ➔ 洞爺湖", 
+                    hours: 5.5, intensity: 9, stay: "洞爺湖溫泉區",
+                    summary: "早晨採買小樽甜點後，前往積丹半島尋找絕美「積丹藍」神威岬，傍晚抵達洞爺湖看煙火。",
+                    details: [
+                        { 
+                            time: "08:30", action: "出發前往小樽", type: "car",
+                            duration: "45 分鐘", departure: "09:15", 
+                            route: "國道5號 ➔ 札樽自動車道 ➔ 小樽IC",
+                            tips: "今天路程較長且景點豐富，建議準時出發！"
+                        },
+                        { 
+                            time: "09:30", action: "小樽運河與堺町通", type: "camera",
+                            duration: "1.5 小時", departure: "11:00", 
+                            route: "運河拍照 ➔ 沿著堺町通商店街逛",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Otaru+Canal",
+                            tips: "快速感受浪漫運河，並採買必吃的 LeTAO 雙層起司蛋糕與六花亭甜點。"
+                        },
+                        { 
+                            time: "11:00", action: "海岸線兜風：前進積丹半島", type: "car",
+                            duration: "1.5 小時 (車程)", departure: "12:30 抵達", 
+                            route: "小樽 ➔ 沿國道5號與229號海岸線行駛",
+                            tips: "一邊開車一邊欣賞遼闊的日本海，沿途會經過許多奇岩怪石，非常適合兜風。"
+                        },
+                        { 
+                            time: "12:30", action: "神威岬 (Cape Kamui) 絕景步道", type: "camera",
+                            duration: "1.5 小時", departure: "14:00", 
+                            route: "將車停在神威岬停車場，步行「女人禁制之門」步道至燈塔",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Cape+Kamui",
+                            tips: "此行最壯觀的「積丹藍」海景！走到步道盡頭約需 30 分鐘，風很大請注意帽子。午餐可在入口餐廳簡單吃積丹海鮮丼。"
+                        },
+                        { 
+                            time: "14:30", action: "長途美景：前往洞爺湖", type: "car",
+                            duration: "2.5-3 小時 (車程)", departure: "17:30 抵達", 
+                            route: "神威岬 ➔ 國道229號 ➔ 縣道繞山路 ➔ 洞爺湖溫泉",
+                            tips: "這段山路與海岸線交替，景色多變。駕駛請適時在沿途便利商店喝咖啡提神。"
+                        },
+                        { 
+                            time: "17:45", action: "洞爺湖飯店入住 & 湖上煙火", type: "bed",
+                            duration: "一泊二食", departure: "-", 
+                            route: "洞爺湖溫泉街",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Lake+Toya",
+                            tips: "八月每晚 20:45 洞爺湖都有浪漫的水上煙火大會，換上浴衣享受溫泉與美食，療癒一天的疲勞！"
+                        }
+                    ],
+                    risk: "神威岬若遇強風可能會關閉步道。下午前往洞爺湖的山路漫長，務必注意對向來車與野生動物竄出。"
+                },
+                {
+                    day: 5, date: "8/16 (五)", title: "洞爺湖 ➔ 函館", route: "洞爺湖 ➔ 函館", 
+                    hours: 3, intensity: 5, stay: "函館市區",
+                    summary: "早晨在湖畔散步後，一路開往道南重鎮函館，晚上欣賞世界級的百萬夜景。",
+                    details: [
+                        { 
+                            time: "08:30", action: "洞爺湖畔散步 & 筒倉展望台", type: "camera",
+                            duration: "1.5 小時", departure: "10:00", 
+                            route: "退房後 ➔ 開車約15分至筒倉展望台",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Silo+Observatory",
+                            tips: "在筒倉展望台(Silo Observatory)可俯瞰完整的洞爺湖與中島，買個優酪乳當作早茶超棒。"
+                        },
+                        { 
+                            time: "10:00", action: "輕鬆開往函館", type: "car",
+                            duration: "2.5-3 小時 (車程)", departure: "13:00 抵達", 
+                            route: "豐浦IC ➔ 道央自動車道 ➔ 大沼公園IC ➔ 函館市區",
+                            tips: "可以順路在「八雲PA」休息站停靠，那裡有一片非常漂亮的海景草地可以放風！"
+                        },
+                        { 
+                            time: "13:30", action: "午餐：幸運小丑漢堡", type: "utensils",
+                            duration: "1 小時", departure: "14:30", 
+                            route: "推薦碼頭末廣店或五稜郭公園前店",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Lucky+Pierrot+Hakodate",
+                            tips: "函館人的靈魂速食！必點第一名的「中華雞腿堡(Chinese Chicken Burger)」，份量滿分。"
+                        },
+                        { 
+                            time: "15:30", action: "元町異國風情區散步", type: "camera",
+                            duration: "1.5 小時", departure: "17:00", 
+                            route: "將車停在元町觀光停車場，步行逛八幡坂、教堂群",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Hachiman-Zaka+Slope",
+                            tips: "八幡坂是經典的日劇取景地，筆直的坡道直通蔚藍大海，是絕佳的拍照點。"
+                        },
+                        { 
+                            time: "18:00", action: "函館山百萬夜景", type: "moon",
+                            duration: "2 小時", departure: "20:00", 
+                            route: "搭乘函館山纜車上山",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Mt+Hakodate+Ropeway",
+                            tips: "山上風滿大的，記得帶件薄外套。上山前可先確認官網的即時影像看有沒有起霧。"
+                        }
+                    ],
+                    risk: "道南的高速公路有部分是單線道雙向通車，如需超車請耐心等待超車道路段。夜景纜車下山時排隊人潮會較多。"
+                },
+                {
+                    day: 6, date: "8/17 (六)", title: "函館深度遊", route: "函館市區", 
+                    hours: 0.5, intensity: 6, stay: "函館市區",
+                    summary: "體驗朝市釣花枝的樂趣，並漫步於五稜郭與紅磚倉庫，感受函館的獨特風情。",
+                    details: [
+                        { 
+                            time: "08:00", action: "函館朝市 (海鮮早餐與釣烏賊)", type: "utensils",
+                            duration: "2 小時", departure: "10:00", 
+                            route: "函館車站旁步行即達",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Hakodate+Morning+Market",
+                            tips: "超好玩的「現釣活烏賊」體驗，師傅會當場處理成生魚片，口感超彈牙！再來一碗澎湃的海膽鮭魚卵丼飯。"
+                        },
+                        { 
+                            time: "10:30", action: "五稜郭公園 & 五稜郭塔", type: "camera",
+                            duration: "2 小時", departure: "12:30", 
+                            route: "市區開車約 15 分鐘",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Goryokaku+Tower",
+                            tips: "強烈建議買票上塔，才能完整俯瞰這座巨大的美麗星形碉堡。"
+                        },
+                        { 
+                            time: "13:00", action: "午餐：函館鹽味拉麵", type: "utensils",
+                            duration: "1 小時", departure: "14:00", 
+                            route: "五稜郭塔對面的「紫陽花 (あじさい)」",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Ajisai+Ramen+Hakodate",
+                            tips: "北海道三大拉麵之一，金黃澄澈的清湯配上細麵，吃起來非常清爽解膩。"
+                        },
+                        { 
+                            time: "15:00", action: "金森紅磚倉庫群", type: "shopping-bag",
+                            duration: "3 小時", departure: "18:00", 
+                            route: "港邊灣區，備有大型收費停車場",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Kanemori+Red+Brick+Warehouse",
+                            tips: "購買伴手禮與雜貨的好地方，逛累了可以買杯咖啡坐在港邊看海休息。"
+                        },
+                        { 
+                            time: "18:30", action: "大門橫丁居酒屋晚餐", type: "utensils",
+                            duration: "2 小時", departure: "-", 
+                            route: "函館車站附近復古屋台村",
+                            tips: "最後一晚，挑間順眼的在地居酒屋，吃幾串烤肉配點小酒，享受美好的夜晚。"
+                        }
+                    ],
+                    risk: "朝市的海鮮攤位過中午就會陸續打烊，想吃新鮮海產記得早點出門喔。"
+                },
+                {
+                    day: 7, date: "8/18 (日)", title: "函館 ➔ 滿載而歸", route: "函館市區 ➔ 函館機場", 
+                    hours: 0.5, intensity: 2, stay: "溫暖的家",
+                    summary: "早上做最後的伴手禮衝刺，然後輕鬆前往機場還車，帶著滿滿的回憶搭機返家。",
+                    details: [
+                        { 
+                            time: "09:00", action: "飯店退房 & 藥妝最後補給", type: "suitcase",
+                            duration: "1.5 小時", departure: "10:30", 
+                            route: "函館車站周邊藥妝店",
+                            tips: "將滿滿的戰利品塞入行李箱。如果飯店有溫泉，可以早起再去泡最後一次！"
+                        },
+                        { 
+                            time: "11:00", action: "加滿油 & 函館機場還車", type: "car",
+                            duration: "1 小時", departure: "12:00", 
+                            route: "機場附近加油站 ➔ 租車營業所",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Hakodate+Airport",
+                            tips: "記得日本租車規定「滿油還車 (滿タン返し)」，並保留最後一張加油收據給店員看。"
+                        },
+                        { 
+                            time: "12:15", action: "函館機場報到與免稅店", type: "plane",
+                            duration: "2 小時", departure: "14:00 (起飛)", 
+                            route: "搭乘租車接駁車至國際線航廈",
+                            tips: "函館機場雖然小巧，但國內線航廈二樓的伴手禮超級齊全，是最後的購物天堂！"
+                        },
+                        { 
+                            time: "14:00", action: "搭機平安返家", type: "home",
+                            duration: "飛行", departure: "-", 
+                            route: "函館 (HKD) ➔ 溫暖的家",
+                            tips: "完美的北海道夏日自駕旅行畫下句點，在飛機上好好回顧這幾天的漂亮照片吧！"
+                        }
+                    ],
+                    risk: "記得預留充裕的還車與接駁時間，輕輕鬆鬆準備登機。"
+                }
+            ],
+            budget: [
+                { id: 1, category: "機票 (2人)", amount: 36000, note: "新千歲進、函館出", color: "#3b82f6" },
+                { id: 2, category: "住宿 (6晚)", amount: 24000, note: "含一晚溫泉飯店一泊二食", color: "#10b981" },
+                { id: 3, category: "租車與交通", amount: 15000, note: "7天租車、甲租乙還費、油錢、HEP", color: "#f59e0b" },
+                { id: 4, category: "餐飲估算", amount: 18000, note: "每日約 3000 TWD", color: "#ef4444" },
+                { id: 5, category: "門票與活動", amount: 4000, note: "纜車、五稜郭、停車費", color: "#8b5cf6" },
+                { id: 6, category: "雜支預備金", amount: 5000, note: "不含個人購物", color: "#64748b" }
+            ],
+            food: [
+                { name: "成吉思汗烤肉 (達摩)", region: "札幌", type: "正餐", desc: "北海道特色烤羊肉，搭配洋蔥與特製醬汁，洗去一天的疲勞！", icon: "fa-fire-burner", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Daruma+Sapporo" },
+                { name: "湯咖哩 (Suage+)", region: "札幌", type: "正餐", desc: "發源於札幌的靈魂美食，蔬菜甜度超高，香料味濃郁。", icon: "fa-bowl-food", rating: "4.5", gmap: "https://www.google.com/maps/search/?api=1&query=Suage+Sapporo" },
+                { name: "六花亭 札幌本店", region: "札幌", type: "甜點", desc: "招牌蘭姆葡萄夾心餅乾，二樓有舒適的內用咖啡廳可休息。", icon: "fa-cookie", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Rokkatei+Sapporo" },
+                { name: "LeTAO 本店", region: "小樽", type: "甜點", desc: "堺町通必買雙層起司蛋糕，入口即化，還能去頂樓觀景台。", icon: "fa-cake-candles", rating: "4.5", gmap: "https://www.google.com/maps/search/?api=1&query=LeTAO+Otaru" },
+                { name: "三角市場 滝波食堂", region: "小樽", type: "海鮮", desc: "超霸氣螃蟹海膽海鮮丼，新鮮度爆表，份量十足。", icon: "fa-fish", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Takinami+Shokudo+Otaru" },
+                { name: "富田哈密瓜工房", region: "富良野", type: "甜點", desc: "必吃現切赤肉哈密瓜片與濃郁哈密瓜霜淇淋，甜入心坎。", icon: "fa-ice-cream", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Tomita+Melon+House" },
+                { name: "幸運小丑漢堡", region: "函館", type: "速食", desc: "函館限定！中華雞腿堡絕對不容錯過，CP值極高。", icon: "fa-burger", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Lucky+Pierrot+Hakodate" },
+                { name: "函館朝市海鮮丼", region: "函館", type: "海鮮", desc: "滿滿新鮮海膽、鮭魚卵，還可體驗現釣花枝生魚片。", icon: "fa-fish", rating: "4.2", gmap: "https://www.google.com/maps/search/?api=1&query=Hakodate+Morning+Market" },
+                { name: "鹽味拉麵 (紫陽花)", region: "函館", type: "正餐", desc: "函館代表性拉麵，金黃清澈高湯搭配細麵，清爽無負擔。", icon: "fa-bowl-rice", rating: "4.1", gmap: "https://www.google.com/maps/search/?api=1&query=Ajisai+Ramen+Hakodate" }
+            ],
+            checklist: [
+                "護照正本 (效期大於6個月)",
+                "台灣駕照正本",
+                "駕照日文譯本 (至監理所辦理)",
+                "信用卡 (須準備不同發卡組織)",
+                "網路SIM卡或eSIM",
+                "薄外套與防風衣 (神威岬、函館山夜間必備)",
+                "車用手機支架 (導航用，部分租車無附)",
+                "太陽眼鏡 (駕車防眩光必備)"
+            ]
+        };
+
+        // ================= 狀態與全域變數 =================
+        let isDetailMode = true;
+        let map;
+        let routeLayer;
+        let mapInitialized = false;
+
+        // ================= 初始化 =================
+        document.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+            initItinerary();
+            initBudget();
+            initFoodMap();
+            initLogistics();
+            
+            // 預設檢查系統主題
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                updateDarkModeIcons(true);
+            } else {
+                document.documentElement.classList.remove('dark');
+                updateDarkModeIcons(false);
+            }
+        });
+
+        // ================= Tab 切換邏輯 =================
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('text-brand-600', 'dark:text-brand-400', 'bg-brand-50', 'dark:bg-slate-700');
+                el.classList.add('text-slate-600', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-700');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            
+            const activeBtns = document.querySelectorAll(`[onclick*="switchTab('${tabId}')"]`);
+            activeBtns.forEach(btn => {
+                if(btn.classList.contains('nav-btn')) {
+                    btn.classList.remove('text-slate-600', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-700');
+                    btn.classList.add('text-brand-600', 'dark:text-brand-400', 'bg-brand-50', 'dark:bg-slate-700');
+                }
+            });
+
+            if(tabId === 'dashboard' && mapInitialized) {
+                setTimeout(() => map.invalidateSize(), 100);
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            localStorage.theme = isDark ? 'dark' : 'light';
+            updateDarkModeIcons(isDark);
+            
+            Chart.helpers.each(Chart.instances, function(instance){
+                instance.options.color = isDark ? '#cbd5e1' : '#475569';
+                if(instance.options.scales && instance.options.scales.x) {
+                    instance.options.scales.x.grid.color = isDark ? '#334155' : '#f1f5f9';
+                    instance.options.scales.y.grid.color = isDark ? '#334155' : '#f1f5f9';
+                }
+                instance.update();
+            });
+        }
+
+        function updateDarkModeIcons(isDark) {
+            const icons = [document.getElementById('darkModeIcon'), document.getElementById('darkModeIconMobile')];
+            icons.forEach(icon => {
+                if(icon) {
+                    if(isDark) {
+                        icon.classList.remove('fa-moon', 'text-slate-500');
+                        icon.classList.add('fa-sun', 'text-amber-500');
+                    } else {
+                        icon.classList.remove('fa-sun', 'text-amber-500');
+                        icon.classList.add('fa-moon', 'text-slate-500');
+                    }
+                }
+            });
+        }
+
+        // ================= 模組 1: 行程儀表盤 =================
+        function initDashboard() {
+            map = L.map('strategicMap').setView(appData.mapData.center, 7);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap &copy; CARTO'
+            }).addTo(map);
+
+            const latlngs = [];
+            const jumpBtnsContainer = document.getElementById('map-jump-buttons');
+
+            appData.mapData.points.forEach((pt) => {
+                latlngs.push(pt.coords);
+                const marker = L.circleMarker(pt.coords, {
+                    radius: 6, fillColor: "#3b82f6", color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.8
+                }).addTo(map);
+                marker.bindPopup(`<b>Day ${pt.day}: ${pt.name}</b><br>${pt.desc}`);
+
+                if([1, 4, 7].includes(pt.day) && !jumpBtnsContainer.innerHTML.includes(`Day ${pt.day}`)) {
+                    const btn = document.createElement('button');
+                    btn.className = "text-xs px-2 py-1 bg-slate-200 dark:bg-slate-600 rounded text-slate-700 dark:text-slate-200 hover:bg-brand-500 hover:text-white transition";
+                    btn.innerText = `Day ${pt.day}`;
+                    btn.onclick = () => { map.flyTo(pt.coords, 9); };
+                    jumpBtnsContainer.appendChild(btn);
+                }
+            });
+
+            routeLayer = L.polyline(latlngs, {color: '#3b82f6', weight: 3, dashArray: '5, 5'}).addTo(map);
+            mapInitialized = true;
+
+            const ctxActivity = document.getElementById('activityChart').getContext('2d');
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            new Chart(ctxActivity, {
+                type: 'bar',
+                data: {
+                    labels: appData.itinerary.map(d => `D${d.day}`),
+                    datasets: [
+                        { type: 'bar', label: '交通耗時 (小時)', data: appData.itinerary.map(d => d.hours), backgroundColor: '#3b82f6', borderRadius: 4, yAxisID: 'y', order: 2 },
+                        { type: 'line', label: '活動強度 (1-10)', data: appData.itinerary.map(d => d.intensity), borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 2, tension: 0.4, pointBackgroundColor: '#fff', yAxisID: 'y1', order: 1 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, color: isDark ? '#cbd5e1' : '#475569',
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { display: true, position: 'top' } },
+                    scales: {
+                        y: { type: 'linear', display: true, position: 'left', beginAtZero: true, title: { display: true, text: '耗時 (小時)' }, grid: { color: isDark ? '#334155' : '#f1f5f9' } },
+                        y1: { type: 'linear', display: true, position: 'right', beginAtZero: true, max: 10, title: { display: true, text: '活動強度' }, grid: { drawOnChartArea: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            const weatherContainer = document.getElementById('weather-container');
+            if(weatherContainer) {
+                weatherContainer.innerHTML = appData.weather.map(w => `
+                    <div onclick="scrollToDay(${w.day})" class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-center flex flex-col items-center justify-center cursor-pointer hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md transition-all hover:-translate-y-1">
+                        <div class="text-xs text-slate-500 dark:text-slate-400 font-mono mb-1">Day ${w.day}</div>
+                        <div class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">${w.location}</div>
+                        <i class="fa-solid ${w.icon} text-2xl ${w.color} mb-2 drop-shadow-sm"></i>
+                        <div class="text-base font-bold text-slate-800 dark:text-slate-100">${w.temp}</div>
+                        <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">${w.desc}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // ================= 輔助功能: 跨頁平滑滾動至指定天數 =================
+        function scrollToDay(dayNumber) {
+            switchTab('itinerary');
+            // 給予 DOM 渲染時間後再測量位置
+            setTimeout(() => {
+                const target = document.getElementById(`day-${dayNumber}`);
+                if (target) {
+                    const offset = 140; 
+                    const elementPosition = target.getBoundingClientRect().top + window.scrollY;
+                    window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+                }
+                
+                // 更新上方置頂日期導覽列的焦點狀態
+                document.querySelectorAll('#date-nav button').forEach(btn => {
+                    if (btn.innerText.includes(`Day ${dayNumber}`)) {
+                        btn.classList.remove('bg-white', 'dark:bg-slate-800');
+                        btn.classList.add('bg-brand-500', 'text-white', 'border-brand-600');
+                        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    } else {
+                        btn.classList.add('bg-white', 'dark:bg-slate-800');
+                        btn.classList.remove('bg-brand-500', 'text-white', 'border-brand-600');
+                    }
+                });
+            }, 50);
+        }
+
+        // ================= 模組 2: 行程表 =================
+        function initItinerary() {
+            renderDateNav();
+            renderTimeline();
+        }
+
+        function renderDateNav() {
+            const navContainer = document.getElementById('date-nav');
+            navContainer.innerHTML = appData.itinerary.map(day => `
+                <button onclick="scrollToDay(${day.day})" class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 transition">
+                    Day ${day.day}
+                </button>
+            `).join('');
+        }
+
+        function toggleDetails() {
+            isDetailMode = !isDetailMode;
+            const btn = document.getElementById('btn-toggle-details');
+            btn.innerHTML = isDetailMode ? `<i class="fa-solid fa-compress mr-2"></i>隱藏詳細資訊` : `<i class="fa-solid fa-expand mr-2"></i>展開詳細資訊`;
+            renderTimeline();
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = ''; 
+
+            appData.itinerary.forEach((day) => {
+                const weatherObj = appData.weather.find(w => w.day === day.day) || {icon: "fa-sun", desc: "好天氣", color: "text-amber-500"};
+                
+                let dayHTML = `
+                <div id="day-${day.day}" class="scroll-mt-36 mb-12 fade-in">
+                    <div class="flex flex-col sm:flex-row gap-2 sm:items-center justify-between mb-6 border-l-4 border-brand-500 pl-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Day ${day.day}: ${day.title}</h2>
+                            <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
+                                ${day.date} • <i class="fa-solid ${weatherObj.icon} ${weatherObj.color} mx-1"></i> ${weatherObj.desc}
+                            </p>
+                        </div>
+                        <div class="text-xs font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 self-start sm:self-center">
+                            🏠 住宿: ${day.stay}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-200 dark:border-amber-700/50 text-sm text-amber-800 dark:text-amber-300/90 mb-6 flex items-start shadow-sm">
+                        <i class="fa-regular fa-lightbulb text-amber-500 mt-0.5 mr-2 text-base"></i>
+                        <span><strong>貼心提示：</strong>${day.summary} ${day.risk}</span>
+                    </div>
+
+                    <div class="relative pl-4 sm:pl-8 py-2">
+                        <div class="timeline-line left-4 sm:left-8"></div>
+                `;
+
+                day.details.forEach((detail) => {
+                    let iconClass = "fa-circle-dot text-slate-400";
+                    if(detail.type === 'car') iconClass = "fa-car text-brand-500";
+                    if(detail.type === 'camera') iconClass = "fa-camera text-emerald-500";
+                    if(detail.type === 'utensils') iconClass = "fa-utensils text-orange-500";
+                    if(detail.type === 'bed') iconClass = "fa-bed text-indigo-500";
+                    if(detail.type === 'plane') iconClass = "fa-plane text-slate-600 dark:text-slate-300";
+                    if(detail.type === 'shopping-bag') iconClass = "fa-bag-shopping text-pink-500";
+                    if(detail.type === 'suitcase') iconClass = "fa-suitcase text-amber-500";
+                    if(detail.type === 'moon') iconClass = "fa-moon text-indigo-400";
+                    if(detail.type === 'home') iconClass = "fa-house text-teal-500";
+
+                    let detailBlock = '';
+                    if (isDetailMode && (detail.route || detail.tips)) {
+                        const routeStr = detail.route ? detail.route.split('➔').map(r => r.trim()).join(' <i class="fa-solid fa-arrow-right text-[10px] mx-1.5 text-slate-400"></i> ') : '';
+                        
+                        detailBlock = `
+                            <div class="mt-4 space-y-3 animate-fade-in border-t border-slate-100 dark:border-slate-700/50 pt-4">
+                                ${routeStr ? `
+                                <div class="text-sm text-slate-600 dark:text-slate-300">
+                                    <span class="text-[11px] font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider block mb-1">詳細路線</span>
+                                    <p class="mb-2 flex items-center flex-wrap">${routeStr}</p>
+                                    ${detail.gmap ? `<div><a href="${detail.gmap}" target="_blank" class="inline-flex items-center text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium text-xs bg-brand-50 dark:bg-brand-900/30 px-2 py-1.5 rounded border border-brand-100 dark:border-brand-800/50 shadow-sm transition"><i class="fa-solid fa-location-dot mr-1"></i> 開啟 Google Maps</a></div>` : ''}
+                                </div>` : ''}
+                                
+                                ${detail.tips ? `
+                                <div class="text-sm text-amber-800 dark:text-amber-200 mt-2 bg-amber-50/80 dark:bg-amber-900/30 p-3 rounded-lg border-l-2 border-amber-400 dark:border-amber-600">
+                                    <span class="text-[11px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-wider block mb-1">Tips & Food</span>
+                                    <p class="leading-relaxed">${detail.tips}</p>
+                                </div>` : ''}
+                            </div>
+                        `;
+                    }
+
+                    dayHTML += `
+                        <div class="relative pl-8 sm:pl-10 py-4">
+                            <div class="absolute left-1.5 sm:left-[1.35rem] top-6 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 shadow-sm z-10 bg-brand-500 ring-2 ring-brand-100 dark:ring-slate-700"></div>
+                            
+                            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                                    <span class="font-mono text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded w-fit sm:w-auto">${detail.time}</span>
+                                    <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 flex-wrap">
+                                        <div class="w-6 text-center"><i class="fa-solid ${iconClass}"></i></div> ${detail.action}
+                                    </h3>
+                                </div>
+                                
+                                ${(detail.duration || detail.departure) ? `
+                                <div class="flex gap-4 mt-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                    ${detail.duration ? `<span class="flex items-center gap-1.5"><i class="fa-regular fa-hourglass-half text-brand-500"></i>預計停留: ${detail.duration}</span>` : ''}
+                                    ${detail.departure ? `<span class="flex items-center gap-1.5"><i class="fa-solid fa-person-walking-arrow-right text-indigo-500"></i>建議出發: ${detail.departure}</span>` : ''}
+                                </div>
+                                ` : ''}
+                                
+                                ${detailBlock}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                dayHTML += `</div></div>`;
+                container.innerHTML += dayHTML;
+            });
+        }
+
+        // ================= 模組 3: 財務預算 =================
+        function initBudget() {
+            const tbody = document.getElementById('budget-table-body');
+            let total = 0; const labels = []; const data = []; const bgColors = [];
+
+            appData.budget.forEach(item => {
+                total += item.amount; labels.push(item.category); data.push(item.amount); bgColors.push(item.color);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-4 border-b dark:border-slate-700"><span class="inline-block w-3 h-3 rounded-full mr-2" style="background-color: ${item.color}"></span>${item.category}</td>
+                    <td class="p-4 border-b dark:border-slate-700 font-mono text-right md:text-left">$ ${item.amount.toLocaleString()}</td>
+                    <td class="p-4 border-b dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs">${item.note}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const totalTr = document.createElement('tr');
+            totalTr.className = "bg-slate-50 dark:bg-slate-750 font-bold";
+            totalTr.innerHTML = `<td class="p-4">總計預估</td><td class="p-4 font-mono text-brand-600 dark:text-brand-400">$ ${total.toLocaleString()}</td><td class="p-4"></td>`;
+            tbody.appendChild(totalTr);
+            document.getElementById('total-budget-display').innerText = `NT$ ${total.toLocaleString()}`;
+
+            new Chart(document.getElementById('budgetChart').getContext('2d'), {
+                type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: bgColors, borderWidth: 0 }] },
+                options: { responsive: true, cutout: '70%', plugins: { legend: { display: false } } }
+            });
+        }
+
+        function convertCurrency() {
+            const jpy = document.getElementById('jpy-input').value;
+            const twd = document.getElementById('twd-output');
+            if(jpy && !isNaN(jpy)) twd.value = Math.round(jpy * 0.215);
+            else twd.value = '';
+        }
+
+        // ================= 模組 4: 美食地圖 =================
+        function initFoodMap() {
+            renderFood('all');
+        }
+
+        function filterFood(region) {
+            document.querySelectorAll('.food-filter-btn').forEach(btn => {
+                if(btn.innerText.includes(region) || (region === 'all' && btn.innerText === '全部')) {
+                    btn.classList.remove('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300', 'hover:bg-slate-200');
+                    btn.classList.add('bg-slate-800', 'text-white', 'dark:bg-brand-600');
+                } else {
+                    btn.classList.add('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300', 'hover:bg-slate-200');
+                    btn.classList.remove('bg-slate-800', 'text-white', 'dark:bg-brand-600');
+                }
+            });
+            renderFood(region);
+        }
+
+        function renderFood(region) {
+            const grid = document.getElementById('food-grid');
+            const filtered = region === 'all' ? appData.food : appData.food.filter(f => f.region === region);
+            
+            grid.innerHTML = filtered.map(food => `
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col fade-in hover:shadow-lg transition-shadow duration-300">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="bg-brand-100 text-brand-700 dark:bg-brand-900/50 dark:text-brand-300 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider"><i class="fa-solid ${food.icon} mr-1"></i> ${food.type}</span>
+                        <div class="flex items-center space-x-1 text-amber-500 font-bold text-sm bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded-md">
+                            <i class="fa-solid fa-star"></i>
+                            <span>${food.rating}</span>
+                        </div>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-800 dark:text-slate-100 mb-1">${food.name}</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1"><i class="fa-solid fa-location-dot text-slate-400"></i> 北海道 • ${food.region}</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed flex-grow mb-4">${food.desc}</p>
+                    <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700/50">
+                        <a href="${food.gmap}" target="_blank" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-200 font-bold text-sm flex items-center justify-center w-full bg-slate-50 dark:bg-slate-750/50 hover:bg-brand-50 dark:hover:bg-slate-700 py-2.5 rounded-lg transition border border-slate-100 dark:border-slate-700">
+                            📍 開啟 Google Maps 導航
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ================= 模組 5: 後勤準備 =================
+        function initLogistics() {
+            document.getElementById('checklist-container').innerHTML = appData.checklist.map((item, index) => `
+                <div class="flex items-center bg-slate-50 dark:bg-slate-750/50 p-2.5 rounded-lg border border-transparent hover:border-slate-200 dark:hover:border-slate-600 transition">
+                    <input type="checkbox" id="check-${index}" class="w-5 h-5 text-brand-600 bg-white border-slate-300 rounded focus:ring-brand-500 dark:focus:ring-brand-600 dark:ring-offset-slate-800 focus:ring-2 dark:bg-slate-700 dark:border-slate-600 accent-brand-500 cursor-pointer shadow-sm">
+                    <label for="check-${index}" class="ml-3 text-slate-700 dark:text-slate-300 cursor-pointer transition-all select-none">${item}</label>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
