@@ -75,7 +75,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <!-- Logo -->
-                <div class="flex items-center">
+                <div class="flex items-center cursor-pointer hover:opacity-80 transition" onclick="switchTab('dashboard')">
                     <i class="fa-solid fa-mountain-sun text-brand-500 text-2xl mr-2"></i>
                     <span class="font-bold text-lg tracking-wide">HOKKAIDO <span class="font-light text-sm text-slate-500 dark:text-slate-400">TRIP</span></span>
                 </div>
@@ -123,9 +123,21 @@
         
         <!-- ================= 模組 1: 行程儀表盤 ================= -->
         <section id="dashboard" class="tab-content active">
+            
+            <!-- 每日天氣預報 (移至最上方) -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-200 text-lg"><i class="fa-solid fa-cloud-sun mr-2 text-brand-500"></i>各地區逐日天氣情報</h3>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded hidden sm:inline-block">點擊卡片查看當日行程</span>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3" id="weather-container">
+                    <!-- JS Generated Weather Cards -->
+                </div>
+            </div>
+
             <div class="mb-6">
                 <h1 class="text-3xl font-bold mb-2">八月北海道自駕行程總覽</h1>
-                <p class="text-slate-500 dark:text-slate-400">輕鬆掌握 8/2 - 8/8 核心數據，涵蓋道央至道南的完美自駕路線。(優化版動線)</p>
+                <p class="text-slate-500 dark:text-slate-400">輕鬆掌握 8/2 - 8/8 核心數據，涵蓋道央至道南的完美順暢自駕路線。</p>
             </div>
 
             <!-- 關鍵數據卡片 -->
@@ -167,14 +179,6 @@
                     <div class="relative flex-grow min-h-[250px]">
                         <canvas id="activityChart"></canvas>
                     </div>
-                </div>
-            </div>
-
-            <!-- 每日天氣預報 (可點擊跳轉) -->
-            <div class="mb-6">
-                <h3 class="font-bold text-slate-800 dark:text-slate-200 mb-3"><i class="fa-solid fa-cloud-sun mr-2 text-brand-500"></i>各地區逐日天氣情報 (點擊卡片查看當日行程)</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3" id="weather-container">
-                    <!-- JS Generated Weather Cards -->
                 </div>
             </div>
 
@@ -347,6 +351,7 @@
                 points: [
                     { day: 1, name: "新千歲機場", coords: [42.796, 141.673], desc: "抵達、租車" },
                     { day: 1, name: "札幌市區", coords: [43.061, 141.354], desc: "首日休息、吃晚餐" },
+                    { day: 2, name: "白色戀人工廠", coords: [43.088, 141.270], desc: "夢幻巧克力工廠" },
                     { day: 2, name: "富田農場", coords: [43.418, 142.427], desc: "賞花海吃甜點" },
                     { day: 2, name: "精靈露臺", coords: [43.323, 142.354], desc: "童話木屋" },
                     { day: 3, name: "白金青池", coords: [43.473, 142.614], desc: "絕美青池" },
@@ -398,36 +403,36 @@
                     risk: "市區單行道多，停車費較高，請事先確認飯店是否有附設停車場或特約停車。"
                 },
                 {
-                    day: 2, date: "8/3 (六)", title: "札幌晨間漫遊 ➔ 進入富良野童話", route: "札幌市區 ➔ 富良野", 
+                    day: 2, date: "8/3 (六)", title: "札幌神宮與工廠 ➔ 進入富良野童話", route: "札幌市區 ➔ 富良野", 
                     hours: 2.5, intensity: 6, stay: "富良野 / 美瑛",
-                    summary: "把握上午時光感受札幌市區魅力，吃過道地湯咖哩後，午後驅車前往富良野，晚上欣賞點燈的精靈露臺。",
+                    summary: "早起前往神宮參拜，接著去夢幻的白色戀人工廠，吃過道地湯咖哩後驅車前往富良野，完美的順向安排！",
                     details: [
                         { 
-                            time: "09:00", action: "大通公園 & 札幌電視塔", type: "camera",
-                            duration: "1.5 小時", departure: "10:30", 
-                            route: "搭乘地下鐵至「大通站」出站即達",
-                            gmap: "https://www.google.com/maps/search/?api=1&query=Odori+Park",
-                            tips: "早晨的大通公園非常舒服，可以感受北海道夏日的微風與綠意。"
+                            time: "08:30", action: "北海道神宮參拜", type: "camera",
+                            duration: "1 小時", departure: "09:30", 
+                            route: "市區 ➔ 開車約 15 分鐘",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Hokkaido+Shrine",
+                            tips: "早晨神宮人少清幽且好停車。求個交通安全御守，順便到神宮內的「六花亭」品嚐免費熱茶與現烤判官餅！"
                         },
                         { 
-                            time: "10:45", action: "北海道神宮參拜", type: "camera",
-                            duration: "1 小時", departure: "11:45", 
-                            route: "地下鐵東西線「圓山公園站」步行 15 分鐘",
-                            gmap: "https://www.google.com/maps/search/?api=1&query=Hokkaido+Shrine",
-                            tips: "求個交通安全御守保佑後續自駕平安。順便到神宮內的「六花亭」品嚐免費熱茶與現烤判官餅！"
+                            time: "10:00", action: "白色戀人觀光工廠", type: "camera",
+                            duration: "2 小時", departure: "12:00", 
+                            route: "北海道神宮 ➔ 開車約 15 分鐘 ➔ 白色戀人停車場",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Shiroi+Koibito+Park",
+                            tips: "超夢幻的歐風建築與玫瑰花園，宛如童話小鎮！一定要買支招牌的白色戀人霜淇淋解暑。"
                         },
                         { 
                             time: "12:15", action: "靈魂美食湯咖哩午餐", type: "utensils",
                             duration: "1.5 小時", departure: "13:45", 
-                            route: "薄野周邊 (如 Suage+ 或 GARAKU)",
-                            gmap: "https://www.google.com/maps/search/?api=1&query=Suage+Sapporo",
-                            tips: "【午餐推薦】北海道必吃湯咖哩！蔬菜甜度極高，建議點炸雞腿或野菜總匯口味。"
+                            route: "工廠周邊或札幌西區的湯咖哩店",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Soup+Curry+Sapporo",
+                            tips: "【午餐推薦】順路在西區吃碗北海道必吃的湯咖哩！蔬菜甜度極高，建議點炸雞腿口味。"
                         },
                         { 
                             time: "14:00", action: "悠閒上路前往富良野", type: "car",
                             duration: "2 小時 (車程)", departure: "16:00 抵達", 
-                            route: "札幌IC ➔ 道央自動車道 ➔ 三笠IC ➔ 國道452號 ➔ 富良野",
-                            tips: "這段路程風景優美，準備些喜歡的車上音樂陪伴！"
+                            route: "札幌西IC ➔ 道央自動車道 ➔ 三笠IC ➔ 國道452號 ➔ 富良野",
+                            tips: "吃飽後剛好從西側上高速公路，不走回頭路！這段路程風景優美，準備些喜歡的音樂陪伴。"
                         },
                         { 
                             time: "16:30", action: "森林精靈露臺 (Ningle Terrace)", type: "camera",
@@ -444,7 +449,7 @@
                             tips: "【晚餐推薦】「唯我獨尊」重口味自家製香腸咖哩飯，或車站周邊的「熊啄木鳥」吃生牛肉丼。"
                         }
                     ],
-                    risk: "午後長途行駛務必注意精神狀態，累了就去休息站喘口氣。"
+                    risk: "午後長途行駛務必注意精神狀態，累了就去沿途的便利商店或休息站喘口氣。"
                 },
                 {
                     day: 3, date: "8/4 (日)", title: "美瑛花海、哈密瓜 ➔ 小樽運河浪漫夜", route: "富良野 ➔ 美瑛 ➔ 小樽", 
@@ -730,14 +735,14 @@
                 { name: "六花亭 札幌本店", region: "札幌", type: "甜點/下午茶", desc: "招牌蘭姆葡萄夾心餅乾，二樓有舒適的內用咖啡廳可休息。", icon: "fa-cookie", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Rokkatei+Sapporo" },
                 { name: "Parfaiteria PaL", region: "札幌", type: "夜冰代", desc: "札幌獨特文化「飲酒會後的結尾百匯」，宛如藝術品的精緻聖代。", icon: "fa-ice-cream", rating: "4.2", gmap: "https://www.google.com/maps/search/?api=1&query=Parfaiteria+PaL" },
                 
-                // 小樽/積丹 (10家)
+                // 小樽/積丹 (10家) - 已檢核修正
                 { name: "LeTAO 本店", region: "小樽/積丹", type: "甜點", desc: "堺町通必買雙層起司蛋糕，入口即化，還能去頂樓觀景台。", icon: "fa-cake-candles", rating: "4.5", gmap: "https://www.google.com/maps/search/?api=1&query=LeTAO+Otaru" },
                 { name: "三角市場 滝波食堂", region: "小樽/積丹", type: "海鮮", desc: "超霸氣螃蟹海膽海鮮丼，新鮮度爆表，份量十足。", icon: "fa-fish", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Takinami+Shokudo+Otaru" },
                 { name: "小樽 政壽司", region: "小樽/積丹", type: "壽司", desc: "壽司屋通的代表名店，電影《將太的壽司》原型，捏工一流。", icon: "fa-fish", rating: "4.2", gmap: "https://www.google.com/maps/search/?api=1&query=Otaru+Masa+Sushi" },
                 { name: "若雞時代 炸半雞 (Naruto)", region: "小樽/積丹", type: "特色正餐", desc: "小樽市民的靈魂美食，外皮酥脆、肉汁飽滿的巨大炸半雞。", icon: "fa-drumstick-bite", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Wakadori+Jidai+Naruto+Otaru" },
                 { name: "蒲鉾榮 (Kamaei)", region: "小樽/積丹", type: "在地小吃", desc: "老字號魚板店，必買現炸的「麵包卷魚板」，香甜Q彈。", icon: "fa-hotdog", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Kamaei+Otaru" },
                 { name: "北一廳 (Kitaichi Hall)", region: "小樽/積丹", type: "咖啡/甜點", desc: "在167盞煤氣燈的星光閃爍下喝杯浪漫下午茶，氣氛無敵。", icon: "fa-mug-hot", rating: "4.5", gmap: "https://www.google.com/maps/search/?api=1&query=Kitaichi+Hall+Otaru" },
-                { name: "小樽運河食堂 (小樽啤酒館)", region: "小樽/積丹", type: "晚餐/啤酒", desc: "坐在運河旁的歷史倉庫裡，暢飲在地精釀的小樽啤酒。", icon: "fa-beer-mug-empty", rating: "4.1", gmap: "https://www.google.com/maps/search/?api=1&query=Otaru+Beer+Otaru" },
+                { name: "小樽倉庫 No.1 (在地精釀啤酒)", region: "小樽/積丹", type: "晚餐/啤酒", desc: "坐在運河旁的歷史倉庫裡，暢飲在地精釀的德國風小樽啤酒與德式豬腳。", icon: "fa-beer-mug-empty", rating: "4.1", gmap: "https://www.google.com/maps/search/?api=1&query=Otaru+Soko+No.1" },
                 { name: "北之冰淇淋屋", region: "小樽/積丹", type: "冰品", desc: "超過40種奇特口味的冰淇淋，甚至有海膽、墨魚口味可以挑戰！", icon: "fa-ice-cream", rating: "4.0", gmap: "https://www.google.com/maps/search/?api=1&query=Kita+no+Aisukuriimu-ya+Otaru" },
                 { name: "食堂 岬 (Misaki)", region: "小樽/積丹", type: "海鮮", desc: "積丹半島傳說級海膽丼！夏季限定的赤海膽鮮甜在口中爆發。", icon: "fa-fish", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Shakotan+Misaki" },
                 { name: "中村屋 (Nakamura)", region: "小樽/積丹", type: "海鮮", desc: "積丹另一家海膽名店，漁夫直營，海膽滿到看不到白飯。", icon: "fa-fish", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Shakotan+Nakamura" },
@@ -754,7 +759,7 @@
                 { name: "大門橫丁 居酒屋街", region: "函館", type: "晚餐/宵夜", desc: "充滿昭和風情的屋台村，聚集20多家居酒屋，感受在地人情味。", icon: "fa-shop", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Daimon+Yokocho+Hakodate" },
                 { name: "阿佐利本店 (Asari)", region: "函館", type: "高級和牛", desc: "創立百年的高級壽喜燒老店，A5和牛入口即化，建議午餐時段前往較划算。", icon: "fa-fire-burner", rating: "4.5", gmap: "https://www.google.com/maps/search/?api=1&query=Asari+Honten+Hakodate" },
 
-                // 富良野/美瑛 (10家)
+                // 富良野/美瑛 (10家) - 已檢核修正
                 { name: "富田哈密瓜工房", region: "富良野/美瑛", type: "甜點", desc: "必吃現切赤肉哈密瓜片與濃郁哈密瓜霜淇淋，甜入心坎。", icon: "fa-ice-cream", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Tomita+Melon+House" },
                 { name: "純平洋食 (Junpei)", region: "富良野/美瑛", type: "正餐", desc: "美瑛傳奇名店！酥脆彈牙的巨大炸海老丼(炸蝦飯)，極度熱門。", icon: "fa-bowl-food", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Junpei+Biei" },
                 { name: "唯我獨尊", region: "富良野/美瑛", type: "特色正餐", desc: "富良野超人氣咖哩，自製香腸配上香料黑咖哩，還能念通關密語加醬。", icon: "fa-plate-wheat", rating: "4.2", gmap: "https://www.google.com/maps/search/?api=1&query=Yuiga+Doxon+Furano" },
@@ -762,7 +767,7 @@
                 { name: "富良野 Delice", region: "富良野/美瑛", type: "甜點", desc: "雙層起司蛋糕的發源地！坐在森林露台享用裝在牛奶瓶裡的超嫩布丁。", icon: "fa-cake-candles", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Furano+Delice" },
                 { name: "美瑛選果", region: "富良野/美瑛", type: "輕食/伴手禮", desc: "買農產品的好地方，裡面賣的現烤「美瑛玉米麵包」香甜無比。", icon: "fa-bread-slice", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Biei+Senka" },
                 { name: "聖誕樹木農場 (Popura Farm)", region: "富良野/美瑛", type: "甜點", desc: "招牌「哈密瓜霜淇淋」，直接把半顆哈密瓜當作碗，擠上滿滿霜淇淋。", icon: "fa-ice-cream", rating: "4.2", gmap: "https://www.google.com/maps/search/?api=1&query=Popura+Farm+Furano" },
-                { name: "千望峠景觀餐廳", region: "富良野/美瑛", type: "正餐/景觀", desc: "位於上富良野，可以一邊吃著厚切上富良野豬排，一邊俯瞰十勝岳連峰。", icon: "fa-mountain-sun", rating: "4.1", gmap: "https://www.google.com/maps/search/?api=1&query=Senbo+Toge+Kamifurano" },
+                { name: "千代田農場餐廳 (美瑛和牛)", region: "富良野/美瑛", type: "頂級和牛", desc: "美瑛必吃！自家牧場直營的美瑛和牛牛排與燉牛肉，肉質鮮甜軟嫩。", icon: "fa-cow", rating: "4.2", gmap: "https://www.google.com/maps/search/?api=1&query=Farm+Restaurant+Chiyoda" },
                 { name: "富良野起司工房", region: "富良野/美瑛", type: "輕食/披薩", desc: "使用在地鮮奶製作，除了試吃起司，附設的現烤拿坡里披薩非常美味。", icon: "fa-pizza-slice", rating: "4.2", gmap: "https://www.google.com/maps/search/?api=1&query=Furano+Cheese+Factory" },
                 { name: "Blanc Rouge", region: "富良野/美瑛", type: "下午茶/簡餐", desc: "隱藏在美瑛森林中的童話小木屋，提供好吃的法式燉牛肉與可麗餅。", icon: "fa-mug-hot", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Blanc+Rouge+Biei" }
             ],
