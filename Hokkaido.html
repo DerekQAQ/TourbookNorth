@@ -155,7 +155,7 @@
                 </div>
                 <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
                     <div class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">預估總里程</div>
-                    <div class="text-xl font-bold">約 750 km</div>
+                    <div class="text-xl font-bold">約 700 km</div>
                 </div>
                 <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
                     <div class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">進出機場</div>
@@ -189,9 +189,9 @@
             <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-5 border border-amber-200 dark:border-amber-700/50 fade-in">
                 <h3 class="font-bold text-amber-800 dark:text-amber-400 mb-3"><i class="fa-solid fa-circle-info mr-2"></i>行車注意事項</h3>
                 <ul class="space-y-2 text-sm text-amber-700 dark:text-amber-300/80">
-                    <li><i class="fa-solid fa-circle-right text-xs mr-2"></i><strong>行程優化：</strong> 已將長途駕駛平均分攤，避免單日拉車過久。每日開車皆控制在輕鬆的 1~2.5 小時以內。</li>
+                    <li><i class="fa-solid fa-circle-right text-xs mr-2"></i><strong>完美順向：</strong> 最新規劃採用 洞爺湖 ➔ 大沼 ➔ 函館 的一路向南完美順向路線，完全不走回頭路！</li>
                     <li><i class="fa-solid fa-circle-right text-xs mr-2"></i><strong>適應右駕：</strong> Day 1 剛下飛機，直接前往最近的札幌市區，讓司機有充裕時間休息並適應右駕。</li>
-                    <li><i class="fa-solid fa-circle-right text-xs mr-2"></i><strong>野生動物：</strong> 郊外山路 (特別是積丹半島及往洞爺湖路上) 偶爾會有可愛的狐狸或鹿出沒，請多加留意。</li>
+                    <li><i class="fa-solid fa-circle-right text-xs mr-2"></i><strong>野生動物：</strong> 郊外山路 (特別是積丹半島及往大沼路上) 偶爾會有可愛的狐狸或鹿出沒，請多加留意。</li>
                 </ul>
             </div>
         </section>
@@ -247,7 +247,7 @@
                     <button onclick="filterFood('all')" class="food-filter-btn px-4 py-2 text-sm font-medium rounded-full bg-slate-800 text-white dark:bg-brand-600 transition shadow-sm">全部</button>
                     <button onclick="filterFood('札幌')" class="food-filter-btn px-4 py-2 text-sm font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">札幌</button>
                     <button onclick="filterFood('小樽/積丹')" class="food-filter-btn px-4 py-2 text-sm font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">小樽/積丹</button>
-                    <button onclick="filterFood('函館')" class="food-filter-btn px-4 py-2 text-sm font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">函館</button>
+                    <button onclick="filterFood('函館/大沼')" class="food-filter-btn px-4 py-2 text-sm font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">函館/大沼</button>
                     <button onclick="filterFood('富良野/美瑛')" class="food-filter-btn px-4 py-2 text-sm font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">富良野/美瑛</button>
                 </div>
             </div>
@@ -330,9 +330,9 @@
                 { day: 2, location: "富良野", icon: "fa-cloud-sun", temp: "26°C", desc: "多雲時晴", color: "text-amber-400" },
                 { day: 3, location: "小樽", icon: "fa-sun", temp: "25°C", desc: "涼爽晴天", color: "text-amber-500" },
                 { day: 4, location: "積丹/洞爺", icon: "fa-sun", temp: "26°C", desc: "晴朗海岸", color: "text-amber-500" },
-                { day: 5, location: "登別/函館", icon: "fa-cloud-sun-rain", temp: "24°C", desc: "午後短暫陣雨", color: "text-blue-400" },
+                { day: 5, location: "登別/大沼", icon: "fa-cloud-sun-rain", temp: "24°C", desc: "舒適宜人", color: "text-amber-400" },
                 { day: 6, location: "函館", icon: "fa-sun", temp: "25°C", desc: "晴空萬里", color: "text-amber-500" },
-                { day: 7, location: "大沼/機場", icon: "fa-cloud-sun", temp: "26°C", desc: "適合飛行", color: "text-amber-400" }
+                { day: 7, location: "函館/機場", icon: "fa-sun", temp: "26°C", desc: "適合飛行", color: "text-amber-500" }
             ],
             mapData: {
                 points: [
@@ -346,12 +346,13 @@
                     { day: 4, name: "神威岬", coords: [43.3308, 140.3475], desc: "積丹藍海岸" },
                     { day: 4, name: "洞爺湖", coords: [42.585, 140.835], desc: "湖畔溫泉" },
                     { day: 5, name: "登別地獄谷", coords: [42.4975, 141.1460], desc: "壯觀火山口" },
-                    { day: 5, name: "函館山", coords: [41.760, 140.704], desc: "百萬夜景" },
+                    { day: 5, name: "大沼公園", coords: [41.9822, 140.6696], desc: "仙境騎單車" },
                     { day: 6, name: "五稜郭", coords: [41.796, 140.756], desc: "星形碉堡" },
-                    { day: 7, name: "大沼公園", coords: [41.9822, 140.6696], desc: "仙境騎單車" },
+                    { day: 6, name: "函館山", coords: [41.760, 140.704], desc: "百萬夜景" },
+                    { day: 7, name: "函館朝市", coords: [41.7725, 140.7262], desc: "海鮮早餐" },
                     { day: 7, name: "函館機場", coords: [41.777, 140.823], desc: "還車、賦歸" }
                 ],
-                center: [43.0, 141.0]
+                center: [42.6, 141.0]
             },
             itinerary: [
                 {
@@ -550,9 +551,9 @@
                     risk: "神威岬若遇強風可能會關閉步道。下午前往洞爺湖的山路，務必注意對向來車與野生動物竄出。"
                 },
                 {
-                    day: 5, date: "8/6 (二)", title: "洞爺湖/登別深度遊 ➔ 函館百萬夜景", route: "洞爺湖 ➔ 登別 ➔ 函館", 
-                    hours: 3.5, intensity: 6, stay: "函館市區 (待確認)",
-                    summary: "增加道央停留時間！早上搭纜車俯瞰洞爺湖，再去登別地獄谷感受火山氣息，午後再悠哉前往函館賞夜景。",
+                    day: 5, date: "8/6 (二)", title: "洞爺湖/登別 ➔ 絕美大沼公園", route: "洞爺湖 ➔ 登別 ➔ 大沼", 
+                    hours: 3.5, intensity: 6, stay: "大沼國定公園周邊 (待確認)",
+                    summary: "完美的一路向南！早上搭纜車俯瞰洞爺湖，再去登別地獄谷感受火山氣息，午後開往有如仙境般的「大沼國定公園」入住，享受湖畔寧靜。",
                     details: [
                         { 
                             time: "09:00", action: "有珠山纜車 (Mt. Usu) 俯瞰全景", type: "camera",
@@ -582,14 +583,77 @@
                             tips: "【午餐推薦】「溫泉市場」吃新鮮海鮮丼，或是吃碗熱呼呼的地獄拉麵暖胃。"
                         },
                         { 
-                            time: "13:30", action: "輕鬆開往函館", type: "car",
+                            time: "13:30", action: "輕鬆開往大沼公園", type: "car",
                             duration: "2.5 小時 (車程)", departure: "16:00 抵達", 
-                            route: "登別東IC ➔ 道央自動車道 ➔ 大沼公園IC ➔ 函館市區",
-                            tips: "可以順路在「八雲PA」休息站停靠，那裡有一片非常漂亮的海景草地可以放風！"
+                            route: "登別東IC ➔ 道央自動車道 ➔ 大沼公園IC ➔ 大沼",
+                            tips: "順向一路往南！可以順路在「八雲PA」休息站停靠，那裡有一片非常漂亮的海景草地可以放風。"
                         },
                         { 
-                            time: "16:30", action: "函館飯店 Check-in & 稍作休息", type: "suitcase",
-                            duration: "1 小時", departure: "17:30", 
+                            time: "16:00", action: "大沼國定公園 湖畔漫步", type: "camera",
+                            duration: "1.5 小時", departure: "17:30", 
+                            route: "大沼公園散步",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Onuma+Quasi-National+Park",
+                            tips: "傍晚抵達大沼，湖光山色非常寧靜，享受沒有大批遊客的絕美時光。"
+                        },
+                        { 
+                            time: "17:30", action: "大沼周邊飯店 Check-in & 晚餐", type: "bed",
+                            duration: "住宿", departure: "-", 
+                            route: "大沼國定公園",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Lucky+Pierrot+Togeshita",
+                            tips: "【晚餐推薦】如果是住渡假村可以直接享用飯店晚餐；或是去開車10分鐘的「幸運小丑漢堡 峠下總本店」，這間分店裝潢最浮誇！"
+                        }
+                    ],
+                    risk: "道南的高速公路有部分是單線道雙向通車，如需超車請耐心等待超車道路段。"
+                },
+                {
+                    day: 6, date: "8/7 (三)", title: "大沼 ➔ 函館市區深度遊與百萬夜景", route: "大沼 ➔ 函館市區", 
+                    hours: 1, intensity: 6, stay: "函館市區 (待確認)",
+                    summary: "早晨享受完大沼仙境後，短短 40 分鐘車程即可抵達函館。漫步於五稜郭與紅磚倉庫，晚上欣賞世界級的百萬夜景。",
+                    details: [
+                        { 
+                            time: "08:30", action: "大沼公園晨間騎單車", type: "camera",
+                            duration: "1 小時", departure: "09:30", 
+                            route: "車站周邊租借腳踏車環湖",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Onuma+Park",
+                            tips: "早晨的大沼非常舒服，騎單車感受大自然，遠眺駒岳。"
+                        },
+                        { 
+                            time: "09:30", action: "出發前往函館市區", type: "car",
+                            duration: "40 分鐘", departure: "10:15 抵達", 
+                            route: "國道5號 ➔ 函館市區",
+                            tips: "車程很短，輕輕鬆鬆就能進入道南最大的城市！"
+                        },
+                        { 
+                            time: "10:15", action: "五稜郭公園 & 五稜郭塔", type: "camera",
+                            duration: "2 小時", departure: "12:15", 
+                            route: "市區開車或搭路面電車",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Goryokaku+Tower",
+                            tips: "強烈建議買票上塔，才能完整俯瞰這座巨大的美麗星形碉堡。"
+                        },
+                        { 
+                            time: "12:15", action: "清爽鹽味拉麵午餐", type: "utensils",
+                            duration: "1 小時", departure: "13:15", 
+                            route: "五稜郭塔對面的拉麵店",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Ajisai+Ramen+Hakodate",
+                            tips: "【午餐推薦】名店「紫陽花 (あじさい)」，金黃澄澈的清湯配上細麵，吃起來非常解膩。"
+                        },
+                        { 
+                            time: "13:30", action: "元町異國風情區散步", type: "camera",
+                            duration: "1.5 小時", departure: "15:00", 
+                            route: "將車停在元町觀光停車場",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Hachiman-Zaka+Slope",
+                            tips: "八幡坂是經典的日劇取景地，筆直的坡道直通蔚藍大海，是絕佳的拍照點。"
+                        },
+                        { 
+                            time: "15:30", action: "金森紅磚倉庫群", type: "shopping-bag",
+                            duration: "1.5 小時", departure: "17:00", 
+                            route: "港邊灣區，備有大型收費停車場",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Kanemori+Red+Brick+Warehouse",
+                            tips: "購買伴手禮 (Snaffle's 起司蛋糕必買) 的好地方，逛累了可以買杯咖啡坐在港邊看海。"
+                        },
+                        { 
+                            time: "17:00", action: "函館飯店 Check-in & 稍作休息", type: "suitcase",
+                            duration: "1 小時", departure: "18:00", 
                             route: "函館市區",
                             tips: "放好行李，準備迎接晚上的重頭戲百萬夜景。"
                         },
@@ -608,90 +672,39 @@
                             tips: "【晚餐推薦】「大門橫丁」，充滿昭和風情的屋台村，挑間順眼的在地居酒屋，吃幾串烤肉配點小酒。"
                         }
                     ],
-                    risk: "道南的高速公路有部分是單線道雙向通車，如需超車請耐心等待超車道路段。夜景纜車下山時排隊人潮會較多。"
+                    risk: "市區觀光建議把車停妥後利用路面電車或雙腿移動，可省下昂貴的市區停車費。"
                 },
                 {
-                    day: 6, date: "8/7 (三)", title: "函館深度文化與美食遊", route: "函館市區", 
-                    hours: 0.5, intensity: 6, stay: "函館市區 (待確認)",
-                    summary: "函館一日深度探索，體驗朝市釣花枝的樂趣，並漫步於五稜郭與紅磚倉庫，感受獨特風情。",
+                    day: 7, date: "8/8 (四)", title: "函館朝市 ➔ 滿載而歸", route: "函館市區 ➔ 函館機場", 
+                    hours: 0.5, intensity: 3, stay: "溫暖的家",
+                    summary: "搭乘傍晚 17:30 星宇航班，上午在函館朝市吃豐盛的海鮮早餐，並做最後的免稅店大採購，午後從容還車搭機。",
                     details: [
                         { 
                             time: "08:30", action: "函館朝市 (海鮮早餐與釣烏賊)", type: "utensils",
-                            duration: "2 小時", departure: "10:30", 
+                            duration: "2.5 小時", departure: "11:00", 
                             route: "函館車站旁步行即達",
                             gmap: "https://www.google.com/maps/search/?api=1&query=Hakodate+Morning+Market",
                             tips: "【早餐推薦】「朝市 菊泉」吃海膽丼。體驗「現釣活烏賊」，師傅當場處理成生魚片，口感超彈牙！"
                         },
                         { 
-                            time: "11:00", action: "五稜郭公園 & 五稜郭塔", type: "camera",
-                            duration: "2 小時", departure: "13:00", 
-                            route: "市區開車或搭路面電車約 15 分鐘",
-                            gmap: "https://www.google.com/maps/search/?api=1&query=Goryokaku+Tower",
-                            tips: "強烈建議買票上塔，才能完整俯瞰這座巨大的美麗星形碉堡。"
+                            time: "11:00", action: "飯店退房 & 藥妝最後補給", type: "suitcase",
+                            duration: "1.5 小時", departure: "12:30", 
+                            route: "函館車站周邊藥妝店",
+                            tips: "將滿滿的戰利品塞入行李箱。把握市區的最後時光採買！"
                         },
                         { 
-                            time: "13:15", action: "清爽鹽味拉麵午餐", type: "utensils",
-                            duration: "1 小時", departure: "14:15", 
-                            route: "五稜郭塔對面的拉麵店",
-                            gmap: "https://www.google.com/maps/search/?api=1&query=Ajisai+Ramen+Hakodate",
-                            tips: "【午餐推薦】名店「紫陽花 (あじさい)」，金黃澄澈的清湯配上細麵，吃起來非常解膩。"
-                        },
-                        { 
-                            time: "14:45", action: "元町異國風情區散步", type: "camera",
-                            duration: "1.5 小時", departure: "16:15", 
-                            route: "將車停在元町觀光停車場",
-                            gmap: "https://www.google.com/maps/search/?api=1&query=Hachiman-Zaka+Slope",
-                            tips: "八幡坂是經典的日劇取景地，筆直的坡道直通蔚藍大海，是絕佳的拍照點。"
-                        },
-                        { 
-                            time: "16:30", action: "金森紅磚倉庫群", type: "shopping-bag",
-                            duration: "2 小時", departure: "18:30", 
-                            route: "港邊灣區，備有大型收費停車場",
-                            gmap: "https://www.google.com/maps/search/?api=1&query=Kanemori+Red+Brick+Warehouse",
-                            tips: "購買伴手禮 (Snaffle's 起司蛋糕必買) 的好地方，逛累了可以買杯咖啡坐在港邊看海。"
-                        },
-                        { 
-                            time: "19:00", action: "紅磚倉庫浪漫晚餐", type: "utensils",
-                            duration: "晚餐", departure: "-", 
-                            route: "金森紅磚倉庫周邊",
-                            gmap: "https://www.google.com/maps/search/?api=1&query=Hakodate+Beerhall",
-                            tips: "【晚餐推薦】「函館啤酒館 (Hakodate Beerhall)」，在充滿歷史感的紅磚建築內大口吃肉喝酒！"
-                        }
-                    ],
-                    risk: "朝市的海鮮攤位過中午就會陸續打烊，想吃新鮮海產記得早點出門喔。"
-                },
-                {
-                    day: 7, date: "8/8 (四)", title: "絕美大沼公園 ➔ 滿載而歸", route: "函館 ➔ 大沼公園 ➔ 函館機場", 
-                    hours: 1, intensity: 3, stay: "溫暖的家",
-                    summary: "搭乘傍晚 17:30 星宇航班，上午有充裕時間前往仙境般的「大沼國定公園」騎單車遊湖，午後從容還車搭機。",
-                    details: [
-                        { 
-                            time: "09:30", action: "飯店退房 & 前往大沼公園", type: "car",
-                            duration: "40 分鐘", departure: "10:10 抵達", 
-                            route: "函館市區 ➔ 國道5號 ➔ 大沼國定公園",
-                            gmap: "https://www.google.com/maps/search/?api=1&query=Onuma+Quasi-National+Park",
-                            tips: "將行李放車上，輕鬆前往函館郊區的國家公園呼吸新鮮空氣。"
-                        },
-                        { 
-                            time: "10:15", action: "大沼國定公園遊湖 & 騎單車", type: "camera",
-                            duration: "2.5 小時", departure: "12:45", 
-                            route: "在車站周邊租借腳踏車",
-                            gmap: "https://www.google.com/maps/search/?api=1&query=Onuma+Park",
-                            tips: "湖光山色極美！可以騎腳踏車環湖，或是搭乘觀光遊覽船，非常愜意放鬆。"
-                        },
-                        { 
-                            time: "13:00", action: "特色午餐 或 幸運小丑漢堡", type: "utensils",
-                            duration: "1 小時", departure: "14:00", 
-                            route: "大沼公園周邊",
-                            gmap: "https://www.google.com/maps/search/?api=1&query=Lucky+Pierrot+Togeshita",
-                            tips: "【午餐推薦】品嚐大沼名物「大沼牛排」，或是順路去吃「幸運小丑漢堡 (峠下總本店)」，這間分店裝潢最浮誇！"
+                            time: "12:30", action: "函館特色午餐", type: "utensils",
+                            duration: "1.5 小時", departure: "14:00", 
+                            route: "函館市區",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Asari+Honten+Hakodate",
+                            tips: "【午餐推薦】去吃百年老店「阿佐利本店」的高級和牛壽喜燒，午餐時段非常划算，為旅程畫下完美句點！"
                         },
                         { 
                             time: "14:00", action: "加滿油 & 開往函館機場還車", type: "car",
                             duration: "1 小時", departure: "15:00", 
-                            route: "大沼 ➔ 函館機場附近加油站 ➔ 租車營業所",
+                            route: "函館市區 ➔ 函館機場附近加油站 ➔ 租車營業所",
                             gmap: "https://www.google.com/maps/search/?api=1&query=Hakodate+Airport",
-                            tips: "記得日本租車規定「滿油還車 (滿タン返し)」，並保留最後一張加油收據給店員看。"
+                            tips: "車程僅需約 20 分鐘。記得日本租車規定「滿油還車 (滿タン返し)」，並保留最後一張加油收據給店員看。"
                         },
                         { 
                             time: "15:30", action: "函館機場報到與免稅店", type: "plane",
@@ -714,7 +727,8 @@
                 { day: "2", date: "8/3 (六)", region: "富良野 / 美瑛", name: "La Vista Furano Hills (紫雲の湯)", status: "confirmed", desc: "客房數量: 2間<br>房型: Hollywood Twin Room - Non-Smoking<br>方案: 含早餐、免費Wi-Fi<br>入住人數: 4位成人", icon: "fa-check-circle", gmap: "https://www.google.com/maps/search/?api=1&query=La+Vista+Furano+Hills+Natural+Hot+Spring", address: "富良野市 朝日町5-14", ref: "1708273245" },
                 { day: "3", date: "8/4 (日)", region: "小樽市區", name: "運河の宿 小樽ふる川 (Otaru Furukawa)", status: "confirmed", desc: "客房數量: 2間<br>房型: 露台兩床房-禁菸<br>方案: 含早餐、免費Wi-Fi<br>入住人數: 4位成人", icon: "fa-check-circle", gmap: "https://www.google.com/maps/search/?api=1&query=Otaru+Furukawa+Hotel", address: "小樽市 色内1-2-15", ref: "1708233368" },
                 { day: "4", date: "8/5 (一)", region: "洞爺湖", name: "乃の風リゾート (The Lake view TOYA Nonokaze)", status: "confirmed", desc: "客房數量: 2間<br>房型: 和洋式套房(Spa折疊樓) - 68平方公尺<br>方案: 一泊二食 (含自助早晚餐、禁菸)<br>入住人數: 4位成人", icon: "fa-check-circle", gmap: "https://www.google.com/maps/search/?api=1&query=The+Lake+view+TOYA+Nonokaze+resort", address: "虻田郡洞爺湖町洞爺湖温泉29-1", ref: "FCN00423989" },
-                { day: "5-6", date: "8/6 - 8/7", region: "函館市區", name: "尚未預訂", status: "pending", desc: "將連住兩晚，建議選擇鄰近車站或朝市的飯店，方便早起吃海鮮。", icon: "fa-clock", gmap: "" }
+                { day: "5", date: "8/6 (二)", region: "大沼公園", name: "尚未預訂", status: "pending", desc: "建議尋找大沼湖畔的渡假村或周邊民宿，享受寧靜的早晨。", icon: "fa-clock", gmap: "" },
+                { day: "6", date: "8/7 (三)", region: "函館市區", name: "尚未預訂", status: "pending", desc: "建議選擇鄰近車站、朝市或金森倉庫的飯店，方便市區觀光。", icon: "fa-clock", gmap: "" }
             ],
             food: [
                 // 札幌 (10家)
@@ -742,16 +756,16 @@
                 { name: "中村屋 (Nakamura)", region: "小樽/積丹", type: "海鮮", desc: "積丹另一家海膽名店，漁夫直營，海膽滿到看不到白飯。", icon: "fa-fish", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Shakotan+Nakamura" },
 
                 // 函館 (10家)
-                { name: "幸運小丑漢堡", region: "函館", type: "必吃速食", desc: "函館限定！中華雞腿堡絕對不容錯過，CP值極高。", icon: "fa-burger", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Lucky+Pierrot+Hakodate" },
-                { name: "朝市 菊泉", region: "函館", type: "海鮮", desc: "函館朝市內的高評價食堂，海鮮蓋飯用料實在、價格公道。", icon: "fa-fish", rating: "4.2", gmap: "https://www.google.com/maps/search/?api=1&query=Kikuizumi+Hakodate" },
-                { name: "鹽味拉麵 紫陽花", region: "函館", type: "拉麵", desc: "函館代表性拉麵，金黃清澈高湯搭配細麵，清爽無負擔。", icon: "fa-bowl-rice", rating: "4.1", gmap: "https://www.google.com/maps/search/?api=1&query=Ajisai+Ramen+Hakodate" },
-                { name: "長谷川 烤肉便當", region: "函館", type: "特色小吃", desc: "便利商店裡賣的現烤豬肉串便當，海苔與秘製醬汁完美結合。", icon: "fa-bento-box", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Hasegawa+Store+Hakodate" },
-                { name: "村上海膽 (Uni Murakami)", region: "函館", type: "高級海鮮", desc: "不使用明礬的無添加高級海膽，口感極致滑順甘甜。", icon: "fa-fish", rating: "4.5", gmap: "https://www.google.com/maps/search/?api=1&query=Uni+Murakami+Hakodate" },
-                { name: "Snaffle's 起司蛋糕", region: "函館", type: "甜點", desc: "紅磚倉庫必買的「起司歐姆蕾」，一口咬下彷彿雲朵般融化。", icon: "fa-cake-candles", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Snaffles+Hakodate" },
-                { name: "函館啤酒館", region: "函館", type: "晚餐/啤酒", desc: "在金森紅磚倉庫內大口吃香腸拼盤、成吉思汗烤肉配在地啤酒。", icon: "fa-beer-mug-empty", rating: "4.2", gmap: "https://www.google.com/maps/search/?api=1&query=Hakodate+Beerhall" },
-                { name: "Angelique Voyage", region: "函館", type: "甜點", desc: "元町的人氣排隊甜點店，生鮮奶油可麗餅與松露巧克力必吃。", icon: "fa-ice-cream", rating: "4.6", gmap: "https://www.google.com/maps/search/?api=1&query=Angelique+Voyage+Hakodate" },
-                { name: "大門橫丁 居酒屋街", region: "函館", type: "晚餐/宵夜", desc: "充滿昭和風情的屋台村，聚集20多家居酒屋，感受在地人情味。", icon: "fa-shop", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Daimon+Yokocho+Hakodate" },
-                { name: "阿佐利本店 (Asari)", region: "函館", type: "高級和牛", desc: "創立百年的高級壽喜燒老店，A5和牛入口即化，建議午餐時段前往較划算。", icon: "fa-fire-burner", rating: "4.5", gmap: "https://www.google.com/maps/search/?api=1&query=Asari+Honten+Hakodate" },
+                { name: "幸運小丑漢堡", region: "函館/大沼", type: "必吃速食", desc: "函館限定！中華雞腿堡絕對不容錯過，CP值極高。", icon: "fa-burger", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Lucky+Pierrot+Hakodate" },
+                { name: "朝市 菊泉", region: "函館/大沼", type: "海鮮", desc: "函館朝市內的高評價食堂，海鮮蓋飯用料實在、價格公道。", icon: "fa-fish", rating: "4.2", gmap: "https://www.google.com/maps/search/?api=1&query=Kikuizumi+Hakodate" },
+                { name: "鹽味拉麵 紫陽花", region: "函館/大沼", type: "拉麵", desc: "函館代表性拉麵，金黃清澈高湯搭配細麵，清爽無負擔。", icon: "fa-bowl-rice", rating: "4.1", gmap: "https://www.google.com/maps/search/?api=1&query=Ajisai+Ramen+Hakodate" },
+                { name: "長谷川 烤肉便當", region: "函館/大沼", type: "特色小吃", desc: "便利商店裡賣的現烤豬肉串便當，海苔與秘製醬汁完美結合。", icon: "fa-bento-box", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Hasegawa+Store+Hakodate" },
+                { name: "村上海膽 (Uni Murakami)", region: "函館/大沼", type: "高級海鮮", desc: "不使用明礬的無添加高級海膽，口感極致滑順甘甜。", icon: "fa-fish", rating: "4.5", gmap: "https://www.google.com/maps/search/?api=1&query=Uni+Murakami+Hakodate" },
+                { name: "Snaffle's 起司蛋糕", region: "函館/大沼", type: "甜點", desc: "紅磚倉庫必買的「起司歐姆蕾」，一口咬下彷彿雲朵般融化。", icon: "fa-cake-candles", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Snaffles+Hakodate" },
+                { name: "函館啤酒館", region: "函館/大沼", type: "晚餐/啤酒", desc: "在金森紅磚倉庫內大口吃香腸拼盤、成吉思汗烤肉配在地啤酒。", icon: "fa-beer-mug-empty", rating: "4.2", gmap: "https://www.google.com/maps/search/?api=1&query=Hakodate+Beerhall" },
+                { name: "Angelique Voyage", region: "函館/大沼", type: "甜點", desc: "元町的人氣排隊甜點店，生鮮奶油可麗餅與松露巧克力必吃。", icon: "fa-ice-cream", rating: "4.6", gmap: "https://www.google.com/maps/search/?api=1&query=Angelique+Voyage+Hakodate" },
+                { name: "大門橫丁 居酒屋街", region: "函館/大沼", type: "晚餐/宵夜", desc: "充滿昭和風情的屋台村，聚集20多家居酒屋，感受在地人情味。", icon: "fa-shop", rating: "4.3", gmap: "https://www.google.com/maps/search/?api=1&query=Daimon+Yokocho+Hakodate" },
+                { name: "阿佐利本店 (Asari)", region: "函館/大沼", type: "高級和牛", desc: "創立百年的高級壽喜燒老店，A5和牛入口即化，建議午餐時段前往較划算。", icon: "fa-fire-burner", rating: "4.5", gmap: "https://www.google.com/maps/search/?api=1&query=Asari+Honten+Hakodate" },
 
                 // 富良野/美瑛 (10家)
                 { name: "富田哈密瓜工房", region: "富良野/美瑛", type: "甜點", desc: "必吃現切赤肉哈密瓜片與濃郁哈密瓜霜淇淋，甜入心坎。", icon: "fa-ice-cream", rating: "4.4", gmap: "https://www.google.com/maps/search/?api=1&query=Tomita+Melon+House" },
