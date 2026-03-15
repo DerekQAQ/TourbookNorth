@@ -173,7 +173,7 @@
                 </div>
                 <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
                     <div class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">航班配置</div>
-                    <div class="text-xl font-bold">星宇航空直飛</div>
+                    <div class="text-xl font-bold">雙航線共同出擊</div>
                 </div>
                 <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
                     <div class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">預估總里程</div>
@@ -290,11 +290,17 @@
                     <!-- 去程 -->
                     <div class="bg-slate-50 dark:bg-slate-750/50 p-4 rounded-lg border border-slate-100 dark:border-slate-700 flex items-center justify-between shadow-sm">
                         <div>
-                            <div class="text-xs text-slate-500 dark:text-slate-400 mb-1 font-bold tracking-wider">去程 去北海道</div>
-                            <div class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">
-                                8/2 (五) <a href="https://zh.flightaware.com/live/flight/SJX850" target="_blank" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 hover:underline transition">星宇 JX850</a>
+                            <div class="text-xs text-slate-500 dark:text-slate-400 mb-2 font-bold tracking-wider">去程 去北海道 (新千歲會合)</div>
+                            <div class="flex items-center gap-2 mb-1 mt-1">
+                                <div class="text-lg font-bold text-slate-800 dark:text-slate-100">
+                                    <a href="https://zh.flightaware.com/live/flight/SJX850" target="_blank" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 hover:underline transition">星宇 JX850</a>
+                                </div>
+                                <span class="text-slate-300 dark:text-slate-600">|</span>
+                                <div class="text-lg font-bold text-slate-800 dark:text-slate-100">
+                                    <a href="https://zh.flightaware.com/live/flight/EVA166" target="_blank" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 hover:underline transition">長榮 BR166</a>
+                                </div>
                             </div>
-                            <div class="text-sm text-slate-600 dark:text-slate-300">台北(TPE) ➔ 新千歲(CTS) <span class="font-mono text-xs opacity-70 ml-1">抵達約14:30</span></div>
+                            <div class="text-sm text-slate-600 dark:text-slate-300 mt-2">台北(TPE) ➔ 新千歲(CTS) <span class="font-mono text-xs opacity-70 ml-1">約14:30會合</span></div>
                         </div>
                         <i class="fa-solid fa-plane-arrival text-4xl text-brand-200 dark:text-brand-900"></i>
                     </div>
@@ -302,15 +308,15 @@
                     <div class="bg-slate-50 dark:bg-slate-750/50 p-4 rounded-lg border border-slate-100 dark:border-slate-700 flex items-center justify-between shadow-sm">
                         <div>
                             <div class="text-xs text-slate-500 dark:text-slate-400 mb-1 font-bold tracking-wider">回程 回溫暖的家</div>
-                            <div class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">
+                            <div class="text-lg font-bold text-slate-800 dark:text-slate-100 mt-3 mb-1">
                                 8/8 (四) <a href="https://zh.flightaware.com/live/flight/SJX861" target="_blank" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 hover:underline transition">星宇 JX861</a>
                             </div>
-                            <div class="text-sm text-slate-600 dark:text-slate-300">函館(HKD) 17:30 ➔ 台北(TPE)</div>
+                            <div class="text-sm text-slate-600 dark:text-slate-300 mt-2">函館(HKD) 17:30 ➔ 台北(TPE)</div>
                         </div>
                         <i class="fa-solid fa-plane-departure text-4xl text-brand-200 dark:text-brand-900"></i>
                     </div>
                 </div>
-                <p class="text-xs text-slate-400 dark:text-slate-500 mt-3"><i class="fa-solid fa-circle-info mr-1"></i> 點擊藍色航班號碼，可立即跳轉至 FlightAware 查看當日班機即時狀態。</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-3"><i class="fa-solid fa-circle-info mr-1"></i> 點擊藍色或綠色航班號碼，可立即跳轉至 FlightAware 查看當日班機即時狀態。</p>
             </div>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-in">
@@ -472,15 +478,15 @@
                 {
                     day: 1, date: "8/2 (五)", title: "抵達北海道 ➔ 札幌市區美食夜", route: "新千歲機場 ➔ 札幌市區", 
                     hours: 1, intensity: 3, stay: "SAPPORO HOTEL by GRANBELL (已確認 ✅)",
-                    summary: "搭乘星宇航空抵達！剛下飛機不宜長途開車，直接前往車程僅一小時的札幌市區，適應右駕並好好吃頓晚餐。",
+                    summary: "兩路人馬分別搭乘星宇與長榮航空抵達！剛下飛機不宜長途開車，會合後直接前往車程僅一小時的札幌市區，適應右駕並好好吃頓晚餐。",
                     details: [
                         { 
-                            time: "14:30", action: "搭乘星宇 JX850 抵達新千歲 (CTS)", type: "plane",
+                            time: "14:30", action: "雙航線抵達新千歲 (CTS) 集合", type: "plane",
                             duration: "1 小時", departure: "15:30", 
-                            route: "出海關領行李 ➔ 國內線航廈1樓租車櫃台報到",
+                            route: "出海關領行李 ➔ 國內線航廈1樓租車櫃台集合報到",
                             mapcode: "113 774 532*36",
                             gmap: "https://www.google.com/maps/search/?api=1&query=New+Chitose+Airport",
-                            tips: "【午餐推薦】若肚子餓，可先在機場國內線3樓的「拉麵道場」吃碗熱騰騰的拉麵墊胃！"
+                            tips: "【集合與午餐】搭乘長榮 BR166 的夥伴會較早抵達，建議先去國內線3樓的「拉麵道場」吃拉麵墊胃，再前往1樓租車櫃台等候星宇 JX850 (約14:30抵達) 的夥伴會合！"
                         },
                         { 
                             time: "15:30", action: "悠閒上路前往札幌", type: "car",
@@ -982,7 +988,7 @@
         // ================= 一鍵複製功能 =================
         function copyText(text) {
             navigator.clipboard.writeText(text).then(() => {
-                showToast('已複製地址至剪貼簿！');
+                showToast('已複製！');
             }).catch(err => {
                 // Fallback
                 const textArea = document.createElement("textarea");
@@ -991,7 +997,7 @@
                 textArea.select();
                 document.execCommand("Copy");
                 textArea.remove();
-                showToast('已複製地址！');
+                showToast('已複製！');
             });
         }
 
