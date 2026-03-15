@@ -85,11 +85,12 @@
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-1">
-                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-4 py-2 rounded-md font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-slate-700 transition"><i class="fa-solid fa-chart-line mr-2"></i>行程儀表盤</button>
-                    <button onclick="switchTab('itinerary')" id="nav-itinerary" class="nav-btn px-4 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-route mr-2"></i>每日行程</button>
-                    <button onclick="switchTab('accommodation')" id="nav-accommodation" class="nav-btn px-4 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-bed mr-2"></i>住宿資訊</button>
-                    <button onclick="switchTab('food')" id="nav-food" class="nav-btn px-4 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-utensils mr-2"></i>美食地圖</button>
-                    <button onclick="switchTab('logistics')" id="nav-logistics" class="nav-btn px-4 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-box-open mr-2"></i>後勤準備</button>
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-2 rounded-md font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-slate-700 transition"><i class="fa-solid fa-chart-line mr-2"></i>行程儀表盤</button>
+                    <button onclick="switchTab('itinerary')" id="nav-itinerary" class="nav-btn px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-route mr-2"></i>每日行程</button>
+                    <button onclick="switchTab('accommodation')" id="nav-accommodation" class="nav-btn px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-bed mr-2"></i>住宿資訊</button>
+                    <button onclick="switchTab('food')" id="nav-food" class="nav-btn px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-utensils mr-2"></i>美食地圖</button>
+                    <button onclick="switchTab('logistics')" id="nav-logistics" class="nav-btn px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-box-open mr-2"></i>後勤準備</button>
+                    <button onclick="switchTab('tools')" id="nav-tools" class="nav-btn px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fa-solid fa-toolbox mr-2"></i>實用工具</button>
                     <div class="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
                     <!-- Dark Mode Toggle -->
                     <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition">
@@ -117,6 +118,7 @@
                 <button onclick="switchTab('accommodation'); toggleMobileMenu()" class="text-left px-3 py-3 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"><i class="fa-solid fa-bed w-6"></i> 住宿資訊</button>
                 <button onclick="switchTab('food'); toggleMobileMenu()" class="text-left px-3 py-3 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"><i class="fa-solid fa-utensils w-6"></i> 美食地圖</button>
                 <button onclick="switchTab('logistics'); toggleMobileMenu()" class="text-left px-3 py-3 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"><i class="fa-solid fa-box-open w-6"></i> 後勤準備</button>
+                <button onclick="switchTab('tools'); toggleMobileMenu()" class="text-left px-3 py-3 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"><i class="fa-solid fa-toolbox w-6"></i> 實用工具</button>
             </div>
         </div>
     </nav>
@@ -310,6 +312,79 @@
                     <div class="space-y-3 text-base" id="checklist-container">
                         <!-- JS Generated Checkboxes -->
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 模組 6: 實用工具 (全新) ================= -->
+        <section id="tools" class="tab-content">
+            <h1 class="text-3xl font-bold mb-6 fade-in">實用小工具與緊急聯絡</h1>
+            <p class="text-slate-500 dark:text-slate-400 mb-6 fade-in">旅途當下最需要的功能，通通幫您準備好了！</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-in mb-8">
+                <!-- 匯率換算 -->
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col h-full">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-slate-100"><i class="fa-solid fa-money-bill-transfer text-emerald-500"></i> 血拚必備匯率換算</h3>
+                    <div class="flex flex-col gap-4 mt-2">
+                        <div class="flex items-center gap-3">
+                            <label class="w-16 text-sm font-bold text-slate-500 dark:text-slate-400">目前匯率</label>
+                            <input type="number" id="rate-setting" value="0.215" class="flex-1 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white" oninput="convertCurrencyQuick()">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="w-16 text-sm font-bold text-slate-500 dark:text-slate-400">日幣 (¥)</label>
+                            <input type="number" id="jpy-quick-input" placeholder="輸入日幣金額" class="flex-1 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-lg px-3 py-3 text-lg font-bold text-brand-600 dark:text-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500" oninput="convertCurrencyQuick()">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="w-16 text-sm font-bold text-slate-500 dark:text-slate-400">台幣 ($)</label>
+                            <input type="text" id="twd-quick-output" placeholder="約合台幣" class="flex-1 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-750 rounded-lg px-3 py-3 text-lg font-bold text-slate-700 dark:text-slate-300 focus:outline-none" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 記帳本 -->
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col h-full">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-slate-100"><i class="fa-solid fa-calculator text-brand-500"></i> 簡易旅費記帳本</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">適合紀錄過路費、停車費、拉麵等公費小額支出。</p>
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="expense-name" placeholder="項目 (如: 買飲料)" class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white">
+                        <input type="number" id="expense-amount" placeholder="日幣(¥)" class="w-24 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white" onkeypress="if(event.key === 'Enter') addExpense()">
+                        <button onclick="addExpense()" class="bg-brand-500 text-white px-4 rounded-lg hover:bg-brand-600 transition font-bold shadow-sm">+</button>
+                    </div>
+                    <ul id="expense-list" class="flex-1 overflow-y-auto max-h-48 pr-2 space-y-1 text-sm mb-3 border-t border-slate-100 dark:border-slate-700 pt-3">
+                        <li class="text-center text-slate-400 py-4">目前還沒有記帳紀錄喔！</li>
+                    </ul>
+                    <div class="mt-auto border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between items-center font-bold">
+                        <span class="text-slate-600 dark:text-slate-300">總計花費:</span>
+                        <span class="text-lg text-brand-600 dark:text-brand-400">¥<span id="total-jpy">0</span> <span class="text-slate-400 dark:text-slate-500 text-xs font-normal ml-1">≈ TWD <span id="total-twd-expense">0</span></span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 緊急救援 -->
+            <div class="bg-red-50 dark:bg-red-900/20 p-6 rounded-xl shadow-sm border border-red-100 dark:border-red-800/50 relative fade-in">
+                <h3 class="text-xl font-bold mb-4 text-red-700 dark:text-red-400 flex items-center gap-2"><i class="fa-solid fa-truck-medical text-red-500"></i> 🆘 緊急救援與聯絡資訊</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <a href="tel:110" class="flex items-center gap-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-red-200 dark:border-red-800/50 hover:shadow-md transition group">
+                        <div class="bg-red-100 dark:bg-red-900/50 w-12 h-12 rounded-full flex items-center justify-center text-red-600 dark:text-red-400 group-hover:scale-110 transition"><i class="fa-solid fa-phone text-xl"></i></div>
+                        <div>
+                            <p class="font-bold text-slate-800 dark:text-slate-200">報警 (發生事故)</p>
+                            <p class="text-xl font-black text-red-600 dark:text-red-400">110</p>
+                        </div>
+                    </a>
+                    <a href="tel:119" class="flex items-center gap-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-red-200 dark:border-red-800/50 hover:shadow-md transition group">
+                        <div class="bg-red-100 dark:bg-red-900/50 w-12 h-12 rounded-full flex items-center justify-center text-red-600 dark:text-red-400 group-hover:scale-110 transition"><i class="fa-solid fa-truck-medical text-xl"></i></div>
+                        <div>
+                            <p class="font-bold text-slate-800 dark:text-slate-200">救護車 / 消防</p>
+                            <p class="text-xl font-black text-red-600 dark:text-red-400">119</p>
+                        </div>
+                    </a>
+                    <a href="tel:+818014602568" class="flex items-center gap-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-red-200 dark:border-red-800/50 hover:shadow-md transition group">
+                        <div class="bg-red-100 dark:bg-red-900/50 w-12 h-12 rounded-full flex items-center justify-center text-red-600 dark:text-red-400 group-hover:scale-110 transition"><i class="fa-solid fa-building-flag text-xl"></i></div>
+                        <div>
+                            <p class="font-bold text-slate-800 dark:text-slate-200 text-sm">台北駐日代表處(札幌)</p>
+                            <p class="text-sm font-mono font-bold text-slate-600 dark:text-slate-400 mt-0.5">+81-80-1460-2568</p>
+                        </div>
+                    </a>
                 </div>
             </div>
         </section>
@@ -796,6 +871,7 @@
         let map;
         let routeLayer;
         let mapInitialized = false;
+        let expenses = []; // 記帳本資料陣列
 
         // ================= 初始化 =================
         document.addEventListener('DOMContentLoaded', () => {
@@ -804,6 +880,7 @@
             initAccommodation();
             initFoodMap();
             initLogistics();
+            updateExpenseList(); // 初始化記帳本
             
             // 預設檢查系統主題
             if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -1209,6 +1286,72 @@
                     <label for="check-${index}" class="ml-3 text-slate-700 dark:text-slate-300 cursor-pointer transition-all select-none">${item}</label>
                 </div>
             `).join('');
+        }
+
+        // ================= 模組 6: 實用工具 (Expense & Converter) =================
+        function addExpense() {
+            const nameInput = document.getElementById('expense-name');
+            const amountInput = document.getElementById('expense-amount');
+            const name = nameInput.value.trim();
+            const amount = parseFloat(amountInput.value);
+
+            if (name && !isNaN(amount)) {
+                expenses.push({ name, amount });
+                nameInput.value = '';
+                amountInput.value = '';
+                updateExpenseList();
+            }
+        }
+
+        function updateExpenseList() {
+            const list = document.getElementById('expense-list');
+            const totalJpyEl = document.getElementById('total-jpy');
+            const totalTwdEl = document.getElementById('total-twd-expense');
+            const rate = parseFloat(document.getElementById('rate-setting').value) || 0.215;
+
+            if (expenses.length === 0) {
+                list.innerHTML = '<li class="text-center text-slate-400 py-4">目前還沒有記帳紀錄喔！</li>';
+                totalJpyEl.innerText = '0';
+                totalTwdEl.innerText = '0';
+                return;
+            }
+
+            let totalJpy = 0;
+            list.innerHTML = expenses.map((item, idx) => {
+                totalJpy += item.amount;
+                return `
+                <li class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 last:border-0 pb-2 mb-2">
+                    <span class="text-slate-700 dark:text-slate-300 font-medium">${item.name}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="font-mono font-bold text-brand-600 dark:text-brand-400">¥${item.amount.toLocaleString()}</span>
+                        <button onclick="removeExpense(${idx})" class="text-red-400 hover:text-red-600 transition p-1"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </li>
+                `;
+            }).join('');
+
+            totalJpyEl.innerText = totalJpy.toLocaleString();
+            totalTwdEl.innerText = Math.round(totalJpy * rate).toLocaleString();
+        }
+
+        function removeExpense(idx) {
+            expenses.splice(idx, 1);
+            updateExpenseList();
+        }
+        
+        function convertCurrencyQuick() {
+            const jpy = parseFloat(document.getElementById('jpy-quick-input').value);
+            const twdInput = document.getElementById('twd-quick-output');
+            const rate = parseFloat(document.getElementById('rate-setting').value) || 0.215;
+            
+            // 同時更新記帳本的台幣總額
+            updateExpenseList();
+
+            if (!isNaN(jpy)) {
+                twdInput.value = Math.round(jpy * rate).toLocaleString();
+            } else {
+                twdInput.value = '';
+            }
         }
     </script>
 </body>
