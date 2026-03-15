@@ -1289,15 +1289,15 @@
                                 </div>` : ''}
                                 
                                 ${(detail.mapcode || detail.gmap || detail.parking) ? `
-                                <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 mt-2">
-                                    ${detail.mapcode ? `<div class="col-span-2 sm:col-span-1 inline-flex items-center justify-between sm:justify-start text-slate-700 dark:text-slate-200 font-medium text-xs bg-slate-100 dark:bg-slate-700 px-2.5 py-2 rounded shadow-sm border border-slate-200 dark:border-slate-600"><div class="flex items-center"><i class="fa-solid fa-car-side mr-1.5 text-brand-500"></i> Mapcode: <span class="font-mono ml-1 font-bold tracking-wider">${detail.mapcode}</span></div> <button onclick="copyText('${detail.mapcode}')" class="ml-2 text-slate-400 hover:text-brand-500 transition px-2 py-0.5 -mr-2" title="複製 Mapcode"><i class="fa-regular fa-copy"></i></button></div>` : ''}
-                                    ${detail.gmap ? `<a href="${detail.gmap}" target="_blank" class="inline-flex items-center justify-center text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium text-xs bg-brand-50 dark:bg-brand-900/30 px-2.5 py-2 rounded border border-brand-100 dark:border-brand-800/50 shadow-sm transition"><i class="fa-solid fa-location-dot mr-1.5"></i> 開啟導航</a>` : ''}
-                                    ${detail.parking ? `<a href="${detail.parking}" target="_blank" class="inline-flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-xs bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-2 rounded border border-indigo-100 dark:border-indigo-800/50 shadow-sm transition"><i class="fa-solid fa-square-parking mr-1.5"></i> 找停車場</a>` : ''}
+                                <div class="flex flex-row items-stretch gap-1.5 sm:gap-2 mt-1.5 sm:mt-2 w-full">
+                                    ${detail.mapcode ? `<div class="flex-1 min-w-0 inline-flex items-center justify-between text-slate-700 dark:text-slate-200 font-medium text-[11px] sm:text-xs bg-slate-100 dark:bg-slate-700 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded shadow-sm border border-slate-200 dark:border-slate-600"><div class="flex items-center truncate"><i class="fa-solid fa-car-side mr-1.5 text-brand-500 shrink-0"></i><span class="hidden sm:inline mr-1 shrink-0">Mapcode:</span><span class="font-mono font-bold tracking-tighter sm:tracking-wider truncate">${detail.mapcode}</span></div> <button onclick="copyText('${detail.mapcode}')" class="ml-1 text-slate-400 hover:text-brand-500 transition px-1 shrink-0" title="複製 Mapcode"><i class="fa-regular fa-copy text-xs sm:text-sm"></i></button></div>` : ''}
+                                    ${detail.gmap ? `<a href="${detail.gmap}" target="_blank" class="shrink-0 inline-flex items-center justify-center text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium text-[11px] sm:text-xs bg-brand-50 dark:bg-brand-900/30 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded border border-brand-100 dark:border-brand-800/50 shadow-sm transition whitespace-nowrap"><i class="fa-solid fa-location-dot sm:mr-1.5"></i><span class="hidden sm:inline ml-0">開啟導航</span><span class="sm:hidden ml-1">導航</span></a>` : ''}
+                                    ${detail.parking ? `<a href="${detail.parking}" target="_blank" class="shrink-0 inline-flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-[11px] sm:text-xs bg-indigo-50 dark:bg-indigo-900/30 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded border border-indigo-100 dark:border-indigo-800/50 shadow-sm transition whitespace-nowrap"><i class="fa-solid fa-square-parking sm:mr-1.5"></i><span class="hidden sm:inline ml-0">找停車場</span><span class="sm:hidden ml-1">停車</span></a>` : ''}
                                 </div>` : ''}
                                 
                                 ${detail.tips ? `
-                                <div class="text-xs text-amber-800 dark:text-amber-200 mt-2 bg-amber-50/80 dark:bg-amber-900/30 p-3 rounded-lg border-l-2 border-amber-400 dark:border-amber-600">
-                                    <span class="text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-wider block mb-1">Tips & Food</span>
+                                <div class="text-xs sm:text-sm text-amber-800 dark:text-amber-200 mt-2.5 bg-amber-50/80 dark:bg-amber-900/30 p-3 sm:p-4 rounded-lg border-l-2 border-amber-400 dark:border-amber-600">
+                                    <span class="text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-wider block mb-1.5">Tips & Food</span>
                                     <p class="leading-relaxed">${detail.tips}</p>
                                 </div>` : ''}
                             </div>
@@ -1309,15 +1309,15 @@
                             <div class="absolute left-[7px] sm:left-[19px] top-[1.35rem] sm:top-6 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 shadow-sm z-10 bg-brand-500 ring-2 ring-brand-100 dark:ring-slate-700"></div>
                             
                             <div class="bg-white dark:bg-slate-800 p-3.5 sm:p-5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
-                                <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1 sm:mb-2">
-                                    <span class="font-mono text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded w-fit sm:w-auto mb-1 sm:mb-0">${detail.time}</span>
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 mb-1 sm:mb-2">
+                                    <span class="font-mono text-xs sm:text-sm font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded w-fit sm:w-auto mb-1 sm:mb-0">${detail.time}</span>
                                     <h3 class="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 flex-wrap">
                                         <div class="w-5 sm:w-6 text-center"><i class="fa-solid ${iconClass}"></i></div> ${detail.action}
                                     </h3>
                                 </div>
                                 
                                 ${(detail.duration || detail.departure) ? `
-                                <div class="flex gap-3 sm:gap-4 mt-1 sm:mt-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                <div class="flex flex-wrap gap-2 sm:gap-4 mt-1 sm:mt-2 text-[11px] sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
                                     ${detail.duration ? `<span class="flex items-center gap-1 sm:gap-1.5"><i class="fa-regular fa-hourglass-half text-brand-500"></i>停留/耗時: ${detail.duration}</span>` : ''}
                                     ${detail.departure ? `<span class="flex items-center gap-1 sm:gap-1.5"><i class="fa-solid fa-person-walking-arrow-right text-indigo-500"></i>建議時間: ${detail.departure}</span>` : ''}
                                 </div>
