@@ -295,7 +295,7 @@
                                 </div>
                                 <span class="text-slate-300 dark:text-slate-600">|</span>
                                 <div class="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100">
-                                    <a href="https://zh.flightaware.com/live/flight/EVA166" target="_blank" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 hover:underline transition">長榮 BR166</a>
+                                    <a href="https://zh.flightaware.com/live/flight/EVA116" target="_blank" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 hover:underline transition">長榮 BR116</a>
                                 </div>
                             </div>
                             <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 sm:mt-2">台北(TPE) ➔ 新千歲(CTS) <span class="font-mono text-[10px] sm:text-xs opacity-70 ml-1">約14:30會合</span></div>
@@ -348,7 +348,7 @@
             <h1 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 fade-in">實用小工具與緊急聯絡</h1>
             <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 mb-4 sm:mb-6 fade-in">旅途當下最需要的功能，通通幫您準備好了！紀錄皆會自動保存在設備中。</p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 fade-in mb-6 sm:mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 fade-in mb-6 sm:mb-8">
                 <!-- 匯率換算 -->
                 <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col h-full">
                     <h3 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2 text-slate-800 dark:text-slate-100"><i class="fa-solid fa-money-bill-transfer text-emerald-500"></i> 血拚匯率換算</h3>
@@ -376,17 +376,27 @@
                     </div>
                     <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mb-2 sm:mb-3">適合紀錄過路費、停車費、拉麵等公費小額支出。</p>
                     <div class="flex gap-1.5 sm:gap-2 mb-3 sm:mb-4">
-                        <input type="text" id="expense-name" placeholder="項目 (如: 飲料)" class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white">
-                        <input type="number" id="expense-amount" placeholder="日幣(¥)" class="w-20 sm:w-24 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white" onkeypress="if(event.key === 'Enter') addExpense()">
+                        <input type="text" id="expense-name" placeholder="項目 (如: 飲料)" class="flex-1 min-w-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white">
+                        <input type="number" id="expense-amount" placeholder="日幣(¥)" class="w-16 sm:w-24 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white" onkeypress="if(event.key === 'Enter') addExpense()">
                         <button onclick="addExpense()" class="bg-brand-500 text-white px-3 sm:px-4 rounded-lg hover:bg-brand-600 transition font-bold shadow-sm">+</button>
                     </div>
-                    <ul id="expense-list" class="flex-1 overflow-y-auto max-h-40 sm:max-h-48 pr-1 sm:pr-2 space-y-1 text-xs sm:text-sm mb-2 sm:mb-3 border-t border-slate-100 dark:border-slate-700 pt-2 sm:pt-3">
+                    <ul id="expense-list" class="flex-1 overflow-y-auto max-h-32 sm:max-h-48 pr-1 sm:pr-2 space-y-1 text-xs sm:text-sm mb-2 sm:mb-3 border-t border-slate-100 dark:border-slate-700 pt-2 sm:pt-3">
                         <!-- JS 渲染 -->
                     </ul>
                     <div class="mt-auto border-t border-slate-200 dark:border-slate-700 pt-2 sm:pt-3 flex justify-between items-center font-bold">
                         <span class="text-sm sm:text-base text-slate-600 dark:text-slate-300">總計花費:</span>
                         <span class="text-base sm:text-lg text-brand-600 dark:text-brand-400">¥<span id="total-jpy">0</span> <span class="text-slate-400 dark:text-slate-500 text-[10px] sm:text-xs font-normal ml-0.5 sm:ml-1">≈ TWD <span id="total-twd-expense">0</span></span></span>
                     </div>
+                </div>
+
+                <!-- 隨身筆記本 (新增) -->
+                <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col h-full">
+                    <div class="flex justify-between items-start mb-2 sm:mb-4">
+                        <h3 class="text-lg sm:text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100"><i class="fa-solid fa-note-sticky text-yellow-500"></i> 隨身便條筆記本</h3>
+                        <span class="text-[9px] sm:text-[10px] bg-brand-100 text-brand-700 dark:bg-brand-900/50 dark:text-brand-300 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded mt-1">自動存檔</span>
+                    </div>
+                    <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mb-2 sm:mb-3">隨手紀錄待辦事項、退稅單號或親友代購清單。</p>
+                    <textarea id="travel-memo" class="flex-1 w-full bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white resize-none leading-relaxed" placeholder="在這裡輸入您的筆記..." oninput="saveMemo()"></textarea>
                 </div>
 
                 <!-- Mapcode 查詢工具 -->
@@ -417,6 +427,27 @@
                         前往 PPPark! 查詢 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] sm:text-xs"></i>
                     </a>
                 </div>
+
+                <!-- 必備日文翻譯字卡 (新增) -->
+                <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col h-full">
+                    <h3 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2 text-slate-800 dark:text-slate-100"><i class="fa-solid fa-language text-pink-500"></i> 必備日文翻譯字卡</h3>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-3 sm:mb-4">直接出示給店員看，或點擊複製備用。</p>
+                    <div class="flex flex-col gap-2 overflow-y-auto pr-1 hide-scrollbar flex-1">
+                        <button onclick="copyText('レギュラー、満タンでお願いします')" class="text-left bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-600 px-3 py-2 rounded-lg hover:border-pink-300 dark:hover:border-pink-700 transition group">
+                            <div class="text-[10px] text-slate-500 dark:text-slate-400 mb-0.5">加油站</div>
+                            <div class="text-sm font-bold text-slate-700 dark:text-slate-200">加滿 Regular (紅槍) <i class="fa-regular fa-copy float-right mt-0.5 text-slate-400 group-hover:text-pink-500 transition"></i></div>
+                        </button>
+                        <button onclick="copyText('クレジットカードは使えますか？')" class="text-left bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-600 px-3 py-2 rounded-lg hover:border-pink-300 dark:hover:border-pink-700 transition group">
+                            <div class="text-[10px] text-slate-500 dark:text-slate-400 mb-0.5">結帳</div>
+                            <div class="text-sm font-bold text-slate-700 dark:text-slate-200">可以使用信用卡嗎？ <i class="fa-regular fa-copy float-right mt-0.5 text-slate-400 group-hover:text-pink-500 transition"></i></div>
+                        </button>
+                        <button onclick="copyText('すみません、お会計をお願いします')" class="text-left bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-600 px-3 py-2 rounded-lg hover:border-pink-300 dark:hover:border-pink-700 transition group">
+                            <div class="text-[10px] text-slate-500 dark:text-slate-400 mb-0.5">餐廳</div>
+                            <div class="text-sm font-bold text-slate-700 dark:text-slate-200">不好意思，麻煩結帳 <i class="fa-regular fa-copy float-right mt-0.5 text-slate-400 group-hover:text-pink-500 transition"></i></div>
+                        </button>
+                    </div>
+                </div>
+
             </div>
 
             <!-- 緊急救援 -->
@@ -500,7 +531,7 @@
                             route: "出海關領行李 ➔ 國內線航廈1樓租車櫃台集合報到",
                             mapcode: "113 774 532*36",
                             gmap: "https://www.google.com/maps/search/?api=1&query=New+Chitose+Airport",
-                            tips: "【集合與午餐】搭乘長榮 BR166 的夥伴會較早抵達，建議先去國內線3樓的「拉麵道場」吃拉麵墊胃，再前往1樓租車櫃台等候星宇 JX850 (約14:30抵達) 的夥伴會合！"
+                            tips: "【集合與午餐】搭乘長榮 BR116 的夥伴會較早抵達，建議先去國內線3樓的「拉麵道場」吃拉麵墊胃，再前往1樓租車櫃台等候星宇 JX850 (約14:30抵達) 的夥伴會合！"
                         },
                         { 
                             time: "15:30", action: "悠閒上路前往札幌", type: "car",
@@ -1003,6 +1034,7 @@
             initFoodMap();
             initLogistics();
             updateExpenseList(); // 初始化記帳本
+            initMemo(); // 初始化筆記本
             
             // 預設檢查系統主題
             if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -1289,10 +1321,10 @@
                                 </div>` : ''}
                                 
                                 ${(detail.mapcode || detail.gmap || detail.parking) ? `
-                                <div class="flex flex-row items-stretch gap-1.5 sm:gap-2 mt-1.5 sm:mt-2 w-full">
-                                    ${detail.mapcode ? `<div class="flex-1 min-w-0 inline-flex items-center justify-between text-slate-700 dark:text-slate-200 font-medium text-[11px] sm:text-xs bg-slate-100 dark:bg-slate-700 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded shadow-sm border border-slate-200 dark:border-slate-600"><div class="flex items-center truncate"><i class="fa-solid fa-car-side mr-1.5 text-brand-500 shrink-0"></i><span class="hidden sm:inline mr-1 shrink-0">Mapcode:</span><span class="font-mono font-bold tracking-tighter sm:tracking-wider truncate">${detail.mapcode}</span></div> <button onclick="copyText('${detail.mapcode}')" class="ml-1 text-slate-400 hover:text-brand-500 transition px-1 shrink-0" title="複製 Mapcode"><i class="fa-regular fa-copy text-xs sm:text-sm"></i></button></div>` : ''}
-                                    ${detail.gmap ? `<a href="${detail.gmap}" target="_blank" class="shrink-0 inline-flex items-center justify-center text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium text-[11px] sm:text-xs bg-brand-50 dark:bg-brand-900/30 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded border border-brand-100 dark:border-brand-800/50 shadow-sm transition whitespace-nowrap"><i class="fa-solid fa-location-dot sm:mr-1.5"></i><span class="hidden sm:inline ml-0">開啟導航</span><span class="sm:hidden ml-1">導航</span></a>` : ''}
-                                    ${detail.parking ? `<a href="${detail.parking}" target="_blank" class="shrink-0 inline-flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-[11px] sm:text-xs bg-indigo-50 dark:bg-indigo-900/30 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded border border-indigo-100 dark:border-indigo-800/50 shadow-sm transition whitespace-nowrap"><i class="fa-solid fa-square-parking sm:mr-1.5"></i><span class="hidden sm:inline ml-0">找停車場</span><span class="sm:hidden ml-1">停車</span></a>` : ''}
+                                <div class="grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2 w-full">
+                                    ${detail.mapcode ? `<div class="col-span-3 sm:col-span-1 inline-flex items-center justify-between sm:justify-start text-slate-700 dark:text-slate-200 font-medium text-xs bg-slate-100 dark:bg-slate-700 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded shadow-sm border border-slate-200 dark:border-slate-600"><div class="flex items-center truncate"><i class="fa-solid fa-car-side mr-1.5 text-brand-500 shrink-0"></i><span class="font-mono font-bold tracking-wider truncate">${detail.mapcode}</span></div> <button onclick="copyText('${detail.mapcode}')" class="ml-2 text-slate-400 hover:text-brand-500 transition px-2 py-0.5 -mr-2" title="複製 Mapcode"><i class="fa-regular fa-copy"></i></button></div>` : ''}
+                                    ${detail.gmap ? `<a href="${detail.gmap}" target="_blank" class="col-span-1 inline-flex items-center justify-center text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium text-xs bg-brand-50 dark:bg-brand-900/30 px-2 py-2 sm:px-3 sm:py-2 rounded border border-brand-100 dark:border-brand-800/50 shadow-sm transition whitespace-nowrap"><i class="fa-solid fa-location-dot sm:mr-1.5"></i><span class="hidden sm:inline ml-0">開啟導航</span><span class="sm:hidden ml-1">導航</span></a>` : ''}
+                                    ${detail.parking ? `<a href="${detail.parking}" target="_blank" class="col-span-2 sm:col-span-1 inline-flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-xs bg-indigo-50 dark:bg-indigo-900/30 px-2 py-2 sm:px-3 sm:py-2 rounded border border-indigo-100 dark:border-indigo-800/50 shadow-sm transition whitespace-nowrap"><i class="fa-solid fa-square-parking sm:mr-1.5"></i><span class="hidden sm:inline ml-0">找停車場</span><span class="sm:hidden ml-1">找車位</span></a>` : ''}
                                 </div>` : ''}
                                 
                                 ${detail.tips ? `
@@ -1317,7 +1349,7 @@
                                 </div>
                                 
                                 ${(detail.duration || detail.departure) ? `
-                                <div class="flex flex-wrap gap-2 sm:gap-4 mt-1 sm:mt-2 text-[11px] sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+                                <div class="flex flex-wrap gap-2 sm:gap-4 mt-1 sm:mt-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
                                     ${detail.duration ? `<span class="flex items-center gap-1 sm:gap-1.5"><i class="fa-regular fa-hourglass-half text-brand-500"></i>停留/耗時: ${detail.duration}</span>` : ''}
                                     ${detail.departure ? `<span class="flex items-center gap-1 sm:gap-1.5"><i class="fa-solid fa-person-walking-arrow-right text-indigo-500"></i>建議時間: ${detail.departure}</span>` : ''}
                                 </div>
@@ -1475,7 +1507,21 @@
             localStorage.setItem('hokkaido_checklist', JSON.stringify(savedChecks));
         }
 
-        // ================= 模組 6: 實用工具 (Expense & Converter) =================
+        // ================= 模組 6: 實用工具 (Expense, Memo & Converter) =================
+        function initMemo() {
+            const memoField = document.getElementById('travel-memo');
+            if(memoField) {
+                memoField.value = localStorage.getItem('hokkaido_memo') || '';
+            }
+        }
+
+        function saveMemo() {
+            const memoField = document.getElementById('travel-memo');
+            if(memoField) {
+                localStorage.setItem('hokkaido_memo', memoField.value);
+            }
+        }
+
         function addExpense() {
             const nameInput = document.getElementById('expense-name');
             const amountInput = document.getElementById('expense-amount');
