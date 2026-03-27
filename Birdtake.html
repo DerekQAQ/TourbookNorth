@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鳥取公路之旅 | 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* Custom Styles & Glassmorphism */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-bottom {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        /* Hide scrollbar for horizontal scroll but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Timeline styling */
+        .timeline-line {
+            position: absolute;
+            left: 1.25rem;
+            top: 2rem;
+            bottom: 0;
+            width: 2px;
+            background-color: #cbd5e1;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
+
+    <!-- Top Navigation (Sticky) -->
+    <nav class="fixed top-0 w-full z-50 glass shadow-sm transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo/Title -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="switchTab('dashboard')">
+                    <span class="text-2xl mr-2">🚗</span>
+                    <span class="font-bold text-lg tracking-tight text-slate-800 hidden sm:block">鳥取公路之旅</span>
+                    <span class="font-bold text-lg tracking-tight text-slate-800 sm:hidden">鳥取四日遊</span>
+                </div>
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-1">
+                    <button onclick="switchTab('dashboard')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-blue-600 bg-blue-50 transition-colors">📊 儀表盤</button>
+                    <button onclick="switchTab('itinerary')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-slate-100 transition-colors">📅 每日行程</button>
+                    <button onclick="switchTab('food')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-slate-100 transition-colors">🍱 美食地圖</button>
+                    <button onclick="switchTab('tools')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-slate-100 transition-colors">🧮 實用工具</button>
+                    <button onclick="switchTab('info')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-slate-100 transition-colors">ℹ️ 準備與資訊</button>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-slate-500 hover:text-slate-800 focus:outline-none p-2">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden glass border-t border-slate-200">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 shadow-inner">
+                <button onclick="switchTab('dashboard')" class="nav-btn-mobile block w-full text-left px-3 py-2 rounded-md text-base font-medium text-blue-600 bg-blue-50">📊 儀表盤</button>
+                <button onclick="switchTab('itinerary')" class="nav-btn-mobile block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">📅 每日行程</button>
+                <button onclick="switchTab('food')" class="nav-btn-mobile block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">🍱 美食地圖</button>
+                <button onclick="switchTab('tools')" class="nav-btn-mobile block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">🧮 實用工具</button>
+                <button onclick="switchTab('info')" class="nav-btn-mobile block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">ℹ️ 準備與資訊</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="pt-16 pb-24 min-h-screen">
+        
+        <!-- ================= VIEW 1: Dashboard ================= -->
+        <section id="view-dashboard" class="view-section block max-w-6xl mx-auto px-4 py-6 animate-fade-in">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg p-6 sm:p-10 text-white mb-8 relative overflow-hidden">
+                <div class="relative z-10">
+                    <h1 class="text-3xl sm:text-4xl font-extrabold mb-2">山陰海岸 ‧ 鳥取公路之旅</h1>
+                    <p class="text-blue-100 text-lg mb-4">2026 年 4 月 3 日 - 4 月 6 日 (4天3夜)</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">👩‍❤️‍👨 2 位成人</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">🚗 自駕遊 (Compact Car)</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">♨️ 海景溫泉</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">🦀 松葉蟹/黑牛</span>
+                    </div>
+                </div>
+                <!-- Decorative SVG -->
+                <svg class="absolute right-0 bottom-0 opacity-10 w-64 h-64 transform translate-x-10 translate-y-10" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.991.991 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88v9M12 4.15 6.04 7.5 12 10.85l5.96-3.35L12 4.15M5 15.91l6 3.38v-6.71L5 9.19v6.72m14 0v-6.72l-6 3.39v6.71l6-3.38Z"/></svg>
+            </div>
+
+            <!-- Weather & Highlights -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Weather -->
+                <div class="md:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">🌤️ 氣象預測 (米子/鳥取)</h3>
+                    <div class="flex justify-between items-center overflow-x-auto no-scrollbar gap-4">
+                        <div class="flex-1 min-w-[80px] text-center p-3 bg-slate-50 rounded-xl">
+                            <p class="text-xs text-slate-500 font-medium">4/3 (五)</p>
+                            <p class="text-2xl my-1">⛅</p>
+                            <p class="text-sm font-bold">18°<span class="text-slate-400 font-normal">/10°</span></p>
+                        </div>
+                        <div class="flex-1 min-w-[80px] text-center p-3 bg-slate-50 rounded-xl">
+                            <p class="text-xs text-slate-500 font-medium">4/4 (六)</p>
+                            <p class="text-2xl my-1">☀️</p>
+                            <p class="text-sm font-bold">20°<span class="text-slate-400 font-normal">/12°</span></p>
+                        </div>
+                        <div class="flex-1 min-w-[80px] text-center p-3 bg-slate-50 rounded-xl">
+                            <p class="text-xs text-slate-500 font-medium">4/5 (日)</p>
+                            <p class="text-2xl my-1">🌤️</p>
+                            <p class="text-sm font-bold">21°<span class="text-slate-400 font-normal">/13°</span></p>
+                        </div>
+                        <div class="flex-1 min-w-[80px] text-center p-3 bg-slate-50 rounded-xl">
+                            <p class="text-xs text-slate-500 font-medium">4/6 (一)</p>
+                            <p class="text-2xl my-1">☁️</p>
+                            <p class="text-sm font-bold">19°<span class="text-slate-400 font-normal">/11°</span></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Highlights -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">🌟 每日重點</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition" onclick="scrollToDayFromDashboard('day1')">
+                            <span class="w-6 text-center mr-2 bg-blue-100 text-blue-600 rounded text-xs font-bold py-0.5">D1</span> 抵達米子、浪漫溫泉之夜
+                        </li>
+                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition" onclick="scrollToDayFromDashboard('day2')">
+                            <span class="w-6 text-center mr-2 bg-blue-100 text-blue-600 rounded text-xs font-bold py-0.5">D2</span> 柯南小鎮、世界級沙雕
+                        </li>
+                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition" onclick="scrollToDayFromDashboard('day3')">
+                            <span class="w-6 text-center mr-2 bg-blue-100 text-blue-600 rounded text-xs font-bold py-0.5">D3</span> 足立美術館、妖怪世界
+                        </li>
+                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition" onclick="scrollToDayFromDashboard('day4')">
+                            <span class="w-6 text-center mr-2 bg-blue-100 text-blue-600 rounded text-xs font-bold py-0.5">D4</span> 悠閒早晨、滿載歸國
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Map & Chart Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Map -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">🗺️ 行程總覽地圖</h3>
+                    <div id="map" class="w-full h-64 sm:h-80 rounded-xl z-0 relative border border-slate-200"></div>
+                </div>
+                <!-- Chart -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">⏱️ 每日強度分析 (小時)</h3>
+                    <div class="relative w-full h-64 sm:h-80 flex-grow">
+                        <canvas id="intensityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 2: Daily Itinerary ================= -->
+        <section id="view-itinerary" class="view-section hidden max-w-4xl mx-auto px-4 py-6">
+            <div class="flex justify-between items-end mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">📅 每日行程細節</h2>
+                    <p class="text-slate-500 text-sm mt-1">垂直滑動檢視全行程</p>
+                </div>
+            </div>
+
+            <div id="itinerary-container" class="space-y-12">
+                <!-- Day content generated by JS -->
+            </div>
+        </section>
+
+        <!-- ================= VIEW 3: Food Map ================= -->
+        <section id="view-food" class="view-section hidden max-w-6xl mx-auto px-4 py-6">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">🍱 美食與餐廳推薦</h2>
+            
+            <!-- Filters -->
+            <div class="flex overflow-x-auto no-scrollbar gap-2 mb-6 pb-2" id="food-filters">
+                <button onclick="filterFood('全部')" class="food-filter-btn active whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-slate-800 text-white transition">全部</button>
+                <button onclick="filterFood('海鮮')" class="food-filter-btn whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">🦀 海鮮</button>
+                <button onclick="filterFood('肉類')" class="food-filter-btn whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">🥩 肉類 (大山黑牛)</button>
+                <button onclick="filterFood('咖啡廳/輕食')" class="food-filter-btn whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">☕ 咖啡廳/輕食</button>
+                <button onclick="filterFood('綜合')" class="food-filter-btn whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">🍜 綜合/小吃</button>
+            </div>
+
+            <!-- Food Grid -->
+            <div id="food-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Generated by JS -->
+            </div>
+        </section>
+
+        <!-- ================= VIEW 4: Tools ================= -->
+        <section id="view-tools" class="view-section hidden max-w-4xl mx-auto px-4 py-6">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">🧮 實用工具</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Currency Converter -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">💴 匯率換算器</h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-xs font-medium text-slate-500 mb-1">自訂匯率 (預設 0.21)</label>
+                        <input type="number" id="exchange-rate" value="0.21" step="0.001" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition" oninput="calculateCurrency()">
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="relative">
+                            <label class="block text-xs font-medium text-slate-500 mb-1">日幣 (JPY)</label>
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-200 bg-slate-50 text-slate-500 text-sm">¥</span>
+                                <input type="number" id="input-jpy" class="flex-1 block w-full rounded-none rounded-r-md border border-slate-200 px-3 py-2 text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="1000" oninput="calculateCurrency('jpy')">
+                            </div>
+                        </div>
+                        <div class="flex justify-center">
+                            <span class="text-slate-400">⇅</span>
+                        </div>
+                        <div class="relative">
+                            <label class="block text-xs font-medium text-slate-500 mb-1">台幣 (TWD)</label>
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-200 bg-slate-50 text-slate-500 text-sm">NT$</span>
+                                <input type="number" id="input-twd" class="flex-1 block w-full rounded-none rounded-r-md border border-slate-200 px-3 py-2 text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="210" oninput="calculateCurrency('twd')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expense Tracker -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">📝 簡易記帳本</h3>
+                    
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="expense-name" placeholder="項目 (如: 午餐)" class="flex-1 min-w-0 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="number" id="expense-amount" placeholder="日幣 ¥" class="w-24 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="addExpense()" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition">新增</button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto min-h-[150px] bg-slate-50 rounded-lg border border-slate-100 p-2 mb-4">
+                        <ul id="expense-list" class="space-y-2">
+                            <!-- Items go here -->
+                            <li class="text-center text-slate-400 text-sm py-4" id="empty-expense-msg">尚未新增任何項目</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-blue-50 p-4 rounded-xl mt-auto">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-medium text-blue-800">總花費 (JPY):</span>
+                            <span class="text-lg font-bold text-blue-900" id="total-jpy">¥ 0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-blue-600">約合台幣 (TWD):</span>
+                            <span class="text-sm font-semibold text-blue-700" id="total-twd">NT$ 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 5: Info & Prep ================= -->
+        <section id="view-info" class="view-section hidden max-w-4xl mx-auto px-4 py-6 space-y-8">
+            <h2 class="text-2xl font-bold text-slate-800">ℹ️ 準備與關鍵資訊</h2>
+
+            <!-- Flight Info -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="bg-slate-800 px-5 py-3 border-b border-slate-100">
+                    <h3 class="text-white font-medium flex items-center">✈️ 關鍵航班資訊</h3>
+                </div>
+                <div class="p-0 overflow-x-auto">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead class="bg-slate-50 text-slate-500">
+                            <tr>
+                                <th class="px-5 py-3 font-medium">日期</th>
+                                <th class="px-5 py-3 font-medium">行程</th>
+                                <th class="px-5 py-3 font-medium">航班編號 (點擊追蹤)</th>
+                                <th class="px-5 py-3 font-medium">時間</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td class="px-5 py-4">4/3 (五)</td>
+                                <td class="px-5 py-4">去程：桃園 (TPE) ➔ 米子 (YGJ)</td>
+                                <td class="px-5 py-4"><a href="https://zh-tw.flightaware.com/live/flight/IT288" target="_blank" class="text-blue-600 hover:underline font-medium">台灣虎航 IT288 🔍</a></td>
+                                <td class="px-5 py-4">13:15 - 16:50</td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-4">4/6 (一)</td>
+                                <td class="px-5 py-4">回程：米子 (YGJ) ➔ 桃園 (TPE)</td>
+                                <td class="px-5 py-4"><a href="https://zh-tw.flightaware.com/live/flight/IT289" target="_blank" class="text-blue-600 hover:underline font-medium">台灣虎航 IT289 🔍</a></td>
+                                <td class="px-5 py-4">13:00 - 15:05</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Accommodation -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="bg-slate-800 px-5 py-3 border-b border-slate-100">
+                    <h3 class="text-white font-medium flex items-center">🏨 住宿安排</h3>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div class="flex flex-col sm:flex-row gap-4 justify-between border-b border-slate-100 pb-4">
+                        <div>
+                            <p class="text-sm font-bold text-blue-600 mb-1">Day 1 ~ Day 3 (三晚)</p>
+                            <h4 class="text-lg font-bold text-slate-800">皆生溫泉 某海景旅館</h4>
+                            <p class="text-sm text-slate-500 mt-1">房型：海景和室 (附早晚餐/純住宿)</p>
+                        </div>
+                        <div class="text-left sm:text-right">
+                            <p class="text-sm text-slate-600 mb-2">Check-in 限制：通常為 15:00 - <span class="text-red-500 font-bold">18:00 (若含晚餐)</span></p>
+                            <a href="https://maps.google.com/?q=皆生溫泉" target="_blank" class="inline-flex items-center justify-center px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 transition">📍 Google Maps</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Car Rental -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="bg-slate-800 px-5 py-3 border-b border-slate-100">
+                    <h3 class="text-white font-medium flex items-center">🚗 租車資訊</h3>
+                </div>
+                <div class="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 rounded-xl p-4">
+                        <span class="block text-2xl mb-2">🚘</span>
+                        <p class="text-xs text-slate-500 font-medium">車型</p>
+                        <p class="text-sm font-bold text-slate-800">小型轎車 (Compact)</p>
+                        <p class="text-xs text-slate-500 mt-1">適合2人+2件大行李</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-4">
+                        <span class="block text-2xl mb-2">🛡️</span>
+                        <p class="text-xs text-slate-500 font-medium">保險</p>
+                        <p class="text-sm font-bold text-emerald-600">全險 (Zero Excess)</p>
+                        <p class="text-xs text-slate-500 mt-1">包含 NOC 安心方案</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-4">
+                        <span class="block text-2xl mb-2">⚠️</span>
+                        <p class="text-xs text-slate-500 font-medium">注意事項</p>
+                        <p class="text-sm font-bold text-slate-800">需備齊證件</p>
+                        <p class="text-xs text-slate-500 mt-1">護照 + 台灣駕照正本 + 日文譯本</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Luggage List -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="bg-slate-800 px-5 py-3 border-b border-slate-100">
+                    <h3 class="text-white font-medium flex items-center">🧳 智慧行李清單</h3>
+                </div>
+                <div class="p-2" id="luggage-accordion">
+                    <!-- JS generated accordions -->
+                </div>
+            </div>
+
+            <!-- Emergency Card -->
+            <div class="bg-red-50 border border-red-200 rounded-2xl p-5 mt-8">
+                <h3 class="text-red-700 font-bold flex items-center mb-3">🆘 緊急救援卡 (Emergency Info)</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-red-900 font-medium">報警 (Police): <span class="font-bold text-lg">110</span></p>
+                        <p class="text-red-900 font-medium">救護車/消防 (Ambulance/Fire): <span class="font-bold text-lg">119</span></p>
+                    </div>
+                    <div>
+                        <p class="text-slate-700">台北駐大阪經濟文化辦事處 (急難救助):</p>
+                        <p class="font-mono text-slate-800 font-bold">+81-90-8794-4568</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Bottom Control Panel (Sticky) -->
+    <div class="fixed bottom-0 w-full z-40 glass-bottom pb-safe">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center h-16">
+            <!-- Left: Toggle Mode -->
+            <div class="flex-shrink-0">
+                <button id="mode-toggle-btn" onclick="toggleDetailMode()" class="flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-600 text-white shadow-sm transition-all duration-300">
+                    <span class="mr-1" id="mode-icon">👁️</span> 
+                    <span id="mode-text" class="hidden sm:inline">詳細模式</span>
+                    <span class="sm:hidden">詳細</span>
+                </button>
+            </div>
+            
+            <!-- Right: Horizontal Day Scroll -->
+            <div class="flex-grow overflow-x-auto no-scrollbar ml-4 sm:ml-8 flex sm:justify-center items-center gap-2">
+                <button onclick="scrollToDayFromPanel('day1')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition">Day 1</button>
+                <button onclick="scrollToDayFromPanel('day2')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition">Day 2</button>
+                <button onclick="scrollToDayFromPanel('day3')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition">Day 3</button>
+                <button onclick="scrollToDayFromPanel('day4')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition">Day 4</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed right-4 bottom-20 sm:bottom-24 z-50 glass w-12 h-12 rounded-full flex items-center justify-center text-slate-600 shadow-md opacity-0 translate-y-4 transition-all duration-300 hover:scale-110 focus:outline-none pointer-events-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- State Management ---
+        let currentView = 'dashboard';
+        let detailMode = true; // true = detailed, false = compact
+        let mapInstance = null;
+        let mapMarkers = [];
+        
+        // --- Data ---
+        const itineraryData = [
+            {
+                id: 'day1',
+                title: 'Day 1 (4/3 五)：抵達米子，浪漫海景溫泉之夜',
+                events: [
+                    { time: '16:50', title: '抵達米子機場 (YGJ)', emoji: '🛬', tag: '機場', stay: '40m', move: '租車取車，準備出發！', 
+                      details: '辦理入境手續，直接在機場的租車櫃檯取車，開始兩人專屬的公路之旅。',
+                      tips: '確認駕照正本與譯本是否帶齊。', map: 'https://maps.google.com/?q=米子鬼太郎機場' },
+                    { time: '18:00', title: '皆生溫泉 Check-in', emoji: '♨️', tag: '住宿', stay: '1h', move: '機場開車約 20 分鐘。', 
+                      details: '抵達海景溫泉區，辦理入住手續並放置行李。',
+                      tips: '若有預訂晚餐，請務必準時。', map: 'https://maps.google.com/?q=皆生溫泉' },
+                    { time: '19:00', title: '享用在地美食與泡湯', emoji: '🦀', tag: '晚餐', stay: '2h', move: '步行或開車', 
+                      details: '第一晚建議直接預訂溫泉旅館內精緻的「會席料理」，或是到溫泉街/米子市區找間居酒屋，品嚐鳥取特產「大山黑牛」燒肉或新鮮海鮮。',
+                      tips: '舉杯慶祝連假旅行的開始！', map: 'https://maps.google.com/?q=皆生溫泉+餐廳' },
+                    { time: '21:00', title: '抵達住宿', emoji: '🏠', tag: '休息', stay: '-', move: '-', 
+                      details: '回房休息，享受浪漫海景溫泉。',
+                      tips: '', map: '' }
+                ]
+            },
+            {
+                id: 'day2',
+                title: 'Day 2 (4/4 六)：名偵探柯南與世界級沙雕',
+                events: [
+                    { time: '09:30', title: '悠閒出發', emoji: '🚗', tag: '出發', stay: '-', move: '約 1 小時車程', 
+                      details: '沿著山陰海岸往東行，欣賞平穩開闊的風景。',
+                      tips: '今日室內展館多，不怕日曬雨淋。', map: '' },
+                    { time: '10:30', title: '青山剛昌故鄉館 (柯南博物館)', emoji: '🕵️', tag: '景點', stay: '2h', move: '車程 3 分鐘至午餐', 
+                      details: '進入柯南的世界！館內有豐富的手稿、多國語言漫畫牆，還有用蝴蝶結變聲器變聲等互動體驗。',
+                      tips: '兩人一起逛展解謎充滿樂趣。', map: 'https://maps.google.com/?q=青山剛昌故鄉館' },
+                    { time: '12:30', title: '柯南之家 米花商店街', emoji: '🍝', tag: '午餐', stay: '1.5h', move: '往東開約 30 分鐘', 
+                      details: '到「白羅咖啡廳」吃份經典的拿坡里義大利麵，順便在「新一與小蘭的家」門口按門鈴聽驚喜語音。',
+                      tips: '適合拍照打卡。', map: 'https://maps.google.com/?q=柯南之家+米花商店街' },
+                    { time: '14:00', title: '白兔神社', emoji: '🐇', tag: '景點', stay: '1h', move: '再往東開約 20 分鐘', 
+                      details: '日本最強的結緣與戀愛神社之一！買個超可愛的白兔御守當作情侶紀念，感受神話浪漫氛圍。',
+                      tips: '下車走一小段平緩的參道。', map: 'https://maps.google.com/?q=白兔神社' },
+                    { time: '15:30', title: '砂之美術館', emoji: '🗿', tag: '景點', stay: '1.5h', move: '車程 15 分鐘', 
+                      details: '世界唯一展示沙雕藝術的室內美術館。看完後走到館外的觀景台，就能輕鬆眺望鳥取沙丘全景，完全不需要踩沙健行！',
+                      tips: '室內極度細緻壯觀的沙雕藝術。', map: 'https://maps.google.com/?q=砂之美術館' },
+                    { time: '17:30', title: '賀露港海鮮市場 或 鳥取市區', emoji: '🍣', tag: '晚餐', stay: '1.5h', move: '車程約 1.5 小時回米子', 
+                      details: '在室內海鮮市場挑選新鮮的松葉蟹或生魚片飽餐一頓。',
+                      tips: '市場營業時間需確認，晚餐可能需移至市區。', map: 'https://maps.google.com/?q=賀露港海鮮市場' },
+                    { time: '19:00', title: '抵達住宿', emoji: '🏠', tag: '休息', stay: '-', move: '-', 
+                      details: '行駛山陰自動車道返回皆生溫泉，泡湯休息。',
+                      tips: '夜間駕駛請注意安全。', map: '' }
+                ]
+            },
+            {
+                id: 'day3',
+                title: 'Day 3 (4/5 日)：如畫庭園與妖怪奇幻世界',
+                events: [
+                    { time: '09:30', title: '足立美術館', emoji: '🖼️', tag: '景點', stay: '2.5h', move: '開車約 40 分鐘前往境港', 
+                      details: '連續 20 多年被評為「日本第一」的日式庭園，最棒的體驗方式就是「待在室內透過大片玻璃窗欣賞」。',
+                      tips: '坐在館內咖啡廳面對庭園喝杯浪漫下午茶。', map: 'https://maps.google.com/?q=足立美術館' },
+                    { time: '12:30', title: '境港水產物直賣中心', emoji: '🦀', tag: '午餐', stay: '1.5h', move: '車程約 10 分鐘', 
+                      details: '紅楚蟹的大本營，可以在市場內找間小店品嚐 CP 值極高的螃蟹料理或新鮮握壽司。',
+                      tips: '海鮮控必排行程。', map: 'https://maps.google.com/?q=境港水產物直賣中心' },
+                    { time: '14:00', title: '水木茂紀念館', emoji: '👁️', tag: '景點', stay: '2h', move: '車程約 25 分鐘', 
+                      details: '全新翻修開幕的妖怪博物館，運用豐富光影與精緻模型打造沉浸感。',
+                      tips: '逛完後在平坦寬敞的「水木茂大道」散步，買眼球老爹和菓子。', map: 'https://maps.google.com/?q=水木茂紀念館' },
+                    { time: '16:30', title: 'AEON Mall 日吉津店', emoji: '🛍️', tag: '購物', stay: '2h', move: '步行或短程駕駛', 
+                      details: '西日本最大級別的永旺夢樂城。免稅藥妝、超市零食、服飾品牌一次買齊！',
+                      tips: '室內空間寬敞，不用東奔西跑。', map: 'https://maps.google.com/?q=AEON+Mall+日吉津店' },
+                    { time: '18:30', title: 'AEON Mall 內晚餐', emoji: '🍜', tag: '晚餐', stay: '1.5h', move: '車程約 10 分鐘', 
+                      details: '直接在商場內的餐廳街挑選喜歡的料理（壽司、豬排、拉麵等多樣選擇）。',
+                      tips: '吃飽再回飯店。', map: 'https://maps.google.com/?q=AEON+Mall+日吉津店+餐廳' },
+                    { time: '20:00', title: '抵達住宿', emoji: '🏠', tag: '休息', stay: '-', move: '-', 
+                      details: '整理戰利品，最後一晚享受溫泉。',
+                      tips: '', map: '' }
+                ]
+            },
+            {
+                id: 'day4',
+                title: 'Day 4 (4/6 一)：悠閒早晨，準備返程',
+                events: [
+                    { time: '09:00', title: '悠閒早餐與最後時光', emoji: '☕', tag: '早餐', stay: '1.5h', move: '車程約 20 分鐘', 
+                      details: '睡到自然醒，在飯店享用早餐，或找間昭和風情的復古喫茶店喝杯咖啡。',
+                      tips: '保留彈性與從容。', map: '' },
+                    { time: '10:30', title: '出發前往米子機場', emoji: '🚗', tag: '交通', stay: '30m', move: '-', 
+                      details: '驅車前往機場。',
+                      tips: '還車前記得加滿油。', map: '' },
+                    { time: '11:00', title: '機場還車 & 報到', emoji: '🛂', tag: '機場', stay: '2h', move: '-', 
+                      details: '完成租車歸還手續，前往航廈報到。米子機場二樓有免稅店可做最後衝刺。',
+                      tips: '確認行李重量。', map: 'https://maps.google.com/?q=米子鬼太郎機場' },
+                    { time: '13:00', title: '台灣虎航起飛', emoji: '🛫', tag: '航班', stay: '-', move: '-', 
+                      details: '帶著滿滿的戰利品與浪漫回憶返回台灣。',
+                      tips: '預計 15:05 抵達桃園機場。', map: '' },
+                    { time: '15:05', title: '抵達住宿', emoji: '🏠', tag: '溫暖的家', stay: '-', move: '-', 
+                      details: '平安抵達台灣，期待下次旅程！',
+                      tips: '', map: '' }
+                ]
+            }
+        ];
+
+        const foodData = [
+            { name: '大山黑牛處 強小亭', tag: '肉類', location: '米子市', desc: '頂級大山黑牛燒肉，入口即化，預約制。', map: 'https://maps.google.com/?q=大山黑牛處+強小亭' },
+            { name: '皆生溫泉 居酒屋街', tag: '綜合', location: '皆生溫泉', desc: '泡湯後的放鬆好去處，海鮮與串燒。', map: 'https://maps.google.com/?q=皆生溫泉+居酒屋' },
+            { name: '白羅咖啡廳 (米花商店街)', tag: '咖啡廳/輕食', location: '北榮町', desc: '柯南迷必訪，拿坡里義大利麵。', map: 'https://maps.google.com/?q=白羅咖啡廳+鳥取' },
+            { name: '賀露港 漁師食堂', tag: '海鮮', location: '鳥取市', desc: '超浮誇海鮮丼，松葉蟹季節必吃。', map: 'https://maps.google.com/?q=賀露港+海鮮食堂' },
+            { name: '境港 螃蟹小屋', tag: '海鮮', location: '境港市', desc: '紅楚蟹吃到飽或高CP值單點。', map: 'https://maps.google.com/?q=境港水產物直賣中心' },
+            { name: '妖怪和菓子店', tag: '綜合', location: '水木茂大道', desc: '眼球老爹造型的可愛甜點，適合拍照。', map: 'https://maps.google.com/?q=水木茂大道+妖怪和菓子' },
+        ];
+
+        const luggageData = [
+            { category: '📄 證件與票券', items: ['護照 (期效大於6個月)', '台灣駕照正本', '日文譯本 (監理所申請)', '電子機票憑證', 'VJW (Visit Japan Web) 截圖', '日幣現金 & 信用卡 (JCB佳)'] },
+            { category: '👕 衣物 (春季 10-21度)', items: ['洋蔥式穿搭衣物', '輕薄防風外套', '好走的平底鞋/運動鞋', '睡衣/輕便衣物 (若不習慣浴衣)', '貼身衣物 & 襪子'] },
+            { category: '🔌 電子產品', items: ['手機 & 備用手機', '行動電源 & 充電線', '萬國轉接頭 (日本多為兩孔無接地)', '相機/記憶卡/備用電池'] },
+            { category: '💊 個人藥品/保養', items: ['個人常備藥', '腸胃藥/感冒藥', '保濕乳液/護唇膏 (氣候較乾)', '防曬乳', '隱形眼鏡/藥水'] },
+            { category: '🚗 自駕必備', items: ['車用手機支架 (導航用)', '太陽眼鏡 (防逆光)', '車上零食/提神口香糖', '隨身小垃圾袋'] }
+        ];
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderItinerary();
+            renderFoodGrid('全部');
+            renderLuggage();
+            
+            // Mobile Menu Toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.toggle('hidden');
+            });
+
+            // Map & Chart need to wait for a tick if visible, but initially we render in dashboard
+            setTimeout(() => {
+                initMap();
+                initChart();
+            }, 100);
+        });
+
+        // --- Tab Switching Logic ---
+        function switchTab(viewId) {
+            currentView = viewId;
+            // Hide all
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            // Show target
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            document.getElementById(`view-${viewId}`).classList.add('block');
+            
+            // Update Nav visual
+            document.querySelectorAll('.nav-btn, .nav-btn-mobile').forEach(btn => {
+                btn.classList.remove('text-blue-600', 'bg-blue-50');
+                btn.classList.add('text-slate-600');
+            });
+
+            // Auto close mobile menu
+            document.getElementById('mobile-menu').classList.add('hidden');
+            
+            // Scroll to top
+            window.scrollTo({top: 0, behavior: 'smooth'});
+
+            // Fix map size bug if map is loaded while hidden
+            if(viewId === 'dashboard' && mapInstance) {
+                setTimeout(() => mapInstance.invalidateSize(), 100);
+            }
+        }
+
+        function scrollToDayFromPanel(dayId) {
+            if(currentView !== 'itinerary') {
+                switchTab('itinerary');
+            }
+            setTimeout(() => {
+                const el = document.getElementById(dayId);
+                if(el) {
+                    const y = el.getBoundingClientRect().top + window.scrollY - 80; // offset for sticky nav
+                    window.scrollTo({top: y, behavior: 'smooth'});
+                }
+            }, 50);
+        }
+
+        function scrollToDayFromDashboard(dayId) {
+            scrollToDayFromPanel(dayId);
+        }
+
+        // --- Back to Top Button Logic ---
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('back-to-top');
+            if (window.scrollY > 300) {
+                btn.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                btn.classList.add('opacity-100', 'translate-y-0');
+            } else {
+                btn.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                btn.classList.remove('opacity-100', 'translate-y-0');
+            }
+        });
+
+        // --- Render Itinerary ---
+        function renderItinerary() {
+            const container = document.getElementById('itinerary-container');
+            let html = '';
+
+            itineraryData.forEach((day, dayIndex) => {
+                html += `<div id="${day.id}" class="scroll-mt-24">`;
+                html += `<h3 class="text-xl font-bold text-blue-700 bg-blue-50 py-3 px-4 rounded-xl mb-6 shadow-sm border border-blue-100">${day.title}</h3>`;
+                html += `<div class="relative">`;
+                // Timeline vertical line
+                html += `<div class="timeline-line"></div>`;
+
+                day.events.forEach((ev, idx) => {
+                    const isLast = idx === day.events.length - 1;
+                    
+                    html += `
+                    <div class="relative flex items-start mb-8 group">
+                        <!-- Dot -->
+                        <div class="absolute left-[1.25rem] top-1.5 w-3 h-3 rounded-full ${isLast ? 'bg-indigo-500 ring-4 ring-indigo-100' : 'bg-blue-500 ring-4 ring-white'} -translate-x-1.5 z-10"></div>
+                        
+                        <!-- Time Column -->
+                        <div class="w-16 sm:w-24 pt-0.5 text-right pr-4 flex-shrink-0">
+                            <span class="text-sm font-bold text-slate-700 block">${ev.time}</span>
+                            ${ev.stay !== '-' ? `<span class="text-xs text-slate-400 font-medium block mt-1">⏳ ${ev.stay}</span>` : ''}
+                        </div>
+                        
+                        <!-- Content Column -->
+                        <div class="flex-grow bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition p-4 sm:p-5 -mt-2">
+                            <div class="flex flex-wrap items-center justify-between mb-2 gap-2">
+                                <h4 class="text-base sm:text-lg font-bold text-slate-800 flex items-center">
+                                    <span class="text-xl mr-2">${ev.emoji}</span> ${ev.title}
+                                </h4>
+                                <span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-md font-medium">${ev.tag}</span>
+                            </div>
+                            
+                            ${ev.move !== '-' ? `<div class="text-sm text-slate-500 mb-3 flex items-center"><span class="mr-1">🚀</span> 建議出發/交通: ${ev.move}</div>` : ''}
+                            
+                            <!-- Detailed Mode Blocks -->
+                            <div class="detail-box ${detailMode ? '' : 'hidden'} space-y-3 mt-4">
+                                ${ev.details ? `
+                                <div class="bg-blue-50/50 border-l-4 border-blue-400 p-3 rounded-r-lg">
+                                    <p class="text-sm text-slate-700 font-medium">詳細路線</p>
+                                    <p class="text-sm text-slate-600 mt-1 leading-relaxed">${ev.details}</p>
+                                </div>` : ''}
+                                
+                                ${ev.tips ? `
+                                <div class="bg-amber-50/50 border-l-4 border-amber-400 p-3 rounded-r-lg flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm text-amber-800 font-medium">Tips / 注意事項</p>
+                                        <p class="text-sm text-amber-700 mt-1 leading-relaxed">${ev.tips}</p>
+                                    </div>
+                                    ${ev.map ? `<a href="${ev.map}" target="_blank" class="flex-shrink-0 ml-3 bg-white border border-slate-200 shadow-sm text-slate-600 px-3 py-1.5 rounded hover:bg-slate-50 text-xs font-bold transition flex items-center">📍 導航</a>` : ''}
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Toggle Detail Mode
+        function toggleDetailMode() {
+            detailMode = !detailMode;
+            
+            // Update button visual
+            const btn = document.getElementById('mode-toggle-btn');
+            const icon = document.getElementById('mode-icon');
+            const text = document.getElementById('mode-text');
+            
+            if(detailMode) {
+                btn.className = "flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-600 text-white shadow-sm transition-all duration-300";
+                icon.innerText = "👁️";
+                text.innerText = "詳細模式";
+            } else {
+                btn.className = "flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-slate-200 text-slate-600 border border-slate-300 shadow-sm transition-all duration-300";
+                icon.innerText = "👁️‍🗨️";
+                text.innerText = "簡潔模式";
+            }
+
+            // Toggle classes on elements
+            document.querySelectorAll('.detail-box').forEach(el => {
+                if(detailMode) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- Leaflet Map ---
+        function initMap() {
+            if(mapInstance) return;
+
+            // Centered roughly on Yonago
+            mapInstance = L.map('map').setView([35.45, 133.5], 9);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18,
+            }).addTo(mapInstance);
+
+            const locations = [
+                { name: "米子機場", coords: [35.493, 133.236], day: "day1" },
+                { name: "皆生溫泉", coords: [35.458, 133.359], day: "day1" },
+                { name: "青山剛昌故鄉館", coords: [35.495, 133.722], day: "day2" },
+                { name: "砂之美術館/沙丘", coords: [35.540, 134.228], day: "day2" },
+                { name: "足立美術館", coords: [35.378, 133.198], day: "day3" },
+                { name: "水木茂紀念館", coords: [35.544, 133.230], day: "day3" }
+            ];
+
+            // Custom icon using Emoji
+            const createCustomIcon = (emoji) => {
+                return L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background-color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 16px;">${emoji}</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+            };
+
+            locations.forEach(loc => {
+                const marker = L.marker(loc.coords, {icon: createCustomIcon('📍')}).addTo(mapInstance);
+                marker.bindPopup(`
+                    <div class="text-center font-sans">
+                        <strong class="block mb-1 text-slate-800">${loc.name}</strong>
+                        <button onclick="scrollToDayFromDashboard('${loc.day}')" class="bg-blue-600 text-white px-2 py-1 rounded text-xs mt-1 hover:bg-blue-700 transition">查看行程</button>
+                    </div>
+                `);
+            });
+        }
+
+        // --- Chart.js ---
+        function initChart() {
+            const ctx = document.getElementById('intensityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4'],
+                    datasets: [
+                        {
+                            label: '🚗 車程 (小時)',
+                            data: [0.5, 3.0, 1.5, 0.5],
+                            backgroundColor: 'rgba(99, 102, 241, 0.8)', // Indigo
+                            borderRadius: 4
+                        },
+                        {
+                            label: '🎡 遊玩/停留 (小時)',
+                            data: [3.0, 6.0, 6.0, 3.5],
+                            backgroundColor: 'rgba(56, 189, 248, 0.8)', // Sky
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true },
+                        y: { stacked: true, beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'sans-serif' } } }
+                    }
+                }
+            });
+        }
+
+        // --- Food Map ---
+        function renderFoodGrid(filter) {
+            const grid = document.getElementById('food-grid');
+            grid.innerHTML = '';
+
+            const filtered = filter === '全部' ? foodData : foodData.filter(f => f.tag === filter);
+
+            filtered.forEach(f => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition group">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">${f.tag}</span>
+                            <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full flex items-center">📍 ${f.location}</span>
+                        </div>
+                        <h4 class="font-bold text-lg text-slate-800 mb-2">${f.name}</h4>
+                        <p class="text-sm text-slate-600 mb-4 h-10 overflow-hidden">${f.desc}</p>
+                        <a href="${f.map}" target="_blank" class="block text-center w-full bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 py-2 rounded-lg text-sm font-medium transition">Google Maps 導航</a>
+                    </div>
+                `;
+            });
+
+            // Update active button state
+            document.querySelectorAll('.food-filter-btn').forEach(btn => {
+                if(btn.innerText.includes(filter)) {
+                    btn.classList.replace('bg-white', 'bg-slate-800');
+                    btn.classList.replace('text-slate-600', 'text-white');
+                } else {
+                    btn.classList.replace('bg-slate-800', 'bg-white');
+                    btn.classList.replace('text-white', 'text-slate-600');
+                }
+            });
+        }
+        function filterFood(tag) { renderFoodGrid(tag); }
+
+        // --- Tools: Currency ---
+        function calculateCurrency(source = 'jpy') {
+            const rate = parseFloat(document.getElementById('exchange-rate').value) || 0;
+            const jpyInput = document.getElementById('input-jpy');
+            const twdInput = document.getElementById('input-twd');
+
+            if (source === 'jpy') {
+                const jpy = parseFloat(jpyInput.value);
+                if (!isNaN(jpy)) twdInput.value = Math.round(jpy * rate);
+                else twdInput.value = '';
+            } else if (source === 'twd') {
+                const twd = parseFloat(twdInput.value);
+                if (!isNaN(twd) && rate > 0) jpyInput.value = Math.round(twd / rate);
+                else jpyInput.value = '';
+            }
+        }
+
+        // --- Tools: Expense Tracker ---
+        let expenses = [];
+        function addExpense() {
+            const nameInput = document.getElementById('expense-name');
+            const amtInput = document.getElementById('expense-amount');
+            const name = nameInput.value.trim();
+            const amt = parseInt(amtInput.value);
+
+            if (name && !isNaN(amt) && amt > 0) {
+                expenses.push({ id: Date.now(), name, amount: amt });
+                nameInput.value = '';
+                amtInput.value = '';
+                renderExpenses();
+            }
+        }
+        function deleteExpense(id) {
+            expenses = expenses.filter(e => e.id !== id);
+            renderExpenses();
+        }
+        function renderExpenses() {
+            const list = document.getElementById('expense-list');
+            const msg = document.getElementById('empty-expense-msg');
+            let html = '';
+            let totalJpy = 0;
+
+            if (expenses.length === 0) {
+                msg.style.display = 'block';
+            } else {
+                msg.style.display = 'none';
+                expenses.forEach(e => {
+                    totalJpy += e.amount;
+                    html += `
+                        <li class="flex justify-between items-center bg-white p-2 rounded border border-slate-100 shadow-sm">
+                            <span class="text-sm font-medium text-slate-700">${e.name}</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm text-slate-600">¥ ${e.amount.toLocaleString()}</span>
+                                <button onclick="deleteExpense(${e.id})" class="text-red-400 hover:text-red-600 focus:outline-none">✖</button>
+                            </div>
+                        </li>
+                    `;
+                });
+            }
+            list.innerHTML = html || `<li class="text-center text-slate-400 text-sm py-4" id="empty-expense-msg">尚未新增任何項目</li>`;
+            
+            // Update Totals
+            const rate = parseFloat(document.getElementById('exchange-rate').value) || 0.21;
+            document.getElementById('total-jpy').innerText = `¥ ${totalJpy.toLocaleString()}`;
+            document.getElementById('total-twd').innerText = `NT$ ${Math.round(totalJpy * rate).toLocaleString()}`;
+        }
+
+        // --- Info: Luggage Accordion ---
+        function renderLuggage() {
+            const container = document.getElementById('luggage-accordion');
+            let html = '';
+            
+            luggageData.forEach((cat, idx) => {
+                html += `
+                    <div class="border-b border-slate-100 last:border-0">
+                        <button onclick="toggleAccordion('acc-${idx}')" class="w-full flex justify-between items-center py-4 px-2 hover:bg-slate-50 transition focus:outline-none">
+                            <span class="font-bold text-slate-700">${cat.category}</span>
+                            <svg id="icon-acc-${idx}" class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div id="content-acc-${idx}" class="hidden px-4 pb-4">
+                            <div class="space-y-2">
+                                ${cat.items.map((item, i) => `
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 transition duration-150 ease-in-out">
+                                        <span class="text-slate-600 text-sm">${item}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function toggleAccordion(id) {
+            const content = document.getElementById(`content-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+    </script>
+</body>
+</html>
