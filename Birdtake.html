@@ -2,7 +2,7 @@
 <html lang="zh-TW" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>鳥取公路之旅 | 2026</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,16 +31,8 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Timeline styling */
-        .timeline-line {
-            position: absolute;
-            left: 1.25rem;
-            top: 2rem;
-            bottom: 0;
-            width: 2px;
-            background-color: #cbd5e1;
-            z-index: 0;
-        }
+        /* Safe Area Padding for modern phones */
+        .pb-safe { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
@@ -74,13 +66,13 @@
             </div>
         </div>
         <!-- Mobile Menu (Hidden by default) -->
-        <div id="mobile-menu" class="hidden md:hidden glass border-t border-slate-200">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 shadow-inner">
-                <button onclick="switchTab('dashboard')" class="nav-btn-mobile block w-full text-left px-3 py-2 rounded-md text-base font-medium text-blue-600 bg-blue-50">📊 儀表盤</button>
-                <button onclick="switchTab('itinerary')" class="nav-btn-mobile block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">📅 每日行程</button>
-                <button onclick="switchTab('food')" class="nav-btn-mobile block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">🍱 美食地圖</button>
-                <button onclick="switchTab('tools')" class="nav-btn-mobile block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">🧮 實用工具</button>
-                <button onclick="switchTab('info')" class="nav-btn-mobile block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">ℹ️ 準備與資訊</button>
+        <div id="mobile-menu" class="hidden md:hidden glass border-t border-slate-200 absolute w-full z-40">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 shadow-md bg-white/95 backdrop-blur-md">
+                <button onclick="switchTab('dashboard')" class="nav-btn-mobile block w-full text-left px-3 py-3 rounded-md text-base font-medium text-blue-600 bg-blue-50">📊 儀表盤</button>
+                <button onclick="switchTab('itinerary')" class="nav-btn-mobile block w-full text-left px-3 py-3 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">📅 每日行程</button>
+                <button onclick="switchTab('food')" class="nav-btn-mobile block w-full text-left px-3 py-3 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">🍱 美食地圖</button>
+                <button onclick="switchTab('tools')" class="nav-btn-mobile block w-full text-left px-3 py-3 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">🧮 實用工具</button>
+                <button onclick="switchTab('info')" class="nav-btn-mobile block w-full text-left px-3 py-3 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">ℹ️ 準備與資訊</button>
             </div>
         </div>
     </nav>
@@ -96,10 +88,10 @@
                     <h1 class="text-3xl sm:text-4xl font-extrabold mb-2">山陰海岸 ‧ 鳥取公路之旅</h1>
                     <p class="text-blue-100 text-lg mb-4">2026 年 4 月 3 日 - 4 月 6 日 (4天3夜)</p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">👩‍❤️‍👨 2 位成人</span>
-                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">🚗 自駕遊 (Compact Car)</span>
-                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">♨️ 海景溫泉</span>
-                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">🦀 松葉蟹/黑牛</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-xs sm:text-sm font-medium backdrop-blur-sm">👩‍❤️‍👨 2 位成人</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-xs sm:text-sm font-medium backdrop-blur-sm">🚗 自駕遊 (Compact)</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-xs sm:text-sm font-medium backdrop-blur-sm">♨️ 海景溫泉</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-xs sm:text-sm font-medium backdrop-blur-sm">🦀 松葉蟹/黑牛</span>
                     </div>
                 </div>
                 <!-- Decorative SVG -->
@@ -111,7 +103,7 @@
                 <!-- Weather -->
                 <div class="md:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
                     <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">🌤️ 氣象預測 (米子/鳥取)</h3>
-                    <div class="flex justify-between items-center overflow-x-auto no-scrollbar gap-4">
+                    <div class="flex justify-between items-center overflow-x-auto no-scrollbar gap-4 pb-2">
                         <div class="flex-1 min-w-[80px] text-center p-3 bg-slate-50 rounded-xl">
                             <p class="text-xs text-slate-500 font-medium">4/3 (五)</p>
                             <p class="text-2xl my-1">⛅</p>
@@ -138,17 +130,17 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
                     <h3 class="text-lg font-bold text-slate-800 mb-4">🌟 每日重點</h3>
                     <ul class="space-y-3">
-                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition" onclick="scrollToDayFromDashboard('day1')">
-                            <span class="w-6 text-center mr-2 bg-blue-100 text-blue-600 rounded text-xs font-bold py-0.5">D1</span> 抵達米子、浪漫溫泉之夜
+                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-2 -ml-2 rounded transition" onclick="scrollToDayFromDashboard('day1')">
+                            <span class="w-7 text-center mr-3 bg-blue-100 text-blue-600 rounded text-xs font-bold py-1 flex-shrink-0">D1</span> 抵達米子、浪漫溫泉之夜
                         </li>
-                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition" onclick="scrollToDayFromDashboard('day2')">
-                            <span class="w-6 text-center mr-2 bg-blue-100 text-blue-600 rounded text-xs font-bold py-0.5">D2</span> 柯南、砂丘纜車與浦富海岸
+                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-2 -ml-2 rounded transition" onclick="scrollToDayFromDashboard('day2')">
+                            <span class="w-7 text-center mr-3 bg-blue-100 text-blue-600 rounded text-xs font-bold py-1 flex-shrink-0">D2</span> 柯南、砂丘纜車與浦富海岸
                         </li>
-                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition" onclick="scrollToDayFromDashboard('day3')">
-                            <span class="w-6 text-center mr-2 bg-blue-100 text-blue-600 rounded text-xs font-bold py-0.5">D3</span> 倉吉老街、梨香與大山牧場
+                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-2 -ml-2 rounded transition" onclick="scrollToDayFromDashboard('day3')">
+                            <span class="w-7 text-center mr-3 bg-blue-100 text-blue-600 rounded text-xs font-bold py-1 flex-shrink-0">D3</span> 倉吉老街、梨香與大山牧場
                         </li>
-                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition" onclick="scrollToDayFromDashboard('day4')">
-                            <span class="w-6 text-center mr-2 bg-blue-100 text-blue-600 rounded text-xs font-bold py-0.5">D4</span> 悠閒早晨、滿載歸國
+                        <li class="flex items-center text-sm cursor-pointer hover:bg-slate-50 p-2 -ml-2 rounded transition" onclick="scrollToDayFromDashboard('day4')">
+                            <span class="w-7 text-center mr-3 bg-blue-100 text-blue-600 rounded text-xs font-bold py-1 flex-shrink-0">D4</span> 悠閒早晨、滿載歸國
                         </li>
                     </ul>
                 </div>
@@ -180,7 +172,7 @@
                 </div>
             </div>
 
-            <div id="itinerary-container" class="space-y-12">
+            <div id="itinerary-container" class="space-y-4">
                 <!-- Day content generated by JS -->
             </div>
         </section>
@@ -199,7 +191,7 @@
             </div>
 
             <!-- Food Grid -->
-            <div id="food-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div id="food-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                 <!-- Generated by JS -->
             </div>
         </section>
@@ -210,12 +202,12 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Currency Converter -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-6">
                     <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">💴 匯率換算器</h3>
                     
                     <div class="mb-4">
                         <label class="block text-xs font-medium text-slate-500 mb-1">自訂匯率 (預設 0.21)</label>
-                        <input type="number" id="exchange-rate" value="0.21" step="0.001" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition" oninput="calculateCurrency()">
+                        <input type="number" id="exchange-rate" value="0.21" step="0.001" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition" oninput="calculateCurrency()">
                     </div>
 
                     <div class="space-y-4">
@@ -223,7 +215,7 @@
                             <label class="block text-xs font-medium text-slate-500 mb-1">日幣 (JPY)</label>
                             <div class="flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-200 bg-slate-50 text-slate-500 text-sm">¥</span>
-                                <input type="number" id="input-jpy" class="flex-1 block w-full rounded-none rounded-r-md border border-slate-200 px-3 py-2 text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="1000" oninput="calculateCurrency('jpy')">
+                                <input type="number" id="input-jpy" class="flex-1 block w-full rounded-none rounded-r-md border border-slate-200 px-3 py-2 text-base sm:text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="1000" oninput="calculateCurrency('jpy')">
                             </div>
                         </div>
                         <div class="flex justify-center">
@@ -233,19 +225,19 @@
                             <label class="block text-xs font-medium text-slate-500 mb-1">台幣 (TWD)</label>
                             <div class="flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-200 bg-slate-50 text-slate-500 text-sm">NT$</span>
-                                <input type="number" id="input-twd" class="flex-1 block w-full rounded-none rounded-r-md border border-slate-200 px-3 py-2 text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="210" oninput="calculateCurrency('twd')">
+                                <input type="number" id="input-twd" class="flex-1 block w-full rounded-none rounded-r-md border border-slate-200 px-3 py-2 text-base sm:text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="210" oninput="calculateCurrency('twd')">
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Expense Tracker -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-6 flex flex-col">
                     <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">📝 簡易記帳本</h3>
                     
                     <div class="flex gap-2 mb-4">
-                        <input type="text" id="expense-name" placeholder="項目 (如: 午餐)" class="flex-1 min-w-0 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <input type="number" id="expense-amount" placeholder="日幣 ¥" class="w-24 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="expense-name" placeholder="項目 (如: 午餐)" class="flex-1 min-w-0 border border-slate-200 rounded-lg px-3 py-2 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="number" id="expense-amount" placeholder="日幣 ¥" class="w-24 sm:w-28 border border-slate-200 rounded-lg px-3 py-2 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <button onclick="addExpense()" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition">新增</button>
                     </div>
 
@@ -271,36 +263,36 @@
         </section>
 
         <!-- ================= VIEW 5: Info & Prep ================= -->
-        <section id="view-info" class="view-section hidden max-w-4xl mx-auto px-4 py-6 space-y-8">
+        <section id="view-info" class="view-section hidden max-w-4xl mx-auto px-4 py-6 space-y-6 sm:space-y-8">
             <h2 class="text-2xl font-bold text-slate-800">ℹ️ 準備與關鍵資訊</h2>
 
             <!-- Flight Info -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="bg-slate-800 px-5 py-3 border-b border-slate-100">
-                    <h3 class="text-white font-medium flex items-center">✈️ 關鍵航班資訊</h3>
+                <div class="bg-slate-800 px-4 sm:px-5 py-3 border-b border-slate-100">
+                    <h3 class="text-white font-medium flex items-center text-sm sm:text-base">✈️ 關鍵航班資訊</h3>
                 </div>
                 <div class="p-0 overflow-x-auto">
                     <table class="w-full text-left text-sm whitespace-nowrap">
                         <thead class="bg-slate-50 text-slate-500">
                             <tr>
-                                <th class="px-5 py-3 font-medium">日期</th>
-                                <th class="px-5 py-3 font-medium">行程</th>
-                                <th class="px-5 py-3 font-medium">航班編號 (點擊追蹤)</th>
-                                <th class="px-5 py-3 font-medium">時間</th>
+                                <th class="px-4 sm:px-5 py-3 font-medium">日期</th>
+                                <th class="px-4 sm:px-5 py-3 font-medium">行程</th>
+                                <th class="px-4 sm:px-5 py-3 font-medium">航班編號 (點擊追蹤)</th>
+                                <th class="px-4 sm:px-5 py-3 font-medium">時間</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-slate-700">
                             <tr>
-                                <td class="px-5 py-4">4/3 (五)</td>
-                                <td class="px-5 py-4">去程：桃園 (TPE) ➔ 米子 (YGJ)</td>
-                                <td class="px-5 py-4"><a href="https://zh-tw.flightaware.com/live/flight/IT288" target="_blank" class="text-blue-600 hover:underline font-medium">台灣虎航 IT288 🔍</a></td>
-                                <td class="px-5 py-4">13:15 - 16:50</td>
+                                <td class="px-4 sm:px-5 py-4">4/3 (五)</td>
+                                <td class="px-4 sm:px-5 py-4">桃園 ➔ 米子</td>
+                                <td class="px-4 sm:px-5 py-4"><a href="https://zh-tw.flightaware.com/live/flight/IT288" target="_blank" class="text-blue-600 hover:underline font-medium">台灣虎航 IT288 🔍</a></td>
+                                <td class="px-4 sm:px-5 py-4">13:15 - 16:50</td>
                             </tr>
                             <tr>
-                                <td class="px-5 py-4">4/6 (一)</td>
-                                <td class="px-5 py-4">回程：米子 (YGJ) ➔ 桃園 (TPE)</td>
-                                <td class="px-5 py-4"><a href="https://zh-tw.flightaware.com/live/flight/IT289" target="_blank" class="text-blue-600 hover:underline font-medium">台灣虎航 IT289 🔍</a></td>
-                                <td class="px-5 py-4">13:00 - 15:05</td>
+                                <td class="px-4 sm:px-5 py-4">4/6 (一)</td>
+                                <td class="px-4 sm:px-5 py-4">米子 ➔ 桃園</td>
+                                <td class="px-4 sm:px-5 py-4"><a href="https://zh-tw.flightaware.com/live/flight/IT289" target="_blank" class="text-blue-600 hover:underline font-medium">台灣虎航 IT289 🔍</a></td>
+                                <td class="px-4 sm:px-5 py-4">13:00 - 15:05</td>
                             </tr>
                         </tbody>
                     </table>
@@ -309,25 +301,25 @@
 
             <!-- Accommodation -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="bg-slate-800 px-5 py-3 border-b border-slate-100">
-                    <h3 class="text-white font-medium flex items-center">🏨 住宿安排</h3>
+                <div class="bg-slate-800 px-4 sm:px-5 py-3 border-b border-slate-100">
+                    <h3 class="text-white font-medium flex items-center text-sm sm:text-base">🏨 住宿安排</h3>
                 </div>
-                <div class="p-5 space-y-4">
-                    <div class="flex flex-col sm:flex-row gap-4 justify-between border-b border-slate-100 pb-4">
+                <div class="p-4 sm:p-5 space-y-4">
+                    <div class="flex flex-col sm:flex-row gap-4 justify-between pb-2">
                         <div>
                             <p class="text-sm font-bold text-blue-600 mb-1">Day 1 ~ Day 3 (三晚)</p>
-                            <h4 class="text-xl font-bold text-slate-800">華水亭 (Kasuitei)</h4>
+                            <h4 class="text-lg sm:text-xl font-bold text-slate-800">華水亭 (Kasuitei)</h4>
                             <p class="text-sm text-slate-600 mt-2 font-medium">房型：客房(兩床) / 包含早餐、免費 Wi-Fi</p>
                             <p class="text-sm text-slate-500 mt-1">地址：米子市皆生温泉4-19-10</p>
-                            <p class="text-sm text-slate-500 mt-1">電話：+81 859-33-0001 <span class="text-slate-300 mx-1">|</span> 預訂編號：<span class="font-mono text-slate-700 font-bold">100825301400</span></p>
+                            <p class="text-sm text-slate-500 mt-1 leading-relaxed">電話：+81 859-33-0001 <br class="sm:hidden"><span class="hidden sm:inline text-slate-300 mx-1">|</span>預訂編號：<span class="font-mono text-slate-700 font-bold">100825301400</span></p>
                         </div>
-                        <div class="text-left sm:text-right flex flex-col justify-between">
+                        <div class="text-left sm:text-right flex flex-col justify-between border-t sm:border-t-0 border-slate-100 pt-3 sm:pt-0">
                             <div>
                                 <p class="text-sm text-slate-600 mb-1">Check-in：15:00 - <span class="text-red-500 font-bold">18:00</span></p>
                                 <p class="text-xs bg-red-50 text-red-600 border border-red-100 px-2 py-1 rounded inline-block mt-1">※ 現場需支付沐浴稅 TWD 179.58</p>
                             </div>
-                            <div class="mt-4">
-                                <a href="https://maps.google.com/?q=米子市皆生温泉4-19-10" target="_blank" class="inline-flex items-center justify-center px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 transition shadow-sm">📍 Google Maps</a>
+                            <div class="mt-4 sm:mt-0">
+                                <a href="https://maps.google.com/?q=米子市皆生温泉4-19-10" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 transition shadow-sm">📍 Google Maps</a>
                             </div>
                         </div>
                     </div>
@@ -336,36 +328,41 @@
 
             <!-- Car Rental -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="bg-slate-800 px-5 py-3 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="text-white font-medium flex items-center">🚗 租車資訊 (Toyota Rent a Car)</h3>
+                <div class="bg-slate-800 px-4 sm:px-5 py-3 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="text-white font-medium flex items-center text-sm sm:text-base">🚗 租車 (Toyota)</h3>
                     <span class="text-xs bg-white/20 text-white px-2 py-1 rounded font-mono">預約號: R07GITKC</span>
                 </div>
-                <div class="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                        <span class="block text-2xl mb-2">🚘</span>
-                        <p class="text-xs text-slate-500 font-medium">車型與配備</p>
-                        <p class="text-sm font-bold text-slate-800">小型轎車 (Compact) / AT</p>
-                        <p class="text-xs text-slate-500 mt-1">禁煙車、導航、ETC車載器</p>
+                <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                    <div class="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100 flex sm:block items-center sm:items-start gap-4 sm:gap-0">
+                        <span class="block text-2xl sm:mb-2 bg-white sm:bg-transparent p-2 sm:p-0 rounded-lg shadow-sm sm:shadow-none">🚘</span>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium">車型與配備</p>
+                            <p class="text-sm font-bold text-slate-800">小車 (Compact) / AT</p>
+                            <p class="text-xs text-slate-500 mt-0.5 sm:mt-1">禁煙、導航、ETC</p>
+                        </div>
                     </div>
-                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                        <span class="block text-2xl mb-2">🛡️</span>
-                        <p class="text-xs text-slate-500 font-medium">保險與費用</p>
-                        <p class="text-sm font-bold text-emerald-600">全險 (免責補償/NOC補償)</p>
-                        <p class="text-xs text-slate-700 mt-1 font-bold">總額 ¥31,570 <span class="text-slate-500 font-normal">(現場支付)</span></p>
+                    <div class="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100 flex sm:block items-center sm:items-start gap-4 sm:gap-0">
+                        <span class="block text-2xl sm:mb-2 bg-white sm:bg-transparent p-2 sm:p-0 rounded-lg shadow-sm sm:shadow-none">🛡️</span>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium">保險與費用</p>
+                            <p class="text-sm font-bold text-emerald-600">全險 (免責/NOC)</p>
+                            <p class="text-xs text-slate-700 mt-0.5 sm:mt-1 font-bold">¥31,570 <span class="text-slate-500 font-normal">(現場付)</span></p>
+                        </div>
                     </div>
-                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                        <span class="block text-2xl mb-2">📍</span>
-                        <p class="text-xs text-slate-500 font-medium">取還車資訊</p>
-                        <p class="text-sm font-bold text-slate-800">米子鬼太郎空港店</p>
-                        <p class="text-xs text-slate-500 mt-1">0859-45-0115<br>取 4/3 18:00 | 還 4/6 12:00</p>
+                    <div class="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100 flex sm:block items-center sm:items-start gap-4 sm:gap-0">
+                        <span class="block text-2xl sm:mb-2 bg-white sm:bg-transparent p-2 sm:p-0 rounded-lg shadow-sm sm:shadow-none">📍</span>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium">米子空港店 (0859-45-0115)</p>
+                            <p class="text-sm text-slate-800 font-medium leading-snug mt-0.5 sm:mt-1">取: 4/3 18:00<br>還: 4/6 12:00</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Smart Luggage List -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="bg-slate-800 px-5 py-3 border-b border-slate-100">
-                    <h3 class="text-white font-medium flex items-center">🧳 智慧行李清單</h3>
+                <div class="bg-slate-800 px-4 sm:px-5 py-3 border-b border-slate-100">
+                    <h3 class="text-white font-medium flex items-center text-sm sm:text-base">🧳 智慧行李清單</h3>
                 </div>
                 <div class="p-2" id="luggage-accordion">
                     <!-- JS generated accordions -->
@@ -373,16 +370,16 @@
             </div>
 
             <!-- Emergency Card -->
-            <div class="bg-red-50 border border-red-200 rounded-2xl p-5 mt-8">
+            <div class="bg-red-50 border border-red-200 rounded-2xl p-4 sm:p-5">
                 <h3 class="text-red-700 font-bold flex items-center mb-3">🆘 緊急救援卡 (Emergency Info)</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                    <div>
-                        <p class="text-red-900 font-medium">報警 (Police): <span class="font-bold text-lg">110</span></p>
-                        <p class="text-red-900 font-medium">救護車/消防 (Ambulance/Fire): <span class="font-bold text-lg">119</span></p>
+                    <div class="bg-white/60 p-3 rounded-lg">
+                        <p class="text-red-900 font-medium">報警 (Police): <span class="font-bold text-lg float-right sm:float-none">110</span></p>
+                        <p class="text-red-900 font-medium mt-1">救護車/消防 (Ambulance/Fire): <span class="font-bold text-lg float-right sm:float-none">119</span></p>
                     </div>
-                    <div>
-                        <p class="text-slate-700">台北駐大阪經濟文化辦事處 (急難救助):</p>
-                        <p class="font-mono text-slate-800 font-bold">+81-90-8794-4568</p>
+                    <div class="bg-white/60 p-3 rounded-lg">
+                        <p class="text-slate-700 font-medium">台北駐大阪辦事處 (急難救助):</p>
+                        <p class="font-mono text-slate-800 font-bold mt-1 text-lg">+81-90-8794-4568</p>
                     </div>
                 </div>
             </div>
@@ -396,7 +393,7 @@
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center h-16">
             <!-- Left: Toggle Mode -->
             <div class="flex-shrink-0">
-                <button id="mode-toggle-btn" onclick="toggleDetailMode()" class="flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-600 text-white shadow-sm transition-all duration-300">
+                <button id="mode-toggle-btn" onclick="toggleDetailMode()" class="flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-600 text-white shadow-sm transition-all duration-300 active:scale-95">
                     <span class="mr-1" id="mode-icon">👁️</span> 
                     <span id="mode-text" class="hidden sm:inline">詳細模式</span>
                     <span class="sm:hidden">詳細</span>
@@ -405,17 +402,17 @@
             
             <!-- Right: Horizontal Day Scroll -->
             <div class="flex-grow overflow-x-auto no-scrollbar ml-4 sm:ml-8 flex sm:justify-center items-center gap-2">
-                <button onclick="scrollToDayFromPanel('day1')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition">Day 1</button>
-                <button onclick="scrollToDayFromPanel('day2')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition">Day 2</button>
-                <button onclick="scrollToDayFromPanel('day3')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition">Day 3</button>
-                <button onclick="scrollToDayFromPanel('day4')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition">Day 4</button>
+                <button onclick="scrollToDayFromPanel('day1')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition active:scale-95">Day 1</button>
+                <button onclick="scrollToDayFromPanel('day2')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition active:scale-95">Day 2</button>
+                <button onclick="scrollToDayFromPanel('day3')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition active:scale-95">Day 3</button>
+                <button onclick="scrollToDayFromPanel('day4')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition active:scale-95">Day 4</button>
             </div>
         </div>
     </div>
 
     <!-- Back to Top Button -->
-    <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed right-4 bottom-20 sm:bottom-24 z-50 glass w-12 h-12 rounded-full flex items-center justify-center text-slate-600 shadow-md opacity-0 translate-y-4 transition-all duration-300 hover:scale-110 focus:outline-none pointer-events-none">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed right-4 bottom-24 sm:bottom-24 z-50 glass w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-slate-600 shadow-md opacity-0 translate-y-4 transition-all duration-300 hover:scale-110 focus:outline-none pointer-events-none pb-safe">
+        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
     </button>
 
     <!-- JavaScript Logic -->
@@ -424,7 +421,6 @@
         let currentView = 'dashboard';
         let detailMode = true; // true = detailed, false = compact
         let mapInstance = null;
-        let mapMarkers = [];
         
         // --- Data ---
         const itineraryData = [
@@ -626,62 +622,69 @@
             }
         });
 
-        // --- Render Itinerary ---
+        // --- Render Itinerary (Mobile Optimized) ---
         function renderItinerary() {
             const container = document.getElementById('itinerary-container');
             let html = '';
 
             itineraryData.forEach((day, dayIndex) => {
-                html += `<div id="${day.id}" class="scroll-mt-24">`;
-                html += `<h3 class="text-xl font-bold text-blue-700 bg-blue-50 py-3 px-4 rounded-xl mb-6 shadow-sm border border-blue-100">${day.title}</h3>`;
+                html += `<div id="${day.id}" class="scroll-mt-24 mb-10">`;
+                // Sticky Day Header
+                html += `<h3 class="text-lg sm:text-xl font-bold text-blue-700 bg-blue-50/90 backdrop-blur-md py-3 px-4 rounded-xl mb-6 shadow-sm border border-blue-100 sticky top-[4rem] z-20">${day.title}</h3>`;
                 html += `<div class="relative">`;
-                // Timeline vertical line
-                html += `<div class="timeline-line"></div>`;
+                
+                // Responsive vertical timeline line
+                html += `<div class="absolute top-2 bottom-0 w-[2px] bg-slate-200 left-[1.125rem] sm:left-24 z-0"></div>`;
 
                 day.events.forEach((ev, idx) => {
                     const isLast = idx === day.events.length - 1;
                     
                     html += `
-                    <div class="relative flex items-start mb-8 group">
+                    <div class="relative flex flex-col sm:flex-row items-start mb-6 sm:mb-8 group">
                         <!-- Dot -->
-                        <div class="absolute left-[1.25rem] top-1.5 w-3 h-3 rounded-full ${isLast ? 'bg-indigo-500 ring-4 ring-indigo-100' : 'bg-blue-500 ring-4 ring-white'} -translate-x-1.5 z-10"></div>
+                        <div class="absolute left-[1.125rem] sm:left-24 top-1.5 sm:top-5 w-3 h-3 rounded-full ${isLast ? 'bg-indigo-500 ring-4 ring-slate-50' : 'bg-blue-500 ring-4 ring-slate-50'} -translate-x-[5px] z-10"></div>
                         
-                        <!-- Time Column -->
-                        <div class="w-16 sm:w-24 pt-0.5 text-right pr-4 flex-shrink-0">
-                            <span class="text-sm font-bold text-slate-700 block">${ev.time}</span>
-                            ${ev.stay !== '-' ? `<span class="text-xs text-slate-400 font-medium block mt-1">⏳ ${ev.stay}</span>` : ''}
+                        <!-- Time Column (Mobile: Above Card, Desktop: Left Side) -->
+                        <div class="w-full sm:w-24 pl-10 sm:pl-0 pr-4 sm:pr-6 pt-0 sm:pt-4 text-left sm:text-right flex-shrink-0 mb-1.5 sm:mb-0 flex items-center sm:block">
+                            <span class="text-sm font-bold text-slate-700 block mr-2 sm:mr-0">${ev.time}</span>
+                            ${ev.stay !== '-' ? `<span class="text-xs text-slate-400 font-medium block">⏳ ${ev.stay}</span>` : ''}
                         </div>
                         
-                        <!-- Content Column -->
-                        <div class="flex-grow bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition p-4 sm:p-5 -mt-2">
-                            <div class="flex flex-wrap items-center justify-between mb-2 gap-2">
-                                <h4 class="text-base sm:text-lg font-bold text-slate-800 flex items-center">
-                                    <span class="text-xl mr-2">${ev.emoji}</span> ${ev.title}
-                                </h4>
-                                <span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-md font-medium">${ev.tag}</span>
-                            </div>
-                            
-                            ${ev.move !== '-' ? `<div class="text-sm text-slate-500 mb-3 flex items-center"><span class="mr-1">🚀</span> 建議出發/交通: ${ev.move}</div>` : ''}
-                            
-                            <!-- Detailed Mode Blocks -->
-                            <div class="detail-box ${detailMode ? '' : 'hidden'} space-y-3 mt-4">
-                                ${ev.details ? `
-                                <div class="bg-blue-50/50 border-l-4 border-blue-400 p-3 rounded-r-lg">
-                                    <p class="text-sm text-slate-700 font-medium">詳細路線</p>
-                                    <p class="text-sm text-slate-600 mt-1 leading-relaxed">${ev.details}</p>
-                                </div>` : ''}
+                        <!-- Content Card Column -->
+                        <div class="flex-grow w-full pl-10 sm:pl-0 pr-0">
+                            <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-4 hover:shadow-md transition">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
+                                    <h4 class="text-base sm:text-lg font-bold text-slate-800 flex items-center leading-tight">
+                                        <span class="text-xl mr-2">${ev.emoji}</span> ${ev.title}
+                                    </h4>
+                                    <span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-md font-medium self-start sm:self-auto">${ev.tag}</span>
+                                </div>
                                 
-                                ${ev.tips || ev.map || ev.mapcode ? `
-                                <div class="bg-amber-50/50 border-l-4 border-amber-400 p-3 rounded-r-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                    <div>
-                                        <p class="text-sm text-amber-800 font-medium">Tips / 注意事項</p>
-                                        <p class="text-sm text-amber-700 mt-1 leading-relaxed">${ev.tips}</p>
-                                    </div>
-                                    <div class="flex flex-col sm:flex-row items-end sm:items-center gap-2 flex-shrink-0">
-                                        ${ev.mapcode ? `<span class="bg-slate-100 text-slate-700 font-mono text-xs px-2 py-1.5 rounded shadow-sm border border-slate-200 select-all cursor-pointer" title="全選複製">MC: ${ev.mapcode}</span>` : ''}
-                                        ${ev.map ? `<a href="${ev.map}" target="_blank" class="bg-white border border-slate-200 shadow-sm text-slate-600 px-3 py-1.5 rounded hover:bg-slate-50 text-xs font-bold transition flex items-center">📍 導航</a>` : ''}
-                                    </div>
-                                </div>` : ''}
+                                ${ev.move !== '-' ? `<div class="text-sm text-slate-500 mb-3 flex items-center bg-slate-50 p-2 rounded-lg"><span class="mr-2">🚀</span> <span class="leading-snug">交通/出發: ${ev.move}</span></div>` : ''}
+                                
+                                <!-- Detailed Mode Blocks -->
+                                <div class="detail-box ${detailMode ? '' : 'hidden'} space-y-3 mt-4">
+                                    ${ev.details ? `
+                                    <div class="bg-blue-50/50 border-l-4 border-blue-400 p-3 rounded-r-lg">
+                                        <p class="text-sm text-slate-700 font-bold mb-1">詳細路線</p>
+                                        <p class="text-sm text-slate-600 leading-relaxed">${ev.details}</p>
+                                    </div>` : ''}
+                                    
+                                    ${ev.tips || ev.map || ev.mapcode ? `
+                                    <div class="bg-amber-50/50 border-l-4 border-amber-400 p-3 rounded-r-lg flex flex-col gap-3">
+                                        <div>
+                                            <p class="text-sm text-amber-800 font-bold mb-1">Tips / 注意事項</p>
+                                            <p class="text-sm text-amber-700 leading-relaxed">${ev.tips}</p>
+                                        </div>
+                                        
+                                        ${ev.mapcode || ev.map ? `
+                                        <!-- Mobile Full Width Buttons -->
+                                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2 border-t border-amber-100/50">
+                                            ${ev.mapcode ? `<span class="bg-white text-slate-700 font-mono text-xs px-2 py-2 sm:py-1.5 rounded shadow-sm border border-slate-200 select-all cursor-pointer text-center" title="全選複製">MC: ${ev.mapcode}</span>` : ''}
+                                            ${ev.map ? `<a href="${ev.map}" target="_blank" class="bg-white border border-slate-200 shadow-sm text-slate-700 px-3 py-2 sm:py-1.5 rounded hover:bg-slate-50 text-xs font-bold transition flex items-center justify-center">📍 Google 導航</a>` : ''}
+                                        </div>` : ''}
+                                    </div>` : ''}
+                                </div>
                             </div>
                         </div>
                     </div>`;
@@ -703,11 +706,11 @@
             const text = document.getElementById('mode-text');
             
             if(detailMode) {
-                btn.className = "flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-600 text-white shadow-sm transition-all duration-300";
+                btn.className = "flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-600 text-white shadow-sm transition-all duration-300 active:scale-95";
                 icon.innerText = "👁️";
                 text.innerText = "詳細模式";
             } else {
-                btn.className = "flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-slate-200 text-slate-600 border border-slate-300 shadow-sm transition-all duration-300";
+                btn.className = "flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-slate-200 text-slate-600 border border-slate-300 shadow-sm transition-all duration-300 active:scale-95";
                 icon.innerText = "👁️‍🗨️";
                 text.innerText = "簡潔模式";
             }
@@ -811,7 +814,7 @@
 
             filtered.forEach(f => {
                 grid.innerHTML += `
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition group">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-5 hover:shadow-md transition group">
                         <div class="flex justify-between items-start mb-3">
                             <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">${f.tag}</span>
                             <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full flex items-center">📍 ${f.location}</span>
@@ -889,7 +892,7 @@
                             <span class="text-sm font-medium text-slate-700">${e.name}</span>
                             <div class="flex items-center gap-3">
                                 <span class="text-sm text-slate-600">¥ ${e.amount.toLocaleString()}</span>
-                                <button onclick="deleteExpense(${e.id})" class="text-red-400 hover:text-red-600 focus:outline-none">✖</button>
+                                <button onclick="deleteExpense(${e.id})" class="text-red-400 hover:text-red-600 focus:outline-none p-1">✖</button>
                             </div>
                         </li>
                     `;
@@ -912,15 +915,15 @@
                 html += `
                     <div class="border-b border-slate-100 last:border-0">
                         <button onclick="toggleAccordion('acc-${idx}')" class="w-full flex justify-between items-center py-4 px-2 hover:bg-slate-50 transition focus:outline-none">
-                            <span class="font-bold text-slate-700">${cat.category}</span>
-                            <svg id="icon-acc-${idx}" class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            <span class="font-bold text-slate-700 text-left">${cat.category}</span>
+                            <svg id="icon-acc-${idx}" class="w-5 h-5 text-slate-400 transform transition-transform flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div id="content-acc-${idx}" class="hidden px-4 pb-4">
-                            <div class="space-y-2">
+                        <div id="content-acc-${idx}" class="hidden px-2 sm:px-4 pb-4">
+                            <div class="space-y-3">
                                 ${cat.items.map((item, i) => `
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 transition duration-150 ease-in-out">
-                                        <span class="text-slate-600 text-sm">${item}</span>
+                                    <label class="flex items-start sm:items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 sm:h-4 sm:w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 transition duration-150 ease-in-out mt-0.5 sm:mt-0 flex-shrink-0">
+                                        <span class="text-slate-600 text-sm leading-snug">${item}</span>
                                     </label>
                                 `).join('')}
                             </div>
