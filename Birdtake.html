@@ -181,13 +181,30 @@
         <section id="view-food" class="view-section hidden max-w-6xl mx-auto px-4 py-6">
             <h2 class="text-2xl font-bold text-slate-800 mb-6">🍱 美食與餐廳推薦</h2>
             
-            <!-- Filters -->
-            <div class="flex overflow-x-auto no-scrollbar gap-2 mb-6 pb-2" id="food-filters">
-                <button onclick="filterFood('全部')" class="food-filter-btn active whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-slate-800 text-white transition">全部</button>
-                <button onclick="filterFood('海鮮')" class="food-filter-btn whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">🦀 海鮮</button>
-                <button onclick="filterFood('肉類')" class="food-filter-btn whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">🥩 肉類 (大山黑牛)</button>
-                <button onclick="filterFood('咖啡廳/輕食')" class="food-filter-btn whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">☕ 咖啡廳/輕食</button>
-                <button onclick="filterFood('綜合')" class="food-filter-btn whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">🍜 綜合/小吃</button>
+            <!-- Double Filters (Type + Location) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-6">
+                <!-- 食物種類篩選 -->
+                <div class="mb-4">
+                    <h3 class="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-wider">🍔 食物種類</h3>
+                    <div class="flex overflow-x-auto no-scrollbar gap-2 pb-1" id="type-filters">
+                        <button data-filter="全部" onclick="setTypeFilter('全部')" class="type-btn active whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-800 text-white transition">全部</button>
+                        <button data-filter="海鮮" onclick="setTypeFilter('海鮮')" class="type-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">🦀 海鮮</button>
+                        <button data-filter="肉類" onclick="setTypeFilter('肉類')" class="type-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">🥩 肉類 (黑牛)</button>
+                        <button data-filter="咖啡廳/輕食" onclick="setTypeFilter('咖啡廳/輕食')" class="type-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">☕ 咖啡廳/甜點</button>
+                        <button data-filter="綜合" onclick="setTypeFilter('綜合')" class="type-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">🍜 綜合/拉麵</button>
+                    </div>
+                </div>
+                <!-- 所在地區篩選 -->
+                <div>
+                    <h3 class="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-wider">📍 所在地區</h3>
+                    <div class="flex overflow-x-auto no-scrollbar gap-2 pb-1" id="loc-filters">
+                        <button data-filter="全部" onclick="setLocFilter('全部')" class="loc-btn active whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-slate-800 text-white transition">全部地區</button>
+                        <button data-filter="米子/皆生" onclick="setLocFilter('米子/皆生')" class="loc-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">米子 / 皆生</button>
+                        <button data-filter="鳥取/砂丘" onclick="setLocFilter('鳥取/砂丘')" class="loc-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">鳥取 / 砂丘</button>
+                        <button data-filter="境港/水木茂" onclick="setLocFilter('境港/水木茂')" class="loc-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">境港 / 水木茂</button>
+                        <button data-filter="倉吉/大山" onclick="setLocFilter('倉吉/大山')" class="loc-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">倉吉 / 大山</button>
+                    </div>
+                </div>
             </div>
 
             <!-- Food Grid -->
@@ -388,8 +405,8 @@
 
     </main>
 
-    <!-- Bottom Control Panel (Sticky) -->
-    <div class="fixed bottom-0 w-full z-40 glass-bottom pb-safe">
+    <!-- Bottom Control Panel (Sticky) - ONLY VISIBLE ON ITINERARY PAGE -->
+    <div id="itinerary-bottom-panel" class="hidden fixed bottom-0 w-full z-40 glass-bottom pb-safe">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center h-16">
             <!-- Left: Toggle Mode -->
             <div class="flex-shrink-0">
@@ -421,6 +438,8 @@
         let currentView = 'dashboard';
         let detailMode = true; // true = detailed, false = compact
         let mapInstance = null;
+        let currentTypeFilter = '全部';
+        let currentLocFilter = '全部';
         
         // --- Data ---
         const itineraryData = [
@@ -529,12 +548,22 @@
         ];
 
         const foodData = [
-            { name: '大山黑牛處 強小亭', tag: '肉類', location: '米子市', desc: '頂級大山黑牛燒肉，入口即化，預約制。', map: 'https://maps.google.com/?q=大山黑牛處+強小亭' },
-            { name: '皆生溫泉 居酒屋街', tag: '綜合', location: '皆生溫泉', desc: '泡湯後的放鬆好去處，海鮮與串燒。', map: 'https://maps.google.com/?q=皆生溫泉+居酒屋' },
-            { name: '白羅咖啡廳 (米花商店街)', tag: '咖啡廳/輕食', location: '北榮町', desc: '柯南迷必訪，拿坡里義大利麵。', map: 'https://maps.google.com/?q=白羅咖啡廳+鳥取' },
-            { name: '賀露港 漁師食堂', tag: '海鮮', location: '鳥取市', desc: '超浮誇海鮮丼，松葉蟹季節必吃。', map: 'https://maps.google.com/?q=賀露港+海鮮食堂' },
-            { name: '境港 螃蟹小屋', tag: '海鮮', location: '境港市', desc: '紅楚蟹吃到飽或高CP值單點。', map: 'https://maps.google.com/?q=境港水產物直賣中心' },
-            { name: '妖怪和菓子店', tag: '綜合', location: '水木茂大道', desc: '眼球老爹造型的可愛甜點，適合拍照。', map: 'https://maps.google.com/?q=水木茂大道+妖怪和菓子' },
+            { name: '大山黑牛處 強小亭', area: '米子/皆生', tag: '肉類', rating: '4.6', location: '米子市', desc: '頂級大山黑牛燒肉，入口即化，採預約制的高級享受。', map: 'https://maps.google.com/?q=大山黑牛處+強小亭' },
+            { name: '迴轉壽司 北海道 (皆生店)', area: '米子/皆生', tag: '海鮮', rating: '4.4', location: '米子市', desc: '在地人狂推的超高CP值迴轉壽司，海鮮新鮮且肉質肥美。', map: 'https://maps.google.com/?q=回転すし北海道+皆生店' },
+            { name: '麵屋 無雙', area: '米子/皆生', tag: '綜合', rating: '4.4', location: '米子市', desc: '深受在地人喜愛的超人氣牛骨拉麵，湯頭清澈卻風味濃郁。', map: 'https://maps.google.com/?q=麺屋無双+米子' },
+            { name: '皆生溫泉 居酒屋街', area: '米子/皆生', tag: '綜合', rating: '4.1', location: '皆生溫泉', desc: '泡湯後的放鬆去處，提供各式在地海鮮、串燒與沁涼啤酒。', map: 'https://maps.google.com/?q=皆生溫泉+居酒屋' },
+            { name: '海鮮丼 鯛喜 (Taiki)', area: '鳥取/砂丘', tag: '海鮮', rating: '4.6', location: '鳥取砂丘', desc: '砂丘旁極具人氣的海鮮丼專賣店，每日限量，建議提早排隊。', map: 'https://maps.google.com/?q=鯛喜+海鮮丼' },
+            { name: '賀露港 漁師食堂', area: '鳥取/砂丘', tag: '海鮮', rating: '4.2', location: '鳥取市', desc: '位於市場內的超浮誇海鮮丼，松葉蟹與白烏賊季節必吃。', map: 'https://maps.google.com/?q=賀露港+海鮮食堂' },
+            { name: 'すなば珈琲 (Sunaba)', area: '鳥取/砂丘', tag: '咖啡廳/輕食', rating: '4.2', location: '鳥取/米子', desc: '鳥取知名連鎖咖啡，「雖然沒星巴克，但我們有砂巴」！', map: 'https://maps.google.com/?q=すなば珈琲' },
+            { name: 'Totto PURIN', area: '鳥取/砂丘', tag: '咖啡廳/輕食', rating: '4.5', location: '鳥取砂丘', desc: '超人氣排隊甜點，主打綿密滑順的「砂丘布丁」，非常適合拍照。', map: 'https://maps.google.com/?q=Totto+PURIN' },
+            { name: '孤島咖啡廳 ALOHA', area: '鳥取/砂丘', tag: '咖啡廳/輕食', rating: '4.3', location: '浦富海岸', desc: '無敵海景第一排！享受浦富海岸的透明海水與優閒的午後咖啡。', map: 'https://maps.google.com/?q=ALOHA+浦富' },
+            { name: '境港 螃蟹小屋', area: '境港/水木茂', tag: '海鮮', rating: '4.3', location: '境港市', desc: '紅楚蟹大本營，提供螃蟹吃到飽或極高CP值的單點料理。', map: 'https://maps.google.com/?q=境港水產物直賣中心' },
+            { name: '味處 美佐', area: '境港/水木茂', tag: '海鮮', rating: '4.5', location: '境港市', desc: '絕品紅楚蟹與海鮮料理名店，水產新鮮，份量與精緻度兼具。', map: 'https://maps.google.com/?q=味処美佐+境港' },
+            { name: '妖怪和菓子店', area: '境港/水木茂', tag: '綜合', rating: '4.4', location: '水木茂大道', desc: '超吸睛的「眼球老爹」造型甜點，邊走邊吃享受妖怪氣氛。', map: 'https://maps.google.com/?q=水木茂大道+妖怪和菓子' },
+            { name: '大山牧場牛奶之鄉餐廳', area: '倉吉/大山', tag: '肉類', rating: '4.4', location: '大山', desc: '除了濃郁霜淇淋，大山牛奶起司鍋與燒肉也極具水準。', map: 'https://maps.google.com/?q=大山牧場牛奶之鄉' },
+            { name: '町屋清水庵', area: '倉吉/大山', tag: '綜合', rating: '4.3', location: '倉吉市', desc: '在百年歷史的町屋建築內，品嘗特色色彩繽紛的「麻糬涮涮鍋」。', map: 'https://maps.google.com/?q=町屋清水庵' },
+            { name: 'ラーメン幸雅', area: '倉吉/大山', tag: '綜合', rating: '4.2', location: '倉吉市', desc: '主打牛骨熬製的黃金湯頭拉麵，香醇不膩，在地人大推。', map: 'https://maps.google.com/?q=ラーメン幸雅' },
+            { name: '白羅咖啡廳', area: '倉吉/大山', tag: '咖啡廳/輕食', rating: '4.3', location: '北榮町', desc: '柯南迷必訪，完美重現經典拿坡里義大利麵與特製餐點。', map: 'https://maps.google.com/?q=白羅咖啡廳+鳥取' },
         ];
 
         const luggageData = [
@@ -548,7 +577,7 @@
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             renderItinerary();
-            renderFoodGrid('全部');
+            renderFoodGrid();
             renderLuggage();
             
             // Mobile Menu Toggle
@@ -580,6 +609,14 @@
                 btn.classList.remove('text-blue-600', 'bg-blue-50');
                 btn.classList.add('text-slate-600');
             });
+
+            // Toggle Bottom Panel Visibility (Only show on itinerary)
+            const bottomPanel = document.getElementById('itinerary-bottom-panel');
+            if (viewId === 'itinerary') {
+                bottomPanel.classList.remove('hidden');
+            } else {
+                bottomPanel.classList.add('hidden');
+            }
 
             // Auto close mobile menu
             document.getElementById('mobile-menu').classList.add('hidden');
@@ -807,30 +844,22 @@
             });
         }
 
-        // --- Food Map ---
-        function renderFoodGrid(filter) {
-            const grid = document.getElementById('food-grid');
-            grid.innerHTML = '';
+        // --- Food Map (Filters & Render) ---
+        function setTypeFilter(tag) {
+            currentTypeFilter = tag;
+            updateFilterButtons('type-btn', tag);
+            renderFoodGrid();
+        }
 
-            const filtered = filter === '全部' ? foodData : foodData.filter(f => f.tag === filter);
+        function setLocFilter(loc) {
+            currentLocFilter = loc;
+            updateFilterButtons('loc-btn', loc);
+            renderFoodGrid();
+        }
 
-            filtered.forEach(f => {
-                grid.innerHTML += `
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-5 hover:shadow-md transition group">
-                        <div class="flex justify-between items-start mb-3">
-                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">${f.tag}</span>
-                            <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full flex items-center">📍 ${f.location}</span>
-                        </div>
-                        <h4 class="font-bold text-lg text-slate-800 mb-2">${f.name}</h4>
-                        <p class="text-sm text-slate-600 mb-4 h-10 overflow-hidden">${f.desc}</p>
-                        <a href="${f.map}" target="_blank" class="block text-center w-full bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 py-2 rounded-lg text-sm font-medium transition">Google Maps 導航</a>
-                    </div>
-                `;
-            });
-
-            // Update active button state
-            document.querySelectorAll('.food-filter-btn').forEach(btn => {
-                if(btn.innerText.includes(filter)) {
+        function updateFilterButtons(className, activeValue) {
+            document.querySelectorAll(`.${className}`).forEach(btn => {
+                if (btn.dataset.filter === activeValue) {
                     btn.classList.replace('bg-white', 'bg-slate-800');
                     btn.classList.replace('text-slate-600', 'text-white');
                 } else {
@@ -839,7 +868,39 @@
                 }
             });
         }
-        function filterFood(tag) { renderFoodGrid(tag); }
+
+        function renderFoodGrid() {
+            const grid = document.getElementById('food-grid');
+            grid.innerHTML = '';
+
+            const filtered = foodData.filter(f => {
+                const matchType = currentTypeFilter === '全部' || f.tag === currentTypeFilter;
+                const matchLoc  = currentLocFilter === '全部' || f.area === currentLocFilter;
+                return matchType && matchLoc;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 font-medium">沒有符合篩選條件的餐廳，請嘗試其他分類 🍽️</div>`;
+                return;
+            }
+
+            filtered.forEach(f => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-5 hover:shadow-md transition group flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-3 gap-2">
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <span class="text-[11px] sm:text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">${f.tag}</span>
+                                <span class="text-[11px] sm:text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded flex items-center">⭐ ${f.rating}</span>
+                            </div>
+                            <span class="text-[11px] sm:text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full flex items-center flex-shrink-0">📍 ${f.location}</span>
+                        </div>
+                        <h4 class="font-bold text-lg text-slate-800 mb-2">${f.name}</h4>
+                        <p class="text-sm text-slate-600 mb-4 flex-grow">${f.desc}</p>
+                        <a href="${f.map}" target="_blank" class="block text-center w-full bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 py-2 rounded-lg text-sm font-medium transition mt-auto">Google Maps 導航</a>
+                    </div>
+                `;
+            });
+        }
 
         // --- Tools: Currency ---
         function calculateCurrency(source = 'jpy') {
