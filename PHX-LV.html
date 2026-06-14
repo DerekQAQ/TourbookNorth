@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026-2027 亞利桑那與拉斯維加斯：聖誕跨年深度自駕系統</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#151e2e' },
+                        primary: '#10b981', // Emerald 500
+                        secondary: '#6366f1', // Indigo 500
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Leaflet JS (Map) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Custom Styles & Transitions */
+        .tab-content { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Map Custom Icon */
+        .custom-map-marker {
+            background-color: #10b981; color: white; border-radius: 50%; width: 30px; height: 30px;
+            display: flex; justify-content: center; align-items: center; border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 12px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Simple Mode Toggle Classes */
+        .timeline-simple-mode .detail-element { display: none !important; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-slate-900 dark:text-gray-200 transition-colors duration-300 font-sans antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/80 dark:bg-slate-850/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-route text-primary text-2xl mr-3"></i>
+                    <span class="font-bold text-xl tracking-tight hidden sm:block">AZ-LV Roadtrip 2026</span>
+                    <span class="font-bold text-xl tracking-tight sm:hidden">AZ-LV</span>
+                </div>
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <button class="nav-btn active px-3 py-2 rounded-md text-sm font-medium hover:text-primary transition-colors" data-target="dashboard">
+                        <i class="fa-solid fa-chart-line mr-2"></i>行程儀表盤
+                    </button>
+                    <button class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:text-primary transition-colors" data-target="itinerary">
+                        <i class="fa-solid fa-map-location-dot mr-2"></i>詳細行程
+                    </button>
+                    <button class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:text-primary transition-colors" data-target="budget">
+                        <i class="fa-solid fa-sack-dollar mr-2"></i>財務預算
+                    </button>
+                    <button class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:text-primary transition-colors" data-target="logistics">
+                        <i class="fa-solid fa-box-open mr-2"></i>後勤與美食
+                    </button>
+                    <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-yellow-400 hover:bg-gray-300 dark:hover:bg-slate-600 transition-all">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:block"></i>
+                    </button>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button id="theme-toggle-mobile" class="mr-4 p-2 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-yellow-400">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:block"></i>
+                    </button>
+                    <button id="mobile-menu-btn" class="text-gray-600 dark:text-gray-300 hover:text-primary focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-slate-850 border-b border-gray-200 dark:border-slate-700">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <button class="nav-btn active block w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-slate-700" data-target="dashboard">行程儀表盤</button>
+                <button class="nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-slate-700" data-target="itinerary">詳細行程</button>
+                <button class="nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-slate-700" data-target="budget">財務預算</button>
+                <button class="nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-slate-700" data-target="logistics">後勤與美食</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-20 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen">
+        
+        <!-- ==================== TAB 1: DASHBOARD ==================== -->
+        <section id="dashboard" class="tab-content active space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">專屬行程儀表盤</h1>
+                    <p class="text-gray-500 dark:text-gray-400 mt-1">2026-12-24 至 2027-01-03 亞利桑那-內華達冬季探索</p>
+                </div>
+                <div class="mt-4 md:mt-0 px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-sm font-semibold border border-emerald-200 dark:border-emerald-800 flex items-center">
+                    <i class="fa-solid fa-check-circle mr-2"></i> 行程狀態：已確認
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center space-x-4">
+                    <div class="p-3 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-xl"><i class="fa-regular fa-calendar-days text-xl"></i></div>
+                    <div><p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">總天數</p><p class="text-2xl font-bold">11 天</p></div>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center space-x-4">
+                    <div class="p-3 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-xl"><i class="fa-solid fa-car text-xl"></i></div>
+                    <div><p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">預估自駕</p><p class="text-2xl font-bold">850+ mi</p></div>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center space-x-4">
+                    <div class="p-3 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-xl"><i class="fa-solid fa-camera text-xl"></i></div>
+                    <div><p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">關鍵據點</p><p class="text-2xl font-bold">12 處</p></div>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center space-x-4">
+                    <div class="p-3 bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 rounded-xl"><i class="fa-solid fa-temperature-empty text-xl"></i></div>
+                    <div><p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">極端溫差</p><p class="text-2xl font-bold">-5°~18°C</p></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Map Container -->
+                <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden flex flex-col h-[500px]">
+                    <div class="p-4 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                        <h2 class="font-bold text-lg"><i class="fa-solid fa-satellite mr-2 text-primary"></i>互動地圖</h2>
+                    </div>
+                    <div id="map" class="flex-grow z-0 w-full"></div>
+                </div>
+
+                <!-- Charts & Risk -->
+                <div class="space-y-6 flex flex-col">
+                    <!-- Chart -->
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex-grow">
+                        <h2 class="font-bold text-lg mb-4"><i class="fa-solid fa-chart-column mr-2 text-secondary"></i>每日體力與駕駛負載</h2>
+                        <div class="h-48 relative">
+                            <canvas id="loadChart"></canvas>
+                        </div>
+                    </div>
+                    <!-- Risk Matrix -->
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                        <h2 class="font-bold text-lg mb-4 text-red-500"><i class="fa-solid fa-triangle-exclamation mr-2"></i>注意事項與控管</h2>
+                        <ul class="space-y-3">
+                            <li class="flex items-start p-2 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-900/50">
+                                <i class="fa-solid fa-snowflake text-red-500 mt-1 mr-3"></i>
+                                <div><p class="text-sm font-bold text-red-700 dark:text-red-400">大峽谷/佩吉市 黑冰與積雪</p><p class="text-xs text-gray-600 dark:text-gray-400">務必確認租賃車輛為 AWD/4WD，清晨駕駛需留意橋樑黑冰。</p></div>
+                            </li>
+                            <li class="flex items-start p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-100 dark:border-orange-900/50">
+                                <i class="fa-solid fa-battery-quarter text-orange-500 mt-1 mr-3"></i>
+                                <div><p class="text-sm font-bold text-orange-700 dark:text-orange-400">攝影器材低溫掉電</p><p class="text-xs text-gray-600 dark:text-gray-400">相機電池在 0°C 以下耗電極快，需將備用電池貼身保暖。</p></div>
+                            </li>
+                            <li class="flex items-start p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-100 dark:border-yellow-900/50">
+                                <i class="fa-solid fa-clock text-yellow-500 mt-1 mr-3"></i>
+                                <div><p class="text-sm font-bold text-yellow-700 dark:text-yellow-400">冬季日照時間極短</p><p class="text-xs text-gray-600 dark:text-gray-400">下午 5:15 左右即天黑，長途移動與山區駕駛需在下午 4 點前完成多數進度。</p></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: ITINERARY ==================== -->
+        <section id="itinerary" class="tab-content relative">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 sticky top-16 z-30 bg-gray-50/90 dark:bg-slate-900/90 backdrop-blur-md py-4">
+                <h1 class="text-3xl font-bold"><i class="fa-solid fa-list-check mr-2 text-primary"></i>詳細行程時間軸</h1>
+                
+                <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                    <!-- View Toggle -->
+                    <div class="bg-gray-200 dark:bg-slate-700 rounded-lg p-1 flex text-sm shadow-inner">
+                        <button id="view-simple" class="px-4 py-1.5 rounded-md font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all">簡化版</button>
+                        <button id="view-detail" class="px-4 py-1.5 rounded-md font-medium bg-white dark:bg-slate-800 shadow-sm text-primary transition-all">詳細版</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sticky Date Navigator (Horizontal Scroll) -->
+            <div class="overflow-x-auto whitespace-nowrap pb-4 mb-8 sticky top-[125px] md:top-[100px] z-20 bg-gray-50/90 dark:bg-slate-900/90 backdrop-blur-md hide-scrollbar">
+                <div id="date-nav" class="inline-flex space-x-2 px-2">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Timeline Container (Row by Row layout) -->
+            <div class="max-w-4xl mx-auto pb-20" id="timeline-container">
+                <!-- Content Populated by JS -->
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: BUDGET ==================== -->
+        <section id="budget" class="tab-content space-y-6">
+            <h1 class="text-3xl font-bold mb-6"><i class="fa-solid fa-file-invoice-dollar mr-2 text-primary"></i>財務預算分析 (雙人)</h1>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Overview & Currency -->
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 dark:from-slate-800 dark:to-slate-950 p-6 rounded-2xl shadow-lg text-white">
+                        <h3 class="text-slate-300 text-sm font-medium uppercase tracking-wider mb-1">預估總支出 (USD)</h3>
+                        <p class="text-4xl font-bold text-emerald-400 mb-4" id="total-usd">$0</p>
+                        <h3 class="text-slate-300 text-sm font-medium uppercase tracking-wider mb-1">折合台幣 (TWD)</h3>
+                        <p class="text-2xl font-bold" id="total-twd">NT$ 0</p>
+                    </div>
+
+                    <!-- Currency Converter -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                        <h3 class="font-bold text-lg mb-3"><i class="fa-solid fa-calculator mr-2 text-secondary"></i>即時匯率換算</h3>
+                        <div class="flex items-center space-x-2">
+                            <div class="flex-1 relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">$</span>
+                                </div>
+                                <input type="number" id="usd-input" value="100" class="w-full pl-7 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-gray-50 dark:bg-slate-700 focus:ring-primary focus:border-primary text-gray-900 dark:text-white" placeholder="USD">
+                            </div>
+                            <i class="fa-solid fa-arrow-right-arrow-left text-gray-400"></i>
+                            <div class="flex-1 relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">NT</span>
+                                </div>
+                                <input type="text" id="twd-output" readonly class="w-full pl-8 pr-3 py-2 border border-transparent rounded-lg bg-gray-100 dark:bg-slate-900 text-gray-900 dark:text-white font-bold" value="3,150">
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 text-right">預設匯率: 1 USD = 31.5 TWD</p>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex flex-col justify-center items-center">
+                    <h3 class="font-bold text-lg mb-4 self-start w-full">預算結構</h3>
+                    <div class="w-48 h-48">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detail Table -->
+                <div class="md:col-span-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-850">
+                        <h3 class="font-bold text-lg">預算明細表 (預估)</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                            <thead class="bg-gray-50 dark:bg-slate-800">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">項目</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">說明</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">USD</th>
+                                </tr>
+                            </thead>
+                            <tbody id="budget-table-body" class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: LOGISTICS & FOOD ==================== -->
+        <section id="logistics" class="tab-content space-y-8">
+            <h1 class="text-3xl font-bold mb-6"><i class="fa-solid fa-compass mr-2 text-primary"></i>後勤補給與精選美食</h1>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Flight & Car -->
+                <div class="space-y-6">
+                    <!-- Flight Card -->
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border-l-4 border-l-secondary border border-gray-100 dark:border-slate-700 relative overflow-hidden">
+                        <i class="fa-solid fa-plane text-8xl absolute -right-6 -bottom-6 text-gray-100 dark:text-slate-700/50 transform -rotate-12"></i>
+                        <h3 class="font-bold text-xl mb-4 relative z-10"><i class="fa-solid fa-plane-departure mr-2"></i>星宇航空 (STARLUX) 直飛航班</h3>
+                        <div class="space-y-4 relative z-10">
+                            <div class="flex justify-between items-center border-b border-gray-100 dark:border-slate-700 pb-2">
+                                <div><span class="text-xs text-gray-500 block">去程 (12/24)</span><span class="font-bold">TPE 飛往 PHX</span></div>
+                                <div class="text-right"><span class="bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded text-sm font-mono">JX026</span><br><span class="text-sm font-bold text-primary">17:40 抵達</span></div>
+                            </div>
+                            <div class="flex justify-between items-center pb-1">
+                                <div><span class="text-xs text-gray-500 block">回程 (01/03)</span><span class="font-bold">PHX 飛往 TPE</span></div>
+                                <div class="text-right"><span class="bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded text-sm font-mono">JX025</span><br><span class="text-sm font-bold text-red-500">22:45 起飛</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Car Rental -->
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border-l-4 border-l-emerald-500 border border-gray-100 dark:border-slate-700">
+                        <h3 class="font-bold text-xl mb-4"><i class="fa-solid fa-car-side mr-2"></i>租車注意事項</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">冬季亞利桑那北部存在不可預測之降雪，強烈建議遵守以下原則：</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 指定車型：Mid-size SUV 或以上</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 驅動系統：強烈要求 <strong>AWD 或 4WD</strong></li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 取車檢查：確認暖氣運作、雨刷水抗凍能力、胎紋深度</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Checklist -->
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                    <h3 class="font-bold text-xl mb-4"><i class="fa-solid fa-list-check mr-2 text-orange-500"></i>極端環境裝備檢查表</h3>
+                    <div id="equipment-checklist" class="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Food Database -->
+            <div>
+                <h2 class="text-2xl font-bold mb-4 mt-8">精選美食庫</h2>
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2 mb-6" id="food-filters">
+                    <button class="filter-btn active px-4 py-1.5 rounded-full text-sm font-medium bg-primary text-white" data-filter="all">全部</button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300" data-filter="Phoenix">鳳凰城</button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300" data-filter="Sedona">塞多納</button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300" data-filter="Vegas">拉斯維加斯</button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium border border-orange-300 text-orange-600 dark:text-orange-400" data-filter="steak">牛排/美式</button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium border border-blue-300 text-blue-600 dark:text-blue-400" data-filter="asian">亞洲/熱湯</button>
+                </div>
+                
+                <!-- Food Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="food-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        /**
+         * System Core Data (appData)
+         * 更新：
+         * 1. 移除了戰略字眼，改為客觀專業描述。
+         * 2. 加入了每個景點與節日（12/25, 01/01）的營業狀態查核。
+         * 3. 將每日的早、午、晚餐餐廳明確排入 schedule 中。
+         * 4. 確認自駕路線為最順暢的「逆時針大圓環」行車動線。
+         */
+        const appData = {
+            state: {
+                isDetailMode: true,
+                currentTab: 'dashboard',
+                exchangeRate: 31.5
+            },
+            itinerary: [
+                {
+                    date: "12/24", day: "週四", id: "day1",
+                    location: "鳳凰城 (Phoenix)", lat: 33.4352, lng: -112.0101, 
+                    title: "直飛抵達與取車",
+                    type: "flight", icon: "fa-plane-arrival", color: "bg-blue-500",
+                    desc: "抵達鳳凰城辦理入境與租車，第一晚在市區享用平安夜晚餐，調整時差。",
+                    sop: "入關後搭乘 Sky Train 前往 Rental Car Center。冬季建議確認租到 AWD/4WD 車款。第一晚不要安排過遠車程。",
+                    risk: "班機延誤可能導致租車中心大排長龍，備妥預約文件。平安夜許多餐廳提早打烊，晚餐需事先訂位或準備備案。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Phoenix+Sky+Harbor+International+Airport",
+                    stats: { driveHours: 0.5, actHours: 2 },
+                    schedule: [
+                        { 
+                            time: "17:40 - 18:30", text: "星宇 JX026 抵達鳳凰城 (PHX)，辦理入境與提領行李", 
+                            tips: "準備好電子機票與 ESTA 紙本備查。過海關後循著「Ground Transportation」指標前進。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=PHX+Terminal+3" 
+                        },
+                        { 
+                            time: "18:30 - 19:30", text: "搭乘 Sky Train 前往租車中心，辦理取車手續", 
+                            route: "出航廈搭乘 24小時營運的免費 PHX Sky Train 直達 Rental Car Center。", 
+                            tips: "取車時強烈要求 AWD/4WD 車款，並仔細檢查暖氣與輪胎胎紋深度。確認合約是否含 CDW 保險。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=PHX+Rental+Car+Center" 
+                        },
+                        { 
+                            time: "19:30 - 20:00", text: "驅車前往鳳凰城市區飯店 Check-in", 
+                            route: "走 I-10 W 高速公路前往市區，車程約 15 分鐘。", 
+                            tips: "剛落地加上夜間駕駛，請放慢車速熟悉油門與煞車手感。"
+                        },
+                        { 
+                            time: "20:00 - 22:00", text: "【晚餐】Steak 44 頂級牛排館 (需提前預約) 或飯店內用餐", 
+                            tips: "平安夜許多店家無營業或提早打烊，若無預約，可選擇營業較晚的 Panda Express 亞洲快餐或飯店餐廳。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Steak+44+Phoenix" 
+                        },
+                        { 
+                            time: "22:00", text: "返回飯店休息，調整時差" 
+                        }
+                    ]
+                },
+                {
+                    date: "12/25", day: "週五", id: "day2",
+                    location: "塞多納 (Sedona)", lat: 34.8697, lng: -111.7610,
+                    title: "聖誕節自然探索",
+                    type: "drive", icon: "fa-car", color: "bg-emerald-500",
+                    desc: "早上驅車北上塞多納，因聖誕節多數商家休息，正好前往 Airport Mesa 捕捉壯觀紅岩落日。",
+                    sop: "沿 I-17 N 轉 AZ-179 N 進入塞多納（景觀公路）。下午提早前往 Airport Mesa 卡位看夕陽。",
+                    risk: "【聖誕節營業狀態】國家級與州立戶外景點(如 Airport Mesa) 全天開放。但多數超市與餐廳皆關閉，建議依賴亞洲餐廳或提前備妥乾糧。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Sedona+Arizona",
+                    stats: { driveHours: 2.5, actHours: 4 },
+                    schedule: [
+                        { 
+                            time: "08:30 - 09:30", text: "【早餐】飯店內享用或星巴克外帶", 
+                            tips: "出發前先在鳳凰城買好幾大罐礦泉水放車上備用。"
+                        },
+                        { 
+                            time: "09:30 - 11:15", text: "行駛 I-17 N 北上往塞多納", 
+                            route: "沿 I-17 N 一路向北行駛約 60 英里，開始進入高海拔區域。", 
+                            tips: "沿路風景會從沙漠仙人掌逐漸變成高山針葉林，留意速限變化。" 
+                        },
+                        { 
+                            time: "11:15 - 11:45", text: "Sunset Point Rest Area 休息與看風景", 
+                            route: "位於 I-17 N 高速公路右側的官方休息站。", 
+                            tips: "亞利桑那高速公路沿途廁所距離極遠，建議在此務必下車使用洗手間，並欣賞山谷遼闊視野。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Sunset+Point+Rest+Area+AZ" 
+                        },
+                        { 
+                            time: "11:45 - 12:30", text: "轉入 AZ-179 N (紅岩景觀公路) 抵達塞多納"
+                        },
+                        { 
+                            time: "12:30 - 14:00", text: "【午餐】Szechuan Restaurant (四川餐廳) 或自備乾糧", 
+                            tips: "聖誕節當天美式餐廳多休息，亞洲餐廳（如中式餐館）通常會正常營業，是最佳選擇。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Szechuan+Restaurant+Sedona" 
+                        },
+                        { 
+                            time: "14:00 - 16:00", text: "前往 Airport Mesa，搶佔停車位並短程徒步", 
+                            route: "由 AZ-89A 轉進 Airport Rd 上坡，約 1 英里後左側即是停車場。", 
+                            tips: "此景點全年開放。山頂免費停車位極少。若客滿，需繼續往上開至付費停車場，再步行下山回到觀景點。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Airport+Mesa+Sedona" 
+                        },
+                        { 
+                            time: "16:00 - 17:30", text: "Airport Mesa 拍攝紅岩落日 (約 17:15 日落)", 
+                            tips: "太陽下山後氣溫會瞬間驟降，務必將防寒羽絨衣帶下車。" 
+                        },
+                        { 
+                            time: "18:00 - 19:30", text: "【晚餐】Sedona Pizza Company 或飯店內餐廳",
+                            tips: "Sedona Pizza Company 過去在聖誕節有營業紀錄，若無開放可回到飯店內的附屬餐廳用餐。"
+                        }
+                    ]
+                },
+                {
+                    date: "12/26", day: "週六", id: "day3",
+                    location: "塞多納 (Sedona)", lat: 34.8251, lng: -111.7885,
+                    title: "紅岩晨跑與能量之旅",
+                    type: "activity", icon: "fa-person-hiking", color: "bg-orange-500",
+                    desc: "清晨在 Cathedral Rock 周邊安排越野晨跑。下午參觀岩石中的聖十字教堂。",
+                    sop: "Cathedral Rock 停車場極小，建議日出前抵達或搭乘接駁車。下午前往教堂注意車流管制。",
+                    risk: "清晨氣溫可能逼近 0度，注意頭部保暖。步道部分路段需手腳並用攀爬。今日各設施與餐廳皆恢復正常營業。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Cathedral+Rock+Trailhead",
+                    stats: { driveHours: 1, actHours: 6 },
+                    schedule: [
+                        { 
+                            time: "06:30 - 09:00", text: "清晨抵達 Cathedral Rock 停車場，日出越野晨跑/徒步", 
+                            route: "從 AZ-179 轉 Back O Beyond Rd 到底。", 
+                            tips: "全年無休。此處為塞多納最強能量漩渦 (Vortex) 之一。後半段步道陡峭需手腳並用，建議穿著防滑越野鞋並戴手套保暖。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Cathedral+Rock+Trailhead" 
+                        },
+                        { 
+                            time: "09:00 - 11:00", text: "【早餐】Coffee Pot Restaurant",
+                            tips: "這家是塞多納極具代表性的老牌美式早餐店，提供超過 100 種歐姆蛋，非常適合爬山後補充熱量。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Coffee+Pot+Restaurant+Sedona"
+                        },
+                        { 
+                            time: "11:00 - 13:00", text: "參觀 Tlaquepaque Arts & Shopping Village 藝術村", 
+                            tips: "已恢復營業。充滿墨西哥風情的藝術村，適合購買當地印第安手工藝品與明信片。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Tlaquepaque+Arts+Sedona" 
+                        },
+                        { 
+                            time: "13:00 - 14:30", text: "【午餐】Elote Cafe 創意墨西哥料理", 
+                            tips: "當地名店，未訂位需現場提早候位，烤玉米 (Elote) 是必點招牌。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Elote+Cafe+Sedona" 
+                        },
+                        { 
+                            time: "15:00 - 16:30", text: "參觀 聖十字教堂 (Chapel of the Holy Cross)", 
+                            route: "沿 AZ-179 南下，轉入 Chapel Rd 直行到底。", 
+                            tips: "確認 12/26 正常開放 (9:00-17:00)。教堂建於紅岩峭壁之中，極具視覺震撼。停車場常客滿，沿途斜坡若有空位即可先停。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Chapel+of+the+Holy+Cross+Sedona" 
+                        },
+                        { 
+                            time: "16:30 - 17:30", text: "Bell Rock 周邊步道散步，欣賞晚霞", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Bell+Rock+Sedona" 
+                        },
+                        { 
+                            time: "18:00", text: "【晚餐】The Hudson",
+                            tips: "景觀極佳的景觀餐廳，提供高品質美式料理，建議提早訂位。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=The+Hudson+Sedona"
+                        }
+                    ]
+                },
+                {
+                    date: "12/27", day: "週日", id: "day4",
+                    location: "大峽谷 (Grand Canyon)", lat: 36.0617, lng: -112.1077,
+                    title: "大峽谷南緣日落",
+                    type: "drive", icon: "fa-mountain-sun", color: "bg-emerald-500",
+                    desc: "驅車前往大峽谷南緣，於 Mather Point 迎接壯闊日落與星空攝影。",
+                    sop: "從塞多納走 89A 經旗桿市(Flagstaff) 北上。下午 4 點前抵達南緣入口以避開車潮。準備三腳架拍攝星空。",
+                    risk: "大峽谷南緣 365 天 24 小時開放。峽谷邊緣風大且無護欄，夜間拍攝需配戴頭燈。極度嚴寒，需穿戴防寒裝備。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Grand+Canyon+National+Park+South+Rim",
+                    stats: { driveHours: 2.5, actHours: 5 },
+                    schedule: [
+                        { 
+                            time: "08:00 - 09:00", text: "【早餐】飯店早餐並退房" 
+                        },
+                        { 
+                            time: "09:00 - 10:00", text: "經 AZ-89A 公路 (Oak Creek Canyon) 北上", 
+                            route: "這是極美的峽谷穿梭公路，沿著溪流一路爬升。", 
+                            tips: "此路段多連續彎道且為雙向單線道，切勿違規超車。" 
+                        },
+                        { 
+                            time: "10:00 - 10:30", text: "Slide Rock State Park 臨停拍照休息", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Slide+Rock+State+Park" 
+                        },
+                        { 
+                            time: "11:00 - 12:30", text: "【午餐】Flagstaff Brewing Company (旗桿市)", 
+                            tips: "Flagstaff 是進入大峽谷前最後一個大型城鎮，請在此將油箱加滿，並在此美式小酒館享用漢堡午餐。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Flagstaff+Brewing+Company" 
+                        },
+                        { 
+                            time: "12:30 - 14:00", text: "走 US-180 N 轉 AZ-64 N 直奔大峽谷南緣" 
+                        },
+                        { 
+                            time: "14:00 - 15:30", text: "南緣收費站入園，至遊客中心了解當天天候", 
+                            tips: "大峽谷南緣全年無休。入園時可購買國家公園年票。先至 Visitor Center 詢問 Ranger 今晚的雲量與星空預測。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Grand+Canyon+Visitor+Center" 
+                        },
+                        { 
+                            time: "15:30 - 17:30", text: "Mather Point 卡位拍攝大峽谷壯闊日落", 
+                            route: "從遊客中心步行約 5-10 分鐘即可抵達。", 
+                            tips: "這是南緣最經典的觀景台，請提早架好三腳架。留意自身安全，切勿跨越護欄。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Mather+Point+Grand+Canyon" 
+                        },
+                        { 
+                            time: "18:00 - 19:30", text: "大峽谷園區內飯店 Check-in 與 【晚餐】El Tovar Dining Room",
+                            tips: "El Tovar 是大峽谷內歷史最悠久的高級餐廳，氣氛極佳，需提前預訂。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=El+Tovar+Dining+Room"
+                        },
+                        { 
+                            time: "20:00 - 22:00", text: "無光害區域進行首場星空/星軌夜景攝影", 
+                            tips: "園區夜間極度嚴寒 (-5度以下)，請穿上所有最厚的衣物，相機電池需放在貼身口袋保暖以免當機。" 
+                        }
+                    ]
+                },
+                {
+                    date: "12/28", day: "週一", id: "day5",
+                    location: "大峽谷 (Grand Canyon)", lat: 36.0336, lng: -111.8519,
+                    title: "景觀公路極致解鎖",
+                    type: "activity", icon: "fa-camera", color: "bg-purple-500",
+                    desc: "沿 Desert View Drive 往東自駕，解鎖各觀景台，傍晚駐守 Lipan Point。",
+                    sop: "自駕極為彈性，各觀景台皆有停車場。Lipan Point 視野廣闊且可見科羅拉多河，是日落與星空的首選地點。",
+                    risk: "相機電池在低溫下急遽掉電，需準備至少 3 顆備用電池並放在貼身口袋保暖。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Desert+View+Drive+Grand+Canyon",
+                    stats: { driveHours: 1.5, actHours: 7 },
+                    schedule: [
+                        { 
+                            time: "08:00 - 09:00", text: "【早餐】Maswik Food Court",
+                            tips: "園區內的平價美食廣場，提供美式早餐與熱咖啡，並順便購買中午的潛艇堡或三明治。"
+                        },
+                        { 
+                            time: "09:30 - 11:00", text: "沿 Desert View Drive (AZ-64 E) 往東，停靠 Grandview Point", 
+                            route: "這是南緣唯一一條允許全線自駕的景觀公路，沿途每個 Point 都可隨意停靠。", 
+                            tips: "Grandview 視野極佳，可看見明顯的斷層與峽谷色彩層次。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Grandview+Point+Grand+Canyon" 
+                        },
+                        { 
+                            time: "11:30 - 12:30", text: "停靠 Moran Point 欣賞不同層次峽谷", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Moran+Point" 
+                        },
+                        { 
+                            time: "12:30 - 13:30", text: "【午餐】於觀景台或車內享用自備簡易午餐", 
+                            tips: "東線路上餐廳極少，強烈建議早上先買好三明治，在車內一邊開暖氣一邊看峽谷用餐。" 
+                        },
+                        { 
+                            time: "14:00 - 15:00", text: "Desert View Watchtower (沙漠景觀瞭望塔) 參觀", 
+                            tips: "這是東門的標誌性建築，內部有印第安壁畫，頂層可360度俯瞰峽谷與科羅拉多河。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Desert+View+Watchtower" 
+                        },
+                        { 
+                            time: "15:30 - 17:30", text: "退回 Lipan Point 駐守，拍攝光影變化與日落", 
+                            tips: "Lipan Point 被眾多攝影師譽為南緣拍日落的最佳地點，因為它能拍到極長一段的科羅拉多河 U型彎。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Lipan+Point+Grand+Canyon" 
+                        },
+                        { 
+                            time: "18:00 - 19:30", text: "【晚餐】Yavapai Tavern",
+                            tips: "返回園區中心區享用熱騰騰的漢堡與啤酒，為疲憊的一天收尾。"
+                        }
+                    ]
+                },
+                {
+                    date: "12/29", day: "週二", id: "day6",
+                    location: "佩吉市 (Page)", lat: 36.8791, lng: -111.5104,
+                    title: "羚羊谷與馬蹄灣",
+                    type: "drive", icon: "fa-water", color: "bg-teal-500",
+                    desc: "驅車前往佩吉市。預約中午光線完美的下羚羊峽谷，下午前往馬蹄灣拍攝。",
+                    sop: "羚羊峽谷需報名當地導覽團（嚴格規定禁帶背包與三腳架）。馬蹄灣需從停車場步行 15 分鐘無遮蔽沙地。",
+                    risk: "大峽谷東門駛出往 Page 的 89 號公路可能有積雪黑冰。馬蹄灣邊緣危險，拍照切勿退後。羚羊谷與馬蹄灣皆正常開放。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Page+Arizona",
+                    stats: { driveHours: 2.5, actHours: 5 },
+                    schedule: [
+                        { 
+                            time: "07:30 - 08:30", text: "【早餐】飯店退房前簡便用餐，準備離開大峽谷" 
+                        },
+                        { 
+                            time: "08:30 - 10:00", text: "經 AZ-64 E 轉 US-89 N 前往 Page", 
+                            route: "從大峽谷東門出園，接上 US-89 向北行駛。", 
+                            tips: "清晨的 AZ-64 森林路段地面極容易結黑冰 (Black Ice)，請切勿急煞與隨意超車。" 
+                        },
+                        { 
+                            time: "10:00 - 10:30", text: "Cameron Trading Post 休息、上廁所", 
+                            tips: "這是一個大型的印第安休息站，可買到當地的特色食物『印第安炸麵包 (Navajo Fry Bread)』當點心。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Cameron+Trading+Post" 
+                        },
+                        { 
+                            time: "10:30 - 11:30", text: "繼續行駛抵達佩吉市 (Page)" 
+                        },
+                        { 
+                            time: "11:30 - 12:00", text: "下羚羊峽谷 (Lower Antelope Canyon) 導覽報到", 
+                            route: "位於 AZ-98 公路上，依據預約的旅行社 (Ken's 或 Dixie's) 指標進入停車場。", 
+                            tips: "納瓦霍族保留區規定極度嚴格：絕對禁止攜帶任何包包、禁止三腳架。建議提早 30 分鐘報到。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Lower+Antelope+Canyon" 
+                        },
+                        { 
+                            time: "12:00 - 13:30", text: "下羚羊峽谷導覽 (拍攝正午完美光線)", 
+                            tips: "下羚羊需爬陡峭鐵梯進入地底裂縫。峽谷內光差極大，相機請使用 HDR 或稍微減曝保留高光細節。" 
+                        },
+                        { 
+                            time: "14:00 - 15:00", text: "【午餐】Birdhouse 炸雞專賣店", 
+                            tips: "佩吉市人氣極高的美式炸雞店，外酥內嫩，能迅速補充峽谷爬梯消耗的熱量。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Birdhouse+Page+AZ" 
+                        },
+                        { 
+                            time: "15:30 - 17:30", text: "馬蹄灣 (Horseshoe Bend) 拍攝 U 型彎道與日落", 
+                            route: "位於 US-89 公路旁，需支付 $10 車輛停車費。", 
+                            tips: "從停車場需步行約 15-20 分鐘的沙地才能抵達懸崖邊。崖邊無任何護欄，拍照時切忌背對峽谷退後！", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Horseshoe+Bend+Parking" 
+                        },
+                        { 
+                            time: "18:30", text: "飯店 Check-in 與 【晚餐】State 48 Tavern",
+                            tips: "當地知名的餐酒館，提供豐富的美式料理與在地精釀啤酒。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=State+48+Tavern+Page"
+                        }
+                    ]
+                },
+                {
+                    date: "12/30", day: "週三", id: "day7",
+                    location: "拉斯維加斯 (Las Vegas)", lat: 36.1215, lng: -115.1615,
+                    title: "駛入賭城與視覺震撼",
+                    type: "drive", icon: "fa-city", color: "bg-pink-500",
+                    desc: "由佩吉市出發前往拉斯維加斯，傍晚前往 Sphere 欣賞沉浸式大秀。",
+                    sop: "今日為長途行車，行駛順暢的逆時針大圓環西半部。抵達 LV 後辦理入住手續。Sphere 秀需提前購票。",
+                    risk: "跨年前夕 The Strip 交通開始壅塞，留意飯店停車場入口動線。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Las+Vegas+Strip",
+                    stats: { driveHours: 5, actHours: 4 },
+                    schedule: [
+                        { 
+                            time: "08:00 - 09:00", text: "【早餐】飯店早餐並退房，準備長途跋涉" 
+                        },
+                        { 
+                            time: "09:00 - 10:30", text: "經 US-89 往西北行駛至 Kanab, UT", 
+                            tips: "這段路程將短暫進入猶他州，此為銜接拉斯維加斯最順暢平坦的路線。" 
+                        },
+                        { 
+                            time: "10:30 - 11:00", text: "Kanab 小鎮休息站上廁所、買咖啡", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Kanab+UT" 
+                        },
+                        { 
+                            time: "11:00 - 12:30", text: "繼續經 AZ-389 / UT-59 駛往 St. George, UT" 
+                        },
+                        { 
+                            time: "12:30 - 13:30", text: "【午餐】In-N-Out Burger (St. George)", 
+                            tips: "抵達美西必吃的漢堡快餐名店，方便快速且順路，用完餐後順便將車輛加滿油。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=In-N-Out+Burger+St.+George" 
+                        },
+                        { 
+                            time: "13:30 - 14:30", text: "行駛 I-15 S，穿越壯觀的 Virgin River Gorge", 
+                            route: "直接駛上 I-15 高速公路向南，這是一段直接穿越深邃峽谷的壯麗高速公路。", 
+                            tips: "此路段車速極快且大卡車多，路面蜿蜒，請集中精神駕駛。" 
+                        },
+                        { 
+                            time: "14:30 - 15:00", text: "Moapa Valley 休息站最後停留" 
+                        },
+                        { 
+                            time: "15:30 - 16:30", text: "駛入拉斯維加斯，飯店 Check-in", 
+                            tips: "跨年前夕，賭城大道 (The Strip) 已經開始出現嚴重塞車。導航請設定飯店的『Self Parking』入口。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Las+Vegas+Strip" 
+                        },
+                        { 
+                            time: "17:30 - 19:00", text: "【晚餐】Gordon Ramsay Burger (Planet Hollywood 內)", 
+                            tips: "品嚐地獄廚神的名氣漢堡，用完餐後可順道欣賞 Bellagio 噴泉秀。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Gordon+Ramsay+Burger+Las+Vegas" 
+                        },
+                        { 
+                            time: "19:00 - 22:00", text: "前往 Sphere 體驗沉浸式大秀 (Postcard from Earth)", 
+                            route: "可從 The Venetian (威尼斯人) 的室內連通道步行前往 Sphere。", 
+                            tips: "20:00 的演出，強烈建議 19:00 就入場體驗一樓大廳的 AI 互動設施。館內嚴格安檢，勿帶大背包。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Sphere+Las+Vegas" 
+                        }
+                    ]
+                },
+                {
+                    date: "12/31", day: "週四", id: "day8",
+                    location: "拉斯維加斯 (Las Vegas)", lat: 36.1147, lng: -115.1728,
+                    title: "跨年夜大道狂歡",
+                    type: "activity", icon: "fa-champagne-glasses", color: "bg-yellow-500",
+                    desc: "全面切換為步行。在客房陽台架設相機捕捉煙火，隨後步入封街大道倒數。",
+                    sop: "下午 5 點 The Strip 全面封街。禁止攜帶玻璃瓶或大型背包上街。確認相機設定：手動對焦無限遠、快門 B 檔。",
+                    risk: "人潮極度擁擠，扒手風險高。封街期間無法開車移動，晚餐必須預訂步行可達的餐廳。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Las+Vegas+Strip",
+                    stats: { driveHours: 0, actHours: 8 },
+                    schedule: [
+                        { 
+                            time: "10:00 - 11:30", text: "【早餐】Mon Ami Gabi 法式餐廳早午餐",
+                            tips: "位於 Paris 飯店樓下，坐在戶外區可以直接看著對面的 Bellagio 水舞吃早餐，極具異國情調。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Mon+Ami+Gabi+Las+Vegas"
+                        },
+                        { 
+                            time: "11:30 - 14:30", text: "徒步探索各大主題飯店 (Venetian 運河、Caesar's 羅馬競技場)", 
+                            tips: "今天一整天請完全依賴雙腳與單軌列車 (Monorail)，絕對不要開車出去。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Caesars+Palace" 
+                        },
+                        { 
+                            time: "14:30 - 15:30", text: "【午餐】Earl of Sandwich",
+                            tips: "號稱賭城 CP 值最高且最美味的熱壓三明治，排隊人潮多但前進速度快。"
+                        },
+                        { 
+                            time: "15:30 - 16:30", text: "返回飯店休息，確認車輛已停妥", 
+                            tips: "從這刻起 The Strip 周邊會陷入交通癱瘓，停車場也會進行管制。" 
+                        },
+                        { 
+                            time: "17:00", text: "The Strip (拉斯維加斯大道) 全面封街，僅限行人", 
+                            tips: "警方會拉起封鎖線。上街『嚴禁攜帶玻璃瓶裝酒精飲料』與『大型背包』，請帶小斜背包並注意扒手。" 
+                        },
+                        { 
+                            time: "18:30 - 20:30", text: "【晚餐】Mastro's Ocean Club 或飯店內高級餐廳", 
+                            tips: "跨年夜沒有預約絕對吃不到任何稍微正式的餐廳。請務必在出發前數個月就完成線上訂位。" 
+                        },
+                        { 
+                            time: "21:00 - 23:30", text: "漫步封街大道，感受街頭派對與狂歡氣氛", 
+                            tips: "整個大道會變成數十萬人的大型派對，可以買些合法的塑料杯裝調酒邊走邊喝。" 
+                        },
+                        { 
+                            time: "23:30 - 00:30", text: "尋找無遮蔽視角或返回客房陽台，倒數迎接跨年煙火", 
+                            tips: "LV 的跨年煙火是從各大飯店屋頂同時施放。攝影玩家建議提前在客房陽台架好腳架。" 
+                        }
+                    ]
+                },
+                {
+                    date: "01/01", day: "週五", id: "day9",
+                    location: "拉斯維加斯 (Las Vegas)", lat: 36.1610, lng: -115.1581,
+                    title: "元旦購物與頂級秀",
+                    type: "activity", icon: "fa-bag-shopping", color: "bg-indigo-500",
+                    desc: "下午前往 Premium Outlets 享受新年折扣。晚上觀賞經典的太陽馬戲團 'O' Show。",
+                    sop: "Outlets North 為戶外型，需注意保暖。'O' Show 位於 Bellagio 內，演出前 30 分鐘入座。",
+                    risk: "【元旦營業狀態】Outlets 與 O Show 皆正常營運。元旦 Outlets 人潮眾多，熱門品牌需排隊。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Las+Vegas+North+Premium+Outlets",
+                    stats: { driveHours: 1, actHours: 6 },
+                    schedule: [
+                        { 
+                            time: "11:00 - 13:00", text: "【早午餐】Bacchanal Buffet (凱薩宮百樂宮自助餐)",
+                            tips: "全美最著名的頂級 Buffet 之一，元旦睡到自然醒後用澎湃的海鮮與烤肉開啟新的一年。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Bacchanal+Buffet"
+                        },
+                        { 
+                            time: "13:30 - 17:00", text: "前往 Las Vegas North Premium Outlets 新年採購", 
+                            route: "開車或搭乘 Uber 往北，約 15 分鐘車程。", 
+                            tips: "North 區品牌較齊全但為『戶外開放式』設計，一月風大會冷，請穿好外套。元旦通常有折上折優惠。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Las+Vegas+North+Premium+Outlets" 
+                        },
+                        { 
+                            time: "17:00 - 18:00", text: "返回飯店放置戰利品，稍作休息" 
+                        },
+                        { 
+                            time: "18:00 - 19:30", text: "【晚餐】Shang Artisan Noodle (手工麵館)", 
+                            tips: "在寒冷的冬天晚上，來一碗熱騰騰的道地亞洲牛肉湯麵解酒保暖，評價極高。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Shang+Artisan+Noodle+Las+Vegas" 
+                        },
+                        { 
+                            time: "20:00 - 20:30", text: "前往 Bellagio 準備觀賞太陽馬戲團 'O' Show", 
+                            tips: "O 秀劇院在 Bellagio 賭場深處，請預留從大門走進去的迷路時間（約 15 分鐘）。" 
+                        },
+                        { 
+                            time: "20:30 - 22:00", text: "欣賞世界頂級水上大秀 'O' Show", 
+                            tips: "全場禁止拍照錄影。舞台機關與水池變換極度震撼，是 LV 必看首選。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=O+by+Cirque+du+Soleil" 
+                        }
+                    ]
+                },
+                {
+                    date: "01/02", day: "週六", id: "day10",
+                    location: "胡佛水壩 / 鳳凰城", lat: 36.0160, lng: -114.7377,
+                    title: "歷史大壩與南下",
+                    type: "drive", icon: "fa-bridge-water", color: "bg-emerald-500",
+                    desc: "離開賭城，參觀胡佛水壩 (Hoover Dam)。隨後沿沙漠公路南下回到鳳凰城。",
+                    sop: "胡佛水壩有安檢，勿攜帶違禁品。經 93 號公路南下是一段筆直且枯燥的沙漠公路，途中需換手駕駛。",
+                    risk: "【營業狀態查核】胡佛水壩僅於感恩節/聖誕節關閉，01/02 正常開放。長途駕駛易疲勞，注意時間控管。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Hoover+Dam",
+                    stats: { driveHours: 5, actHours: 2 },
+                    schedule: [
+                        { 
+                            time: "08:30 - 09:30", text: "【早餐】飯店內簡便早餐並辦理退房，告別賭城" 
+                        },
+                        { 
+                            time: "09:30 - 10:30", text: "驅車前往胡佛水壩 (Hoover Dam)", 
+                            route: "走 US-93 S 約 45 分鐘，直接順路連接回鳳凰城的動線。", 
+                            tips: "進入水壩區前會有軍警的隨機車輛安檢，切勿攜帶大麻或槍械等違禁品。" 
+                        },
+                        { 
+                            time: "10:30 - 12:00", text: "參觀胡佛水壩與大橋，拍攝歷史工程", 
+                            tips: "一定要走上 Mike O'Callaghan–Pat Tillman 紀念大橋，由上往下拍攝水壩全景最壯觀。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Hoover+Dam+Bypass+Bridge" 
+                        },
+                        { 
+                            time: "12:00 - 13:30", text: "沿 US-93 S 南下前往 Kingman" 
+                        },
+                        { 
+                            time: "13:30 - 14:30", text: "【午餐】Mr D'z Route 66 Diner (Kingman)", 
+                            tips: "位於 66 號公路歷史小鎮的經典復古美式 Diner，推薦品嚐漢堡與奶昔，順便拍攝復古汽車。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Mr+D'z+Route+66+Diner" 
+                        },
+                        { 
+                            time: "14:30 - 16:30", text: "繼續行駛枯燥的沙漠公路 US-93 S，途中至 Wickenburg 休息換手", 
+                            tips: "這段公路非常筆直且容易打瞌睡，強烈建議副駕保持清醒並隨時陪駕駛聊天或換手。" 
+                        },
+                        { 
+                            time: "16:30 - 18:00", text: "抵達鳳凰城，辦理飯店 Check-in", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Phoenix+AZ" 
+                        },
+                        { 
+                            time: "19:00 - 21:00", text: "【晚餐】The Arrogant Butcher",
+                            tips: "鳳凰城市區知名的高級餐酒館，旅程最後一晚享用海鮮與牛排慶祝。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=The+Arrogant+Butcher+Phoenix"
+                        }
+                    ]
+                },
+                {
+                    date: "01/03", day: "週日", id: "day11",
+                    location: "鳳凰城 (Phoenix)", lat: 33.4600, lng: -111.9444,
+                    title: "城市巡禮與夜間登機",
+                    type: "flight", icon: "fa-plane-departure", color: "bg-red-500",
+                    desc: "參觀博物館與植物園。晚上 19:30 前往 PHX 機場還車，搭乘 JX025 返台。",
+                    sop: "退房後將行李放車上。還車前務必加滿油（選擇 Rental Car Return 標誌）。",
+                    risk: "市區可能有下班車潮，前往機場務必多抓 30 分鐘緩衝。再次確認所有護照與貴重物品已從租車上帶走。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Phoenix+Sky+Harbor+International+Airport",
+                    stats: { driveHours: 1.5, actHours: 5 },
+                    schedule: [
+                        { 
+                            time: "09:00 - 10:00", text: "【早餐】飯店早餐並完成行李打包 (預留當日換洗衣物)" 
+                        },
+                        { 
+                            time: "10:30 - 12:30", text: "參觀鳳凰城沙漠植物園 (Desert Botanical Garden)", 
+                            tips: "全年開放。全美最壯觀的仙人掌植物園，一月氣候涼爽非常適合漫步。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Desert+Botanical+Garden+Phoenix" 
+                        },
+                        { 
+                            time: "12:30 - 14:00", text: "【午餐】Lo-Lo's Chicken & Waffles",
+                            tips: "體驗美國南方的靈魂美食「炸雞鬆餅」，份量極大，好吃又特別。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Lo-Lo's+Chicken+and+Waffles+Phoenix"
+                        },
+                        { 
+                            time: "14:30 - 17:00", text: "參觀 MIM 樂器博物館", 
+                            tips: "這是全球最大的樂器博物館，提供無線耳機，走到哪個國家展區就會自動播放該區樂器聲音，評價極高。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Musical+Instrument+Museum+Phoenix" 
+                        },
+                        { 
+                            time: "17:00 - 18:00", text: "【晚餐】Matt's Big Breakfast 或機場內用", 
+                            tips: "可選擇在市區吃完晚餐，或是直接前往機場，在航廈內尋找美食填飽肚子。" 
+                        },
+                        { 
+                            time: "18:00 - 18:30", text: "尋找機場周邊加油站將油加滿", 
+                            tips: "還車時油表若未滿，租車公司收取的油費會是市價的 2-3倍。記得保留最後加油的收據備查。" 
+                        },
+                        { 
+                            time: "18:30 - 19:15", text: "前往 PHX Rental Car Center 歸還車輛，搭 Sky Train 至航廈", 
+                            route: "導航請務必設定為 'Rental Car Return'，跟著機場指標進入對應的租車公司車道還車。", 
+                            tips: "離開車子前，徹底檢查手套箱、座椅下方、後車廂，確認沒有遺漏護照或個人物品！", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=PHX+Rental+Car+Return" 
+                        },
+                        { 
+                            time: "19:30 - 20:00", text: "星宇航空櫃檯報到、托運行李", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=PHX+Terminal+3" 
+                        },
+                        { 
+                            time: "22:45", text: "搭乘 JX025 班機起飛返回台灣，結束完美旅程" 
+                        }
+                    ]
+                }
+            ],
+            budget: [
+                { category: "機票 (Flight)", desc: "星宇航空 台北-鳳凰城 直飛 (兩人)", amount: 2500, color: "#6366f1" },
+                { category: "住宿 (Hotel)", desc: "10晚住宿 (含賭城跨年高溢價時段)", amount: 3200, color: "#10b981" },
+                { category: "租車與交通 (Car)", desc: "AWD SUV 11天 + 油資 + 停車費", amount: 1100, color: "#f59e0b" },
+                { category: "餐飲 (Food)", desc: "早午晚餐 + 咖啡 + 跨年大餐", amount: 1500, color: "#ef4444" },
+                { category: "活動與門票 (Activity)", desc: "國家公園年票、羚羊谷、Sphere、O Show", amount: 800, color: "#8b5cf6" }
+            ],
+            equipment: [
+                { item: "護照、ESTA 紙本備查、台灣駕照、國際駕照", checked: false },
+                { item: "信用卡 (2-3張不同銀行)、少量美金現鈔(給小費)", checked: false },
+                { item: "相機、超廣角鏡頭、穩固三腳架、快門線", checked: false },
+                { item: "相機備用電池 (至少3顆，抗低溫)、行動電源", checked: false },
+                { item: "極地防寒外套 (Gore-Tex防風防潑水等級)", checked: false },
+                { item: "毛帽、防水手套、發熱衣、羊毛襪、防滑登山鞋", checked: false },
+                { item: "太陽眼鏡、高係數防曬乳 (沙漠紫外線極強)", checked: false },
+                { item: "車用手機支架、車充線、音源線/藍牙設定", checked: false },
+                { item: "保溫瓶 (每天早上在飯店裝熱水)", checked: false },
+                { item: "常備藥品 (感冒、腸胃、暈車藥、個人處方藥)", checked: false }
+            ],
+            food: [
+                { name: "Elote Cafe", loc: "Sedona", type: "mexican", tags: ["Sedona", "特色"], desc: "塞多納極具盛名的墨西哥創新料理，招牌烤玉米必點。需提早排隊或訂位。" },
+                { name: "Steak 44", loc: "Phoenix", type: "steak", tags: ["Phoenix", "steak"], desc: "鳳凰城頂級牛排館，適合做為平安夜或旅程結尾的慶祝大餐。" },
+                { name: "Gordon Ramsay Hell's Kitchen", loc: "Vegas", type: "steak", tags: ["Vegas", "steak"], desc: "朝聖地獄廚房，威靈頓牛排與干貝是經典。跨年期間需提早數月預訂。" },
+                { name: "Grand Canyon Lodge Dining", loc: "Grand Canyon", type: "american", tags: ["Grand Canyon"], desc: "峽谷內少數提供熱食的選擇，景觀無敵，但餐點口味偏向美式粗獷。" },
+                { name: "Shang Artisan Noodle", loc: "Vegas", type: "asian", tags: ["Vegas", "asian"], desc: "賭城評價極高的手工麵館，寒冷冬天來碗熱騰騰的牛肉麵非常療癒。" },
+                { name: "Birdhouse", loc: "Page", type: "american", tags: ["Page", "特色"], desc: "佩吉市在地人氣炸雞店，走完羚羊谷與馬蹄灣後補充熱量的首選。" }
+            ]
+        };
+
+        // ==========================================
+        // 核心邏輯與初始化
+        // ==========================================
+        let map; // Leaflet map instance
+        let markers = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initUI();
+            renderTimeline();
+            renderDateNav();
+            renderBudget();
+            renderChecklist();
+            renderFoodGrid('all');
+            
+            // Map needs a slight delay to ensure container is properly sized in DOM
+            setTimeout(initMap, 100);
+            initCharts();
+
+            // Handle Resize
+            window.addEventListener('resize', () => {
+                if (map) map.invalidateSize();
+            });
+        });
+
+        // ==========================================
+        // UI & 導航控制
+        // ==========================================
+        function initUI() {
+            // Tab Switching
+            const navBtns = document.querySelectorAll('.nav-btn');
+            const tabs = document.querySelectorAll('.tab-content');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            navBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    navBtns.forEach(b => b.classList.remove('active', 'text-primary'));
+                    const targetId = btn.getAttribute('data-target');
+                    document.querySelectorAll(`.nav-btn[data-target="${targetId}"]`).forEach(b => {
+                        b.classList.add('active', 'text-primary');
+                    });
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.getElementById(targetId).classList.add('active');
+                    mobileMenu.classList.add('hidden');
+
+                    if (targetId === 'dashboard' && map) {
+                        setTimeout(() => map.invalidateSize(), 100);
+                    }
+                });
+            });
+
+            // Mobile Menu Toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Dark Mode Toggle
+            const toggleDark = () => {
+                document.documentElement.classList.toggle('dark');
+            };
+            document.getElementById('theme-toggle').addEventListener('click', toggleDark);
+            document.getElementById('theme-toggle-mobile').addEventListener('click', toggleDark);
+
+            // Itinerary View Toggle (Updated to use CSS classes)
+            const btnSimple = document.getElementById('view-simple');
+            const btnDetail = document.getElementById('view-detail');
+            const timelineContainer = document.getElementById('timeline-container');
+
+            btnSimple.addEventListener('click', () => {
+                appData.state.isDetailMode = false;
+                btnSimple.classList.add('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-primary');
+                btnSimple.classList.remove('text-gray-500', 'dark:text-gray-400');
+                btnDetail.classList.remove('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-primary');
+                btnDetail.classList.add('text-gray-500', 'dark:text-gray-400');
+                
+                // Add class to hide detailed elements
+                timelineContainer.classList.add('timeline-simple-mode');
+            });
+
+            btnDetail.addEventListener('click', () => {
+                appData.state.isDetailMode = true;
+                btnDetail.classList.add('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-primary');
+                btnDetail.classList.remove('text-gray-500', 'dark:text-gray-400');
+                btnSimple.classList.remove('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-primary');
+                btnSimple.classList.add('text-gray-500', 'dark:text-gray-400');
+                
+                // Remove class to show detailed elements
+                timelineContainer.classList.remove('timeline-simple-mode');
+            });
+
+            // Currency Converter
+            const usdInput = document.getElementById('usd-input');
+            const twdOutput = document.getElementById('twd-output');
+            usdInput.addEventListener('input', (e) => {
+                const usd = parseFloat(e.target.value) || 0;
+                twdOutput.value = (usd * appData.state.exchangeRate).toLocaleString();
+            });
+        }
+
+        // ==========================================
+        // 模組：互動地圖 (Leaflet)
+        // ==========================================
+        function initMap() {
+            map = L.map('map').setView([35.5, -113], 6);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap &copy; CARTO'
+            }).addTo(map);
+
+            const latlngs = [];
+            appData.itinerary.forEach((day) => {
+                const latlng = [day.lat, day.lng];
+                latlngs.push(latlng);
+                const iconHtml = `<div class="custom-map-marker ${day.color.replace('bg-', 'bg-')}"><i class="fa-solid ${day.icon}"></i></div>`;
+                const customIcon = L.divIcon({ html: iconHtml, className: '', iconSize: [30, 30], iconAnchor: [15, 15] });
+                const marker = L.marker(latlng, { icon: customIcon }).addTo(map);
+                marker.bindPopup(`<b>${day.date} ${day.title}</b><br>${day.location}`);
+                markers.push({ id: day.id, marker: marker });
+            });
+
+            const polyline = L.polyline(latlngs, {color: '#6366f1', weight: 3, dashArray: '5, 10'}).addTo(map);
+            map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+        }
+
+        function flyToMap(id) {
+            document.querySelector('.nav-btn[data-target="dashboard"]').click();
+            setTimeout(() => {
+                const targetMarker = markers.find(m => m.id === id);
+                if (targetMarker) {
+                    map.flyTo(targetMarker.marker.getLatLng(), 11, { duration: 1.5 });
+                    setTimeout(() => targetMarker.marker.openPopup(), 1500);
+                }
+            }, 200);
+        }
+
+        // ==========================================
+        // 模組：圖表 (Chart.js)
+        // ==========================================
+        function initCharts() {
+            Chart.defaults.color = document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b';
+            Chart.defaults.font.family = "'Inter', sans-serif";
+
+            const ctxLoad = document.getElementById('loadChart').getContext('2d');
+            new Chart(ctxLoad, {
+                type: 'bar',
+                data: {
+                    labels: appData.itinerary.map(d => d.date),
+                    datasets: [
+                        { label: '駕駛時數 (hr)', data: appData.itinerary.map(d => d.stats.driveHours), backgroundColor: '#f59e0b', borderRadius: 4 },
+                        { label: '活動/徒步時數 (hr)', data: appData.itinerary.map(d => d.stats.actHours), backgroundColor: '#10b981', borderRadius: 4 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } } }
+            });
+
+            const ctxBudget = document.getElementById('budgetChart').getContext('2d');
+            new Chart(ctxBudget, {
+                type: 'doughnut',
+                data: {
+                    labels: appData.budget.map(b => b.category.split(' ')[0]),
+                    datasets: [{ data: appData.budget.map(b => b.amount), backgroundColor: appData.budget.map(b => b.color), borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } }
+            });
+        }
+
+        // ==========================================
+        // 模組：行程渲染 (一列一列超詳盡版)
+        // ==========================================
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            if (!appData.state.isDetailMode) container.classList.add('timeline-simple-mode');
+            
+            let html = '';
+
+            appData.itinerary.forEach((day, index) => {
+                html += `
+                <div id="${day.id}" class="mb-14 scroll-mt-36">
+                    
+                    <!-- Day Header Sticky -->
+                    <div class="sticky top-[125px] md:top-[100px] z-10 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur-md py-4 mb-6 border-b-2 border-gray-200 dark:border-slate-700">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-xl ${day.color} text-white flex items-center justify-center text-xl shadow-lg mr-4 flex-shrink-0">
+                                    <i class="fa-solid ${day.icon}"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white flex items-center tracking-tight">
+                                        Day ${index + 1} <span class="mx-2 text-gray-300 dark:text-slate-600">|</span> ${day.date} ${day.day}
+                                    </h2>
+                                    <p class="text-primary font-medium text-sm mt-0.5">
+                                        <i class="fa-solid fa-location-dot mr-1"></i>${day.location}
+                                        <span class="text-gray-400 dark:text-gray-500 mx-1">·</span> 
+                                        <span class="text-gray-500 dark:text-gray-400">${day.title}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2 shrink-0">
+                                <a href="${day.mapsLink}" target="_blank" class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                                    <i class="fa-brands fa-google text-blue-500 mr-1"></i>今日導航
+                                </a>
+                                <button onclick="flyToMap('${day.id}')" class="px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-secondary border border-indigo-100 dark:border-indigo-800/50 rounded-lg text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
+                                    <i class="fa-solid fa-crosshairs mr-1"></i>行程地圖
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row by Row Schedule Container -->
+                    <div class="relative pl-6 md:pl-10 space-y-5 before:absolute before:inset-y-0 before:left-[11px] md:before:left-[19px] before:w-[2px] before:bg-gray-200 dark:before:bg-slate-700">
+                `;
+
+                if (day.schedule) {
+                    day.schedule.forEach((s) => {
+                        // 智慧判斷 Icon 與顏色
+                        let iconClass = "fa-location-dot text-gray-400";
+                        let ringColor = "ring-gray-100 dark:ring-slate-800";
+                        
+                        if (s.text.match(/飛|航班|機場|搭乘|起飛|降落/)) { iconClass = "fa-plane text-blue-500"; ringColor = "ring-blue-100 dark:ring-blue-900/30"; }
+                        else if (s.text.match(/車|駛|自駕|停車|加油/)) { iconClass = "fa-car text-emerald-500"; ringColor = "ring-emerald-100 dark:ring-emerald-900/30"; }
+                        else if (s.text.match(/餐|吃|咖啡|乾糧|早餐|午餐|晚餐/)) { iconClass = "fa-utensils text-orange-500"; ringColor = "ring-orange-100 dark:ring-orange-900/30"; }
+                        else if (s.text.match(/飯店|Check-in|休息|退房|睡/)) { iconClass = "fa-bed text-indigo-500"; ringColor = "ring-indigo-100 dark:ring-indigo-900/30"; }
+                        else if (s.text.match(/步|跑|拍|參觀|看|徒步|攝影|導覽|抵達/)) { iconClass = "fa-camera text-purple-500"; ringColor = "ring-purple-100 dark:ring-purple-900/30"; }
+
+                        // 組合額外的詳細資訊 (受 detail-element 控制顯示/隱藏)
+                        let extraDetailsHtml = '';
+                        if (s.route) {
+                            extraDetailsHtml += `
+                                <div class="mt-3 text-sm text-gray-500 dark:text-gray-400 flex items-start detail-element">
+                                    <i class="fa-solid fa-route mt-0.5 mr-2 text-gray-400 dark:text-gray-500"></i>
+                                    <span><strong>路線建議：</strong>${s.route}</span>
+                                </div>`;
+                        }
+                        if (s.tips) {
+                            extraDetailsHtml += `
+                                <div class="mt-3 text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-100 dark:border-amber-900/30 flex items-start detail-element">
+                                    <i class="fa-solid fa-lightbulb mt-0.5 mr-2"></i>
+                                    <span><strong>專家提示：</strong>${s.tips}</span>
+                                </div>`;
+                        }
+                        if (s.mapsLink) {
+                            extraDetailsHtml += `
+                                <div class="mt-3 detail-element">
+                                    <a href="${s.mapsLink}" target="_blank" class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-md transition-colors border border-blue-100 dark:border-blue-800/50">
+                                        <i class="fa-solid fa-diamond-turn-right mr-1.5"></i> 開啟地圖導航
+                                    </a>
+                                </div>`;
+                        }
+
+                        html += `
+                        <div class="relative flex flex-col md:flex-row md:items-start gap-2 md:gap-4 group">
+                            <!-- Timeline Dot (Icon) -->
+                            <div class="absolute -left-[30px] md:-left-[44px] top-4 md:top-5 bg-gray-50 dark:bg-slate-900 p-1 z-0">
+                                <div class="w-6 h-6 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center ring-4 ${ringColor}">
+                                    <i class="fa-solid ${iconClass} text-[10px]"></i>
+                                </div>
+                            </div>
+
+                            <!-- Time Badge -->
+                            <div class="w-32 flex-shrink-0 pt-[14px] md:pt-[18px]">
+                                <span class="inline-block px-2.5 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-md text-sm font-bold font-mono shadow-sm">
+                                    ${s.time}
+                                </span>
+                            </div>
+
+                            <!-- Content Row -->
+                            <div class="flex-1 bg-white dark:bg-slate-800 p-4 md:p-5 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md hover:border-primary/50 transition-all cursor-default">
+                                <p class="text-gray-800 dark:text-gray-200 text-base font-bold leading-relaxed">${s.text}</p>
+                                ${extraDetailsHtml}
+                            </div>
+                        </div>
+                        `;
+                    });
+                }
+
+                // SOP & Risk Row
+                html += `
+                        <!-- SOP & Risk Summary Row -->
+                        <div class="relative mt-8 pt-4 detail-element">
+                            <div class="absolute -left-[30px] md:-left-[44px] top-8 bg-gray-50 dark:bg-slate-900 p-1 z-0">
+                                <div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center ring-4 ring-gray-100 dark:ring-slate-800">
+                                    <i class="fa-solid fa-clipboard-check text-[10px] text-gray-500 dark:text-gray-400"></i>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50">
+                                    <span class="font-bold text-blue-700 dark:text-blue-400 block mb-2 text-sm"><i class="fa-solid fa-list-ol mr-1"></i>當日行程細節</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">${day.sop}</span>
+                                </div>
+                                <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-900/50">
+                                    <span class="font-bold text-red-700 dark:text-red-400 block mb-2 text-sm"><i class="fa-solid fa-triangle-exclamation mr-1"></i>注意事項與控管</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">${day.risk}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderDateNav() {
+            const nav = document.getElementById('date-nav');
+            let html = '';
+            appData.itinerary.forEach((day, idx) => {
+                html += `<a href="#${day.id}" class="px-4 py-1.5 bg-white dark:bg-slate-800 text-sm font-medium rounded-full shadow-sm border border-gray-200 dark:border-slate-700 hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors text-gray-600 dark:text-gray-300">D${idx+1} ${day.date}</a>`;
+            });
+            nav.innerHTML = html;
+        }
+
+        // ==========================================
+        // 模組：財務與裝備渲染
+        // ==========================================
+        function renderBudget() {
+            const tbody = document.getElementById('budget-table-body');
+            let total = 0;
+            let html = '';
+
+            appData.budget.forEach(item => {
+                total += item.amount;
+                html += `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">
+                            <span class="w-3 h-3 rounded-full inline-block mr-2" style="background-color: ${item.color}"></span>
+                            ${item.category}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">${item.desc}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">$${item.amount.toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                <tr class="bg-gray-50 dark:bg-slate-900/50 font-bold">
+                    <td colspan="2" class="px-6 py-4 text-right text-sm">Total (USD)</td>
+                    <td class="px-6 py-4 text-right text-sm text-emerald-600 dark:text-emerald-400">$${total.toLocaleString()}</td>
+                </tr>
+            `;
+            tbody.innerHTML = html;
+
+            document.getElementById('total-usd').innerText = `$${total.toLocaleString()}`;
+            document.getElementById('total-twd').innerText = `NT$ ${(total * appData.state.exchangeRate).toLocaleString()}`;
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('equipment-checklist');
+            let html = '';
+            appData.equipment.forEach((eq) => {
+                html += `
+                    <label class="flex items-start space-x-3 cursor-pointer group">
+                        <input type="checkbox" class="mt-1 w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">${eq.item}</span>
+                    </label>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // ==========================================
+        // 模組：美食資料庫過濾與渲染
+        // ==========================================
+        function renderFoodGrid(filter) {
+            const grid = document.getElementById('food-grid');
+            let html = '';
+
+            const filteredFoods = filter === 'all' 
+                ? appData.food 
+                : appData.food.filter(f => f.tags.includes(filter));
+
+            filteredFoods.forEach(food => {
+                let icon = 'fa-utensils';
+                if(food.type === 'steak') icon = 'fa-drumstick-bite';
+                if(food.type === 'asian') icon = 'fa-bowl-food';
+                if(food.type === 'mexican') icon = 'fa-pepper-hot';
+
+                html += `
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 hover:border-primary transition-colors">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-bold text-lg"><i class="fa-solid ${icon} mr-2 text-gray-400"></i>${food.name}</h4>
+                            <span class="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded text-gray-600 dark:text-gray-300">${food.loc}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">${food.desc}</p>
+                        <div class="flex gap-2">
+                            ${food.tags.map(t => `<span class="text-xs text-primary bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full border border-emerald-100 dark:border-emerald-800">#${t}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        // Food Filter Buttons logic
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white');
+                    if(!b.classList.contains('border')) {
+                        b.classList.add('bg-gray-200', 'dark:bg-slate-700', 'text-gray-700', 'dark:text-gray-300');
+                    }
+                });
+                
+                const targetBtn = e.target;
+                if(!targetBtn.classList.contains('border')) {
+                    targetBtn.classList.remove('bg-gray-200', 'dark:bg-slate-700', 'text-gray-700', 'dark:text-gray-300');
+                    targetBtn.classList.add('bg-primary', 'text-white');
+                }
+
+                const filter = targetBtn.getAttribute('data-filter');
+                renderFoodGrid(filter);
+            });
+        });
+
+    </script>
+</body>
+</html>
