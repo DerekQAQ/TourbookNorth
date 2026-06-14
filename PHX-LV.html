@@ -55,12 +55,33 @@
 
         /* Simple Mode Toggle Classes */
         .timeline-simple-mode .detail-element { display: none !important; }
+
+        /* =======================================
+           Print Mode Styles (完美離線列印/PDF排版)
+           ======================================= */
+        @media print {
+            body { background: white !important; color: black !important; }
+            .dark { background: white !important; color: black !important; }
+            .no-print, nav, #back-to-top, .fixed.bottom-0 { display: none !important; }
+            .tab-content { display: block !important; page-break-before: always; }
+            #dashboard { page-break-before: avoid; }
+            .bg-slate-800, .bg-slate-900 { background: white !important; color: black !important; border: 1px solid #ddd !important; }
+            .text-gray-200, .text-gray-300, .text-white { color: black !important; }
+            /* Expand timeline automatically for print */
+            .timeline-simple-mode .detail-element { display: block !important; }
+            /* Reset shadows and gradients */
+            * { box-shadow: none !important; text-shadow: none !important; background-image: none !important; }
+            main { padding-top: 0 !important; margin: 0 !important; max-width: 100% !important; }
+            h1, h2, h3 { color: #000 !important; }
+            a { text-decoration: none !important; color: black !important; }
+            canvas, #map { display: none !important; /* Maps and Canvas don't print well */ }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 dark:bg-slate-900 dark:text-gray-200 transition-colors duration-300 font-sans antialiased">
 
     <!-- Navigation -->
-    <nav class="fixed w-full z-50 bg-white/80 dark:bg-slate-850/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-700">
+    <nav class="fixed w-full z-50 bg-white/80 dark:bg-slate-850/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -82,6 +103,10 @@
                     <button class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:text-primary transition-colors" data-target="logistics">
                         <i class="fa-solid fa-box-open mr-2"></i>後勤與美食
                     </button>
+                    <!-- Print Button -->
+                    <button onclick="window.print()" class="p-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-200 transition-all" title="列印或儲存為離線 PDF">
+                        <i class="fa-solid fa-print"></i>
+                    </button>
                     <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-yellow-400 hover:bg-gray-300 dark:hover:bg-slate-600 transition-all">
                         <i class="fa-solid fa-moon dark:hidden"></i>
                         <i class="fa-solid fa-sun hidden dark:block"></i>
@@ -89,6 +114,9 @@
                 </div>
                 <!-- Mobile menu button -->
                 <div class="flex items-center md:hidden">
+                    <button onclick="window.print()" class="mr-2 p-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                        <i class="fa-solid fa-print"></i>
+                    </button>
                     <button id="theme-toggle-mobile" class="mr-4 p-2 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-yellow-400">
                         <i class="fa-solid fa-moon dark:hidden"></i>
                         <i class="fa-solid fa-sun hidden dark:block"></i>
@@ -100,7 +128,7 @@
             </div>
         </div>
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-slate-850 border-b border-gray-200 dark:border-slate-700">
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-slate-850 border-b border-gray-200 dark:border-slate-700 no-print">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <button class="nav-btn active block w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-slate-700" data-target="dashboard">行程儀表盤</button>
                 <button class="nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-slate-700" data-target="itinerary">詳細行程</button>
@@ -145,9 +173,11 @@
                 </div>
             </div>
 
-            <!-- Weather Dashboard (New Feature) -->
+            <!-- Weather Dashboard -->
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-                <h2 class="font-bold text-lg mb-4 flex items-center"><i class="fa-solid fa-cloud-sun mr-2 text-blue-500"></i>每日天氣預測與快速跳轉</h2>
+                <h2 class="font-bold text-lg mb-4 flex items-center justify-between">
+                    <span><i class="fa-solid fa-cloud-sun mr-2 text-blue-500"></i>天氣與日照預測 <span class="text-xs text-gray-400 font-normal ml-2">(點擊跳轉行程)</span></span>
+                </h2>
                 <div class="flex overflow-x-auto space-x-3 pb-2 hide-scrollbar" id="weather-dashboard">
                     <!-- Populated by JS -->
                 </div>
@@ -200,7 +230,7 @@
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-30 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur-md py-4 border-b border-gray-200 dark:border-slate-700">
                 <h1 class="text-3xl font-bold"><i class="fa-solid fa-list-check mr-2 text-primary"></i>詳細行程時間軸</h1>
                 
-                <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                <div class="flex items-center space-x-4 mt-4 md:mt-0 no-print">
                     <!-- View Toggle -->
                     <div class="bg-gray-200 dark:bg-slate-700 rounded-lg p-1 flex text-sm shadow-inner">
                         <button id="view-simple" class="px-4 py-1.5 rounded-md font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all">簡化版</button>
@@ -215,7 +245,7 @@
             </div>
             
             <!-- Bottom Fixed Date Navigator (Only visible in Itinerary tab - Made smaller) -->
-            <div class="fixed bottom-0 left-0 w-full z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-200 dark:border-slate-700 py-2 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
+            <div class="fixed bottom-0 left-0 w-full z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-200 dark:border-slate-700 py-2 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] no-print">
                 <div class="max-w-7xl mx-auto px-2 overflow-x-auto hide-scrollbar">
                     <div id="date-nav" class="flex space-x-1.5 w-max mx-auto px-1 pb-1">
                         <!-- Populated by JS -->
@@ -228,8 +258,9 @@
         <section id="budget" class="tab-content space-y-6">
             <h1 class="text-3xl font-bold mb-6"><i class="fa-solid fa-file-invoice-dollar mr-2 text-primary"></i>財務預算分析 (雙人)</h1>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Overview & Currency -->
+                <!-- Overview & Currency & Tip Calc -->
                 <div class="space-y-6">
+                    <!-- Total Budget -->
                     <div class="bg-gradient-to-br from-slate-800 to-slate-900 dark:from-slate-800 dark:to-slate-950 p-6 rounded-2xl shadow-lg text-white">
                         <h3 class="text-slate-300 text-sm font-medium uppercase tracking-wider mb-1">預估總支出 (USD)</h3>
                         <p class="text-4xl font-bold text-emerald-400 mb-4" id="total-usd">$0</p>
@@ -238,7 +269,7 @@
                     </div>
 
                     <!-- Currency Converter -->
-                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 no-print">
                         <h3 class="font-bold text-lg mb-3"><i class="fa-solid fa-calculator mr-2 text-secondary"></i>即時匯率換算</h3>
                         <div class="flex items-center space-x-2">
                             <div class="flex-1 relative">
@@ -255,7 +286,34 @@
                                 <input type="text" id="twd-output" readonly class="w-full pl-8 pr-3 py-2 border border-transparent rounded-lg bg-gray-100 dark:bg-slate-900 text-gray-900 dark:text-white font-bold" value="3,150">
                             </div>
                         </div>
-                        <p class="text-xs text-gray-500 mt-2 text-right">預設匯率: 1 USD = 31.5 TWD</p>
+                    </div>
+
+                    <!-- USA Tip Calculator -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-orange-200 dark:border-orange-900/50 no-print">
+                        <h3 class="font-bold text-lg mb-3 text-orange-600 dark:text-orange-400"><i class="fa-solid fa-coins mr-2"></i>美國小費速算機</h3>
+                        <div class="relative mb-3">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 sm:text-sm">$</span>
+                            </div>
+                            <input type="number" id="tip-input" class="w-full pl-7 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-gray-50 dark:bg-slate-700 focus:ring-orange-500 focus:border-orange-500 text-gray-900 dark:text-white text-lg font-bold" placeholder="輸入帳單金額 (稅前)">
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center text-sm">
+                            <div class="p-2 bg-gray-100 dark:bg-slate-700 rounded-lg">
+                                <p class="text-gray-500 dark:text-gray-400 font-bold">15%</p>
+                                <p class="text-emerald-600 dark:text-emerald-400 font-bold" id="tip-15">+$0.00</p>
+                                <p class="text-xs text-gray-400 mt-1" id="total-15">$0.00</p>
+                            </div>
+                            <div class="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-lg border border-orange-200 dark:border-orange-800">
+                                <p class="text-orange-600 dark:text-orange-400 font-bold">18% (一般)</p>
+                                <p class="text-orange-700 dark:text-orange-300 font-bold" id="tip-18">+$0.00</p>
+                                <p class="text-xs text-gray-500 mt-1 font-bold" id="total-18">$0.00</p>
+                            </div>
+                            <div class="p-2 bg-gray-100 dark:bg-slate-700 rounded-lg">
+                                <p class="text-gray-500 dark:text-gray-400 font-bold">20%</p>
+                                <p class="text-emerald-600 dark:text-emerald-400 font-bold" id="tip-20">+$0.00</p>
+                                <p class="text-xs text-gray-400 mt-1" id="total-20">$0.00</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -326,7 +384,10 @@
 
                 <!-- Checklist -->
                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-                    <h3 class="font-bold text-xl mb-4"><i class="fa-solid fa-list-check mr-2 text-orange-500"></i>極端環境裝備檢查表</h3>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-xl"><i class="fa-solid fa-list-check mr-2 text-orange-500"></i>極端環境裝備檢查表</h3>
+                        <span class="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded text-gray-500 no-print">自動儲存</span>
+                    </div>
                     <div id="equipment-checklist" class="space-y-3 max-h-[300px] overflow-y-auto pr-2">
                         <!-- Populated by JS -->
                     </div>
@@ -337,7 +398,7 @@
             <div>
                 <h2 class="text-2xl font-bold mb-4 mt-8">精選美食庫</h2>
                 <!-- Filters -->
-                <div class="flex flex-wrap gap-2 mb-6" id="food-filters">
+                <div class="flex flex-wrap gap-2 mb-6 no-print" id="food-filters">
                     <button class="filter-btn active px-4 py-1.5 rounded-full text-sm font-medium bg-primary text-white" data-filter="all">全部</button>
                     <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300" data-filter="Phoenix">鳳凰城</button>
                     <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300" data-filter="Sedona">塞多納</button>
@@ -356,13 +417,14 @@
     </main>
 
     <!-- Back to Top Button -->
-    <button id="back-to-top" class="fixed bottom-16 right-4 md:right-8 z-50 bg-gray-800/40 hover:bg-gray-800/60 dark:bg-slate-600/40 dark:hover:bg-slate-600/60 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg backdrop-blur-md transition-all duration-300 opacity-0 translate-y-5 pointer-events-none">
+    <button id="back-to-top" class="fixed bottom-16 right-4 md:right-8 z-50 bg-gray-800/40 hover:bg-gray-800/60 dark:bg-slate-600/40 dark:hover:bg-slate-600/60 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg backdrop-blur-md transition-all duration-300 opacity-0 translate-y-5 pointer-events-none no-print">
         <i class="fa-solid fa-chevron-up"></i>
     </button>
 
     <script>
         /**
          * System Core Data (appData)
+         * 更新：在 weather 物件中加入 sunrise (日出) 與 sunset (日落) 時間
          */
         const appData = {
             state: {
@@ -376,7 +438,7 @@
                     location: "鳳凰城 (Phoenix)", lat: 33.4352, lng: -112.0101, 
                     title: "直飛抵達與取車",
                     type: "flight", icon: "fa-plane-arrival", color: "bg-blue-500",
-                    weather: { temp: "10°/18°C", icon: "fa-cloud-sun", color: "text-amber-500" },
+                    weather: { temp: "10°/18°C", icon: "fa-cloud-sun", color: "text-amber-500", sunrise: "07:28", sunset: "17:25" },
                     desc: "抵達鳳凰城辦理入境與租車，第一晚在市區享用平安夜晚餐，調整時差。",
                     sop: "入關後搭乘 Sky Train 前往 Rental Car Center。冬季建議確認租到 AWD/4WD 車款。第一晚不要安排過遠車程。",
                     risk: "班機延誤可能導致租車中心大排長龍，備妥預約文件。平安夜許多餐廳提早打烊，晚餐需事先訂位或準備備案。",
@@ -414,7 +476,7 @@
                     location: "塞多納 (Sedona)", lat: 34.8697, lng: -111.7610,
                     title: "聖誕節自然探索",
                     type: "drive", icon: "fa-car", color: "bg-emerald-500",
-                    weather: { temp: "2°/12°C", icon: "fa-sun", color: "text-amber-400" },
+                    weather: { temp: "2°/12°C", icon: "fa-sun", color: "text-amber-400", sunrise: "07:32", sunset: "17:21" },
                     desc: "早上驅車北上塞多納，因聖誕節多數商家休息，正好前往 Airport Mesa 捕捉壯觀紅岩落日。",
                     sop: "沿 I-17 N 轉 AZ-179 N 進入塞多納（景觀公路）。下午提早前往 Airport Mesa 卡位看夕陽。",
                     risk: "【聖誕節營業狀態】國家級與州立戶外景點(如 Airport Mesa) 全天開放。但多數超市與餐廳皆關閉，建議依賴亞洲餐廳或提前備妥乾糧。",
@@ -465,7 +527,7 @@
                     location: "塞多納 (Sedona)", lat: 34.8251, lng: -111.7885,
                     title: "紅岩吉普車與能量之旅",
                     type: "activity", icon: "fa-truck-field", color: "bg-orange-500",
-                    weather: { temp: "0°/10°C", icon: "fa-sun", color: "text-amber-400" },
+                    weather: { temp: "0°/10°C", icon: "fa-sun", color: "text-amber-400", sunrise: "07:33", sunset: "17:22" },
                     desc: "早上參加著名的 Pink Jeep Tour 深入紅岩峽谷腹地，下午參觀岩石中的聖十字教堂。",
                     sop: "Pink Jeep Tour 需提前上網預約。冬季早晨乘坐敞篷吉普車風極大，務必穿戴毛帽與防風外套。",
                     risk: "清晨氣溫可能逼近 0度，注意頭部保暖。今日各設施與餐廳皆恢復正常營業。",
@@ -515,7 +577,7 @@
                     location: "大峽谷 (Grand Canyon)", lat: 36.0617, lng: -112.1077,
                     title: "大峽谷南緣日落",
                     type: "drive", icon: "fa-mountain-sun", color: "bg-emerald-500",
-                    weather: { temp: "-5°/5°C", icon: "fa-snowflake", color: "text-blue-400" },
+                    weather: { temp: "-5°/5°C", icon: "fa-snowflake", color: "text-blue-400", sunrise: "07:38", sunset: "17:18" },
                     desc: "驅車前往大峽谷南緣，於 Mather Point 迎接壯闊日落與星空攝影。",
                     sop: "從塞多納走 89A 經旗桿市(Flagstaff) 北上。下午 4 點前抵達南緣入口以避開車潮。準備三腳架拍攝星空。",
                     risk: "大峽谷南緣 365 天 24 小時開放。峽谷邊緣風大且無護欄，夜間拍攝需配戴頭燈。極度嚴寒，需穿戴防寒裝備。",
@@ -569,7 +631,7 @@
                     location: "大峽谷 (Grand Canyon)", lat: 36.0336, lng: -111.8519,
                     title: "景觀公路極致解鎖",
                     type: "activity", icon: "fa-camera", color: "bg-purple-500",
-                    weather: { temp: "-8°/4°C", icon: "fa-sun", color: "text-amber-400" },
+                    weather: { temp: "-8°/4°C", icon: "fa-sun", color: "text-amber-400", sunrise: "07:38", sunset: "17:19" },
                     desc: "沿 Desert View Drive 往東自駕，解鎖各觀景台，傍晚駐守 Lipan Point。",
                     sop: "自駕極為彈性，各觀景台皆有停車場。Lipan Point 視野廣闊且可見科羅拉多河，是日落與星空的首選地點。",
                     risk: "相機電池在低溫下急遽掉電，需準備至少 3 顆備用電池並放在貼身口袋保暖。",
@@ -615,7 +677,7 @@
                     location: "佩吉市 (Page)", lat: 36.8791, lng: -111.5104,
                     title: "羚羊谷與馬蹄灣",
                     type: "drive", icon: "fa-water", color: "bg-teal-500",
-                    weather: { temp: "-2°/8°C", icon: "fa-cloud", color: "text-gray-400" },
+                    weather: { temp: "-2°/8°C", icon: "fa-cloud", color: "text-gray-400", sunrise: "07:35", sunset: "17:15" },
                     desc: "驅車前往佩吉市。預約中午光線完美的下羚羊峽谷，下午前往馬蹄灣拍攝。",
                     sop: "羚羊峽谷需報名當地導覽團（嚴格規定禁帶背包與三腳架）。馬蹄灣需從停車場步行 15 分鐘無遮蔽沙地。",
                     risk: "大峽谷東門駛出往 Page 的 89 號公路可能有積雪黑冰。馬蹄灣邊緣危險，拍照切勿退後。羚羊谷與馬蹄灣皆正常開放。",
@@ -671,7 +733,7 @@
                     location: "拉斯維加斯 (Las Vegas)", lat: 36.1215, lng: -115.1615,
                     title: "駛入賭城與視覺震撼",
                     type: "drive", icon: "fa-city", color: "bg-pink-500",
-                    weather: { temp: "5°/14°C", icon: "fa-sun", color: "text-amber-500" },
+                    weather: { temp: "5°/14°C", icon: "fa-sun", color: "text-amber-500", sunrise: "06:49", sunset: "16:38" },
                     desc: "由佩吉市出發前往拉斯維加斯，傍晚前往 Sphere 欣賞沉浸式大秀。",
                     sop: "今日為長途行車，行駛順暢的逆時針大圓環西半部。抵達 LV 後辦理入住手續。Sphere 秀需提前購票。",
                     risk: "跨年前夕 The Strip 交通開始壅塞，留意飯店停車場入口動線。",
@@ -728,7 +790,7 @@
                     location: "拉斯維加斯 (Las Vegas)", lat: 36.1147, lng: -115.1728,
                     title: "跨年夜大道狂歡",
                     type: "activity", icon: "fa-champagne-glasses", color: "bg-yellow-500",
-                    weather: { temp: "4°/13°C", icon: "fa-moon", color: "text-indigo-400" },
+                    weather: { temp: "4°/13°C", icon: "fa-moon", color: "text-indigo-400", sunrise: "06:49", sunset: "16:39" },
                     desc: "全面切換為步行。在客房陽台架設相機捕捉煙火，隨後步入封街大道倒數。",
                     sop: "下午 5 點 The Strip 全面封街。禁止攜帶玻璃瓶或大型背包上街。確認相機設定：手動對焦無限遠、快門 B 檔。",
                     risk: "人潮極度擁擠，扒手風險高。封街期間無法開車移動，晚餐必須預訂步行可達的餐廳。",
@@ -776,7 +838,7 @@
                     location: "拉斯維加斯 (Las Vegas)", lat: 36.1610, lng: -115.1581,
                     title: "元旦購物與頂級秀",
                     type: "activity", icon: "fa-bag-shopping", color: "bg-indigo-500",
-                    weather: { temp: "4°/14°C", icon: "fa-sun", color: "text-amber-500" },
+                    weather: { temp: "4°/14°C", icon: "fa-sun", color: "text-amber-500", sunrise: "06:49", sunset: "16:40" },
                     desc: "下午前往 Premium Outlets 享受新年折扣。晚上觀賞經典的太陽馬戲團 'O' Show。",
                     sop: "Outlets North 為戶外型，需注意保暖。'O' Show 位於 Bellagio 內，演出前 30 分鐘入座。",
                     risk: "【元旦營業狀態】Outlets 與 O Show 皆正常營運。元旦 Outlets 人潮眾多，熱門品牌需排隊。",
@@ -818,7 +880,7 @@
                     location: "胡佛水壩 / 鳳凰城", lat: 36.0160, lng: -114.7377,
                     title: "歷史大壩與南下",
                     type: "drive", icon: "fa-bridge-water", color: "bg-emerald-500",
-                    weather: { temp: "8°/17°C", icon: "fa-sun", color: "text-amber-500" },
+                    weather: { temp: "8°/17°C", icon: "fa-sun", color: "text-amber-500", sunrise: "07:30", sunset: "17:31" },
                     desc: "離開賭城，參觀胡佛水壩 (Hoover Dam)。隨後沿沙漠公路南下回到鳳凰城。",
                     sop: "胡佛水壩有安檢，勿攜帶違禁品。經 93 號公路南下是一段筆直且枯燥的沙漠公路，途中需換手駕駛。",
                     risk: "【營業狀態查核】胡佛水壩僅於感恩節/聖誕節關閉，01/02 正常開放。長途駕駛易疲勞，注意時間控管。",
@@ -866,7 +928,7 @@
                     location: "鳳凰城 (Phoenix)", lat: 33.4600, lng: -111.9444,
                     title: "城市巡禮與夜間登機",
                     type: "flight", icon: "fa-plane-departure", color: "bg-red-500",
-                    weather: { temp: "9°/18°C", icon: "fa-cloud-sun", color: "text-amber-500" },
+                    weather: { temp: "9°/18°C", icon: "fa-cloud-sun", color: "text-amber-500", sunrise: "07:31", sunset: "17:32" },
                     desc: "參觀博物館與植物園。晚上 19:30 前往 PHX 機場還車，搭乘 JX025 返台。",
                     sop: "退房後將行李放車上。還車前務必加滿油（選擇 Rental Car Return 標誌）。",
                     risk: "市區可能有下班車潮，前往機場務必多抓 30 分鐘緩衝。再次確認所有護照與貴重物品已從租車上帶走。",
@@ -923,16 +985,16 @@
                 { category: "活動與門票 (Activity)", desc: "國家公園年票、羚羊谷、Sphere、O Show", amount: 800, color: "#8b5cf6" }
             ],
             equipment: [
-                { item: "護照、ESTA 紙本備查、台灣駕照、國際駕照", checked: false },
-                { item: "信用卡 (2-3張不同銀行)、少量美金現鈔(給小費)", checked: false },
-                { item: "相機、超廣角鏡頭、穩固三腳架、快門線", checked: false },
-                { item: "相機備用電池 (至少3顆，抗低溫)、行動電源", checked: false },
-                { item: "極地防寒外套 (Gore-Tex防風防潑水等級)", checked: false },
-                { item: "毛帽、防水手套、發熱衣、羊毛襪、防滑登山鞋", checked: false },
-                { item: "太陽眼鏡、高係數防曬乳 (沙漠紫外線極強)", checked: false },
-                { item: "車用手機支架、車充線、音源線/藍牙設定", checked: false },
-                { item: "保溫瓶 (每天早上在飯店裝熱水)", checked: false },
-                { item: "常備藥品 (感冒、腸胃、暈車藥、個人處方藥)", checked: false }
+                { id: "eq1", item: "護照、ESTA 紙本備查、台灣駕照、國際駕照" },
+                { id: "eq2", item: "信用卡 (2-3張不同銀行)、少量美金現鈔(給小費)" },
+                { id: "eq3", item: "相機、超廣角鏡頭、穩固三腳架、快門線" },
+                { id: "eq4", item: "相機備用電池 (至少3顆，抗低溫)、行動電源" },
+                { id: "eq5", item: "極地防寒外套 (Gore-Tex防風防潑水等級)" },
+                { id: "eq6", item: "毛帽、防水手套、發熱衣、羊毛襪、防滑登山鞋" },
+                { id: "eq7", item: "太陽眼鏡、高係數防曬乳 (沙漠紫外線極強)" },
+                { id: "eq8", item: "車用手機支架、車充線、音源線/藍牙設定" },
+                { id: "eq9", item: "保溫瓶 (每天早上在飯店裝熱水)" },
+                { id: "eq10", item: "常備藥品 (感冒、腸胃、暈車藥、個人處方藥)" }
             ],
             food: [
                 { name: "Elote Cafe", loc: "Sedona", type: "mexican", tags: ["Sedona", "特色"], desc: "塞多納極具盛名的墨西哥創新料理，招牌烤玉米必點。需提早排隊或訂位。" },
@@ -952,7 +1014,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initUI();
-            renderWeatherDashboard(); // 渲染天氣跳轉方塊
+            renderWeatherDashboard(); 
             renderTimeline();
             renderDateNav();
             renderBudget();
@@ -1041,6 +1103,31 @@
                 twdOutput.value = (usd * appData.state.exchangeRate).toLocaleString();
             });
 
+            // USA Tip Calculator Logic
+            const tipInput = document.getElementById('tip-input');
+            const tip15 = document.getElementById('tip-15');
+            const total15 = document.getElementById('total-15');
+            const tip18 = document.getElementById('tip-18');
+            const total18 = document.getElementById('total-18');
+            const tip20 = document.getElementById('tip-20');
+            const total20 = document.getElementById('total-20');
+
+            tipInput.addEventListener('input', (e) => {
+                const amount = parseFloat(e.target.value) || 0;
+                
+                const t15 = amount * 0.15;
+                tip15.innerText = `+$${t15.toFixed(2)}`;
+                total15.innerText = `總額: $${(amount + t15).toFixed(2)}`;
+
+                const t18 = amount * 0.18;
+                tip18.innerText = `+$${t18.toFixed(2)}`;
+                total18.innerText = `總額: $${(amount + t18).toFixed(2)}`;
+
+                const t20 = amount * 0.20;
+                tip20.innerText = `+$${t20.toFixed(2)}`;
+                total20.innerText = `總額: $${(amount + t20).toFixed(2)}`;
+            });
+
             // Back to Top Logic
             const backToTopBtn = document.getElementById('back-to-top');
             if (backToTopBtn) {
@@ -1060,16 +1147,13 @@
         }
 
         // ==========================================
-        // 跨分頁快速跳轉功能 (給天氣與導航列使用)
+        // 跨分頁快速跳轉功能
         // ==========================================
         window.goToDay = function(id) {
-            // 切換至詳細行程 Tab
             document.querySelector('.nav-btn[data-target="itinerary"]').click();
-            // 稍等 Tab 顯示後進行平滑捲動
             setTimeout(() => {
                 const el = document.getElementById(id);
                 if (el) {
-                    // 電腦版主導航列有 64px 的高度，預留一些空間
                     const yOffset = -80; 
                     const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({top: y, behavior: 'smooth'});
@@ -1078,18 +1162,22 @@
         }
 
         // ==========================================
-        // 模組：天氣儀表板
+        // 模組：天氣儀表板 (新增日出日落)
         // ==========================================
         function renderWeatherDashboard() {
             const container = document.getElementById('weather-dashboard');
             let html = '';
             appData.itinerary.forEach((day, idx) => {
                 html += `
-                <button onclick="goToDay('${day.id}')" class="flex-shrink-0 w-28 p-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-center hover:border-primary hover:shadow-md transition-all group cursor-pointer focus:outline-none">
+                <button onclick="goToDay('${day.id}')" class="flex-shrink-0 w-32 p-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-center hover:border-primary hover:shadow-md transition-all group cursor-pointer focus:outline-none">
                     <div class="text-xs text-gray-500 font-bold mb-1">D${idx+1} ${day.date}</div>
                     <div class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate mb-2">${day.location.split(' ')[0]}</div>
                     <i class="fa-solid ${day.weather.icon} text-2xl ${day.weather.color} group-hover:scale-110 transition-transform mb-2 block"></i>
-                    <div class="text-xs font-mono text-gray-600 dark:text-gray-400">${day.weather.temp}</div>
+                    <div class="text-xs font-mono text-gray-600 dark:text-gray-400 mb-2">${day.weather.temp}</div>
+                    <div class="flex justify-center items-center space-x-2 text-[10px] text-gray-400">
+                        <span title="日出"><i class="fa-solid fa-sun text-amber-500/70 mr-1"></i>${day.weather.sunrise}</span>
+                        <span title="日落"><i class="fa-solid fa-moon text-indigo-400/70 mr-1"></i>${day.weather.sunset}</span>
+                    </div>
                 </button>
                 `;
             });
@@ -1163,7 +1251,7 @@
         }
 
         // ==========================================
-        // 模組：行程渲染 (一列一列超詳盡版)
+        // 模組：行程渲染
         // ==========================================
         function renderTimeline() {
             const container = document.getElementById('timeline-container');
@@ -1174,8 +1262,6 @@
             appData.itinerary.forEach((day, index) => {
                 html += `
                 <div id="${day.id}" class="mb-14 scroll-mt-36">
-                    
-                    <!-- Day Header - 完全移除 sticky，不論手機或電腦皆自然捲動 -->
                     <div class="z-10 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur-md py-4 mb-6 border-b-2 border-gray-200 dark:border-slate-700">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div class="flex items-center">
@@ -1193,7 +1279,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="flex space-x-2 shrink-0">
+                            <div class="flex space-x-2 shrink-0 no-print">
                                 <a href="${day.mapsLink}" target="_blank" class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
                                     <i class="fa-brands fa-google text-blue-500 mr-1"></i>今日導航
                                 </a>
@@ -1204,7 +1290,6 @@
                         </div>
                     </div>
 
-                    <!-- Row by Row Schedule Container -->
                     <div class="relative pl-6 md:pl-10 space-y-5 before:absolute before:inset-y-0 before:left-[11px] md:before:left-[19px] before:w-[2px] before:bg-gray-200 dark:before:bg-slate-700">
                 `;
 
@@ -1236,7 +1321,7 @@
                         }
                         if (s.mapsLink) {
                             extraDetailsHtml += `
-                                <div class="mt-3 detail-element">
+                                <div class="mt-3 detail-element no-print">
                                     <a href="${s.mapsLink}" target="_blank" class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-md transition-colors border border-blue-100 dark:border-blue-800/50">
                                         <i class="fa-solid fa-diamond-turn-right mr-1.5"></i> 開啟地圖導航
                                     </a>
@@ -1245,21 +1330,16 @@
 
                         html += `
                         <div class="relative flex flex-col md:flex-row md:items-start gap-2 md:gap-4 group">
-                            <!-- Timeline Dot (Icon) -->
                             <div class="absolute -left-[30px] md:-left-[44px] top-4 md:top-5 bg-gray-50 dark:bg-slate-900 p-1 z-0">
                                 <div class="w-6 h-6 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center ring-4 ${ringColor}">
                                     <i class="fa-solid ${iconClass} text-[10px]"></i>
                                 </div>
                             </div>
-
-                            <!-- Time Badge -->
                             <div class="w-32 flex-shrink-0 pt-[14px] md:pt-[18px]">
                                 <span class="inline-block px-2.5 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-md text-sm font-bold font-mono shadow-sm">
                                     ${s.time}
                                 </span>
                             </div>
-
-                            <!-- Content Row -->
                             <div class="flex-1 bg-white dark:bg-slate-800 p-4 md:p-5 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md hover:border-primary/50 transition-all cursor-default">
                                 <p class="text-gray-800 dark:text-gray-200 text-base font-bold leading-relaxed">${s.text}</p>
                                 ${extraDetailsHtml}
@@ -1269,9 +1349,7 @@
                     });
                 }
 
-                // SOP & Risk Row
                 html += `
-                        <!-- SOP & Risk Summary Row -->
                         <div class="relative mt-8 pt-4 detail-element">
                             <div class="absolute -left-[30px] md:-left-[44px] top-8 bg-gray-50 dark:bg-slate-900 p-1 z-0">
                                 <div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center ring-4 ring-gray-100 dark:ring-slate-800">
@@ -1301,15 +1379,11 @@
             const nav = document.getElementById('date-nav');
             let html = '';
             appData.itinerary.forEach((day, idx) => {
-                // 導航列按鈕樣式縮小 (px-3 py-1 text-xs)
                 html += `<button onclick="goToDay('${day.id}')" class="px-3 py-1 bg-white dark:bg-slate-800 text-xs font-medium rounded-full shadow-sm border border-gray-200 dark:border-slate-700 hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors text-gray-600 dark:text-gray-300 flex-shrink-0">D${idx+1} ${day.date}</button>`;
             });
             nav.innerHTML = html;
         }
 
-        // ==========================================
-        // 模組：財務與裝備渲染
-        // ==========================================
         function renderBudget() {
             const tbody = document.getElementById('budget-table-body');
             let total = 0;
@@ -1320,7 +1394,7 @@
                 html += `
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">
-                            <span class="w-3 h-3 rounded-full inline-block mr-2" style="background-color: ${item.color}"></span>
+                            <span class="w-3 h-3 rounded-full inline-block mr-2 no-print" style="background-color: ${item.color}"></span>
                             ${item.category}
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">${item.desc}</td>
@@ -1341,13 +1415,22 @@
             document.getElementById('total-twd').innerText = `NT$ ${(total * appData.state.exchangeRate).toLocaleString()}`;
         }
 
+        // ==========================================
+        // 模組：裝備清單 (具備 LocalStorage 記憶功能)
+        // ==========================================
         function renderChecklist() {
             const container = document.getElementById('equipment-checklist');
+            
+            // 從 LocalStorage 讀取已儲存的狀態
+            const savedStateStr = localStorage.getItem('az_lv_checklist_2026');
+            const savedState = savedStateStr ? JSON.parse(savedStateStr) : {};
+
             let html = '';
             appData.equipment.forEach((eq) => {
+                const isChecked = savedState[eq.id] ? 'checked' : '';
                 html += `
                     <label class="flex items-start space-x-3 cursor-pointer group">
-                        <input type="checkbox" class="mt-1 w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <input type="checkbox" data-id="${eq.id}" onchange="saveChecklistState(this)" ${isChecked} class="mt-1 w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                         <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">${eq.item}</span>
                     </label>
                 `;
@@ -1355,9 +1438,18 @@
             container.innerHTML = html;
         }
 
-        // ==========================================
-        // 模組：美食資料庫過濾與渲染
-        // ==========================================
+        // 當 Checkbox 改變時，寫入 LocalStorage
+        window.saveChecklistState = function(checkboxElement) {
+            const id = checkboxElement.getAttribute('data-id');
+            const isChecked = checkboxElement.checked;
+            
+            const savedStateStr = localStorage.getItem('az_lv_checklist_2026');
+            const savedState = savedStateStr ? JSON.parse(savedStateStr) : {};
+            
+            savedState[id] = isChecked;
+            localStorage.setItem('az_lv_checklist_2026', JSON.stringify(savedState));
+        }
+
         function renderFoodGrid(filter) {
             const grid = document.getElementById('food-grid');
             let html = '';
@@ -1375,7 +1467,7 @@
                 html += `
                     <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 hover:border-primary transition-colors">
                         <div class="flex justify-between items-start mb-3">
-                            <h4 class="font-bold text-lg"><i class="fa-solid ${icon} mr-2 text-gray-400"></i>${food.name}</h4>
+                            <h4 class="font-bold text-lg"><i class="fa-solid ${icon} mr-2 text-gray-400 no-print"></i>${food.name}</h4>
                             <span class="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded text-gray-600 dark:text-gray-300">${food.loc}</span>
                         </div>
                         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">${food.desc}</p>
