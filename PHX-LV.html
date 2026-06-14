@@ -145,6 +145,14 @@
                 </div>
             </div>
 
+            <!-- Weather Dashboard (New Feature) -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                <h2 class="font-bold text-lg mb-4 flex items-center"><i class="fa-solid fa-cloud-sun mr-2 text-blue-500"></i>每日天氣預測與快速跳轉</h2>
+                <div class="flex overflow-x-auto space-x-3 pb-2 hide-scrollbar" id="weather-dashboard">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Map Container -->
                 <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden flex flex-col h-[500px]">
@@ -186,8 +194,10 @@
         </section>
 
         <!-- ==================== TAB 2: ITINERARY ==================== -->
-        <section id="itinerary" class="tab-content relative">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 sticky top-16 z-30 bg-gray-50/90 dark:bg-slate-900/90 backdrop-blur-md py-4">
+        <!-- Added pb-24 so the bottom fixed nav doesn't cover the last item -->
+        <section id="itinerary" class="tab-content relative pb-24">
+            <!-- Removed Sticky for mobile (md:sticky) so it doesn't take up mobile screen space -->
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 md:sticky md:top-[64px] z-30 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur-md py-4 border-b border-gray-200 dark:border-slate-700">
                 <h1 class="text-3xl font-bold"><i class="fa-solid fa-list-check mr-2 text-primary"></i>詳細行程時間軸</h1>
                 
                 <div class="flex items-center space-x-4 mt-4 md:mt-0">
@@ -199,16 +209,18 @@
                 </div>
             </div>
 
-            <!-- Sticky Date Navigator (Horizontal Scroll) -->
-            <div class="overflow-x-auto whitespace-nowrap pb-4 mb-8 sticky top-[125px] md:top-[100px] z-20 bg-gray-50/90 dark:bg-slate-900/90 backdrop-blur-md hide-scrollbar">
-                <div id="date-nav" class="inline-flex space-x-2 px-2">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-
             <!-- Timeline Container (Row by Row layout) -->
-            <div class="max-w-4xl mx-auto pb-20" id="timeline-container">
+            <div class="max-w-4xl mx-auto" id="timeline-container">
                 <!-- Content Populated by JS -->
+            </div>
+            
+            <!-- Bottom Fixed Date Navigator (Only visible in Itinerary tab) -->
+            <div class="fixed bottom-0 left-0 w-full z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-200 dark:border-slate-700 py-3 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
+                <div class="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar">
+                    <div id="date-nav" class="flex space-x-2 w-max mx-auto px-2 pb-1">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -346,11 +358,9 @@
     <script>
         /**
          * System Core Data (appData)
-         * 更新：
-         * 1. 移除了戰略字眼，改為客觀專業描述。
-         * 2. 加入了每個景點與節日（12/25, 01/01）的營業狀態查核。
-         * 3. 將每日的早、午、晚餐餐廳明確排入 schedule 中。
-         * 4. 確認自駕路線為最順暢的「逆時針大圓環」行車動線。
+         * 更新亮點：
+         * 1. 注入各天的 weather 屬性供儀表板呈現
+         * 2. D3 行程從晨跑改為著名的 Pink Jeep Tour 紅岩吉普車體驗
          */
         const appData = {
             state: {
@@ -364,6 +374,7 @@
                     location: "鳳凰城 (Phoenix)", lat: 33.4352, lng: -112.0101, 
                     title: "直飛抵達與取車",
                     type: "flight", icon: "fa-plane-arrival", color: "bg-blue-500",
+                    weather: { temp: "10°/18°C", icon: "fa-cloud-sun", color: "text-amber-500" },
                     desc: "抵達鳳凰城辦理入境與租車，第一晚在市區享用平安夜晚餐，調整時差。",
                     sop: "入關後搭乘 Sky Train 前往 Rental Car Center。冬季建議確認租到 AWD/4WD 車款。第一晚不要安排過遠車程。",
                     risk: "班機延誤可能導致租車中心大排長龍，備妥預約文件。平安夜許多餐廳提早打烊，晚餐需事先訂位或準備備案。",
@@ -401,6 +412,7 @@
                     location: "塞多納 (Sedona)", lat: 34.8697, lng: -111.7610,
                     title: "聖誕節自然探索",
                     type: "drive", icon: "fa-car", color: "bg-emerald-500",
+                    weather: { temp: "2°/12°C", icon: "fa-sun", color: "text-amber-400" },
                     desc: "早上驅車北上塞多納，因聖誕節多數商家休息，正好前往 Airport Mesa 捕捉壯觀紅岩落日。",
                     sop: "沿 I-17 N 轉 AZ-179 N 進入塞多納（景觀公路）。下午提早前往 Airport Mesa 卡位看夕陽。",
                     risk: "【聖誕節營業狀態】國家級與州立戶外景點(如 Airport Mesa) 全天開放。但多數超市與餐廳皆關閉，建議依賴亞洲餐廳或提前備妥乾糧。",
@@ -449,24 +461,25 @@
                 {
                     date: "12/26", day: "週六", id: "day3",
                     location: "塞多納 (Sedona)", lat: 34.8251, lng: -111.7885,
-                    title: "紅岩晨跑與能量之旅",
-                    type: "activity", icon: "fa-person-hiking", color: "bg-orange-500",
-                    desc: "清晨在 Cathedral Rock 周邊安排越野晨跑。下午參觀岩石中的聖十字教堂。",
-                    sop: "Cathedral Rock 停車場極小，建議日出前抵達或搭乘接駁車。下午前往教堂注意車流管制。",
-                    risk: "清晨氣溫可能逼近 0度，注意頭部保暖。步道部分路段需手腳並用攀爬。今日各設施與餐廳皆恢復正常營業。",
-                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Cathedral+Rock+Trailhead",
+                    title: "紅岩吉普車與能量之旅",
+                    type: "activity", icon: "fa-truck-field", color: "bg-orange-500",
+                    weather: { temp: "0°/10°C", icon: "fa-sun", color: "text-amber-400" },
+                    desc: "早上參加著名的 Pink Jeep Tour 深入紅岩峽谷腹地，下午參觀岩石中的聖十字教堂。",
+                    sop: "Pink Jeep Tour 需提前上網預約。冬季早晨乘坐敞篷吉普車風極大，務必穿戴毛帽與防風外套。",
+                    risk: "清晨氣溫可能逼近 0度，注意頭部保暖。今日各設施與餐廳皆恢復正常營業。",
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Pink+Jeep+Tours+Sedona",
                     stats: { driveHours: 1, actHours: 6 },
                     schedule: [
                         { 
-                            time: "06:30 - 09:00", text: "清晨抵達 Cathedral Rock 停車場，日出越野晨跑/徒步", 
-                            route: "從 AZ-179 轉 Back O Beyond Rd 到底。", 
-                            tips: "全年無休。此處為塞多納最強能量漩渦 (Vortex) 之一。後半段步道陡峭需手腳並用，建議穿著防滑越野鞋並戴手套保暖。", 
-                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Cathedral+Rock+Trailhead" 
+                            time: "07:30 - 08:30", text: "【早餐】Coffee Pot Restaurant",
+                            tips: "這家是塞多納極具代表性的老牌美式早餐店，提供超過 100 種歐姆蛋，為吉普車之旅補充熱量。",
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Coffee+Pot+Restaurant+Sedona"
                         },
                         { 
-                            time: "09:00 - 11:00", text: "【早餐】Coffee Pot Restaurant",
-                            tips: "這家是塞多納極具代表性的老牌美式早餐店，提供超過 100 種歐姆蛋，非常適合爬山後補充熱量。",
-                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Coffee+Pot+Restaurant+Sedona"
+                            time: "09:00 - 11:00", text: "參加著名的 Pink Jeep Tour (紅岩越野吉普車導覽)", 
+                            route: "前往市中心 Uptown Sedona 的 Pink Jeep Tours 總部報到集合。", 
+                            tips: "強烈推薦『Broken Arrow Tour』路線，司機會載著您在紅岩峭壁上進行刺激的 4x4 越野攀爬，是非常獨特的體驗。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Pink+Jeep+Tours+Sedona" 
                         },
                         { 
                             time: "11:00 - 13:00", text: "參觀 Tlaquepaque Arts & Shopping Village 藝術村", 
@@ -490,7 +503,7 @@
                         },
                         { 
                             time: "18:00", text: "【晚餐】The Hudson",
-                            tips: "景觀極佳的景觀餐廳，提供高品質美式料理，建議提早訂位。",
+                            tips: "擁有絕佳視野的景觀餐廳，提供高品質美式料理，建議提早訂位。",
                             mapsLink: "https://www.google.com/maps/search/?api=1&query=The+Hudson+Sedona"
                         }
                     ]
@@ -500,6 +513,7 @@
                     location: "大峽谷 (Grand Canyon)", lat: 36.0617, lng: -112.1077,
                     title: "大峽谷南緣日落",
                     type: "drive", icon: "fa-mountain-sun", color: "bg-emerald-500",
+                    weather: { temp: "-5°/5°C", icon: "fa-snowflake", color: "text-blue-400" },
                     desc: "驅車前往大峽谷南緣，於 Mather Point 迎接壯闊日落與星空攝影。",
                     sop: "從塞多納走 89A 經旗桿市(Flagstaff) 北上。下午 4 點前抵達南緣入口以避開車潮。準備三腳架拍攝星空。",
                     risk: "大峽谷南緣 365 天 24 小時開放。峽谷邊緣風大且無護欄，夜間拍攝需配戴頭燈。極度嚴寒，需穿戴防寒裝備。",
@@ -553,6 +567,7 @@
                     location: "大峽谷 (Grand Canyon)", lat: 36.0336, lng: -111.8519,
                     title: "景觀公路極致解鎖",
                     type: "activity", icon: "fa-camera", color: "bg-purple-500",
+                    weather: { temp: "-8°/4°C", icon: "fa-sun", color: "text-amber-400" },
                     desc: "沿 Desert View Drive 往東自駕，解鎖各觀景台，傍晚駐守 Lipan Point。",
                     sop: "自駕極為彈性，各觀景台皆有停車場。Lipan Point 視野廣闊且可見科羅拉多河，是日落與星空的首選地點。",
                     risk: "相機電池在低溫下急遽掉電，需準備至少 3 顆備用電池並放在貼身口袋保暖。",
@@ -598,6 +613,7 @@
                     location: "佩吉市 (Page)", lat: 36.8791, lng: -111.5104,
                     title: "羚羊谷與馬蹄灣",
                     type: "drive", icon: "fa-water", color: "bg-teal-500",
+                    weather: { temp: "-2°/8°C", icon: "fa-cloud", color: "text-gray-400" },
                     desc: "驅車前往佩吉市。預約中午光線完美的下羚羊峽谷，下午前往馬蹄灣拍攝。",
                     sop: "羚羊峽谷需報名當地導覽團（嚴格規定禁帶背包與三腳架）。馬蹄灣需從停車場步行 15 分鐘無遮蔽沙地。",
                     risk: "大峽谷東門駛出往 Page 的 89 號公路可能有積雪黑冰。馬蹄灣邊緣危險，拍照切勿退後。羚羊谷與馬蹄灣皆正常開放。",
@@ -653,6 +669,7 @@
                     location: "拉斯維加斯 (Las Vegas)", lat: 36.1215, lng: -115.1615,
                     title: "駛入賭城與視覺震撼",
                     type: "drive", icon: "fa-city", color: "bg-pink-500",
+                    weather: { temp: "5°/14°C", icon: "fa-sun", color: "text-amber-500" },
                     desc: "由佩吉市出發前往拉斯維加斯，傍晚前往 Sphere 欣賞沉浸式大秀。",
                     sop: "今日為長途行車，行駛順暢的逆時針大圓環西半部。抵達 LV 後辦理入住手續。Sphere 秀需提前購票。",
                     risk: "跨年前夕 The Strip 交通開始壅塞，留意飯店停車場入口動線。",
@@ -709,6 +726,7 @@
                     location: "拉斯維加斯 (Las Vegas)", lat: 36.1147, lng: -115.1728,
                     title: "跨年夜大道狂歡",
                     type: "activity", icon: "fa-champagne-glasses", color: "bg-yellow-500",
+                    weather: { temp: "4°/13°C", icon: "fa-moon", color: "text-indigo-400" },
                     desc: "全面切換為步行。在客房陽台架設相機捕捉煙火，隨後步入封街大道倒數。",
                     sop: "下午 5 點 The Strip 全面封街。禁止攜帶玻璃瓶或大型背包上街。確認相機設定：手動對焦無限遠、快門 B 檔。",
                     risk: "人潮極度擁擠，扒手風險高。封街期間無法開車移動，晚餐必須預訂步行可達的餐廳。",
@@ -756,6 +774,7 @@
                     location: "拉斯維加斯 (Las Vegas)", lat: 36.1610, lng: -115.1581,
                     title: "元旦購物與頂級秀",
                     type: "activity", icon: "fa-bag-shopping", color: "bg-indigo-500",
+                    weather: { temp: "4°/14°C", icon: "fa-sun", color: "text-amber-500" },
                     desc: "下午前往 Premium Outlets 享受新年折扣。晚上觀賞經典的太陽馬戲團 'O' Show。",
                     sop: "Outlets North 為戶外型，需注意保暖。'O' Show 位於 Bellagio 內，演出前 30 分鐘入座。",
                     risk: "【元旦營業狀態】Outlets 與 O Show 皆正常營運。元旦 Outlets 人潮眾多，熱門品牌需排隊。",
@@ -797,6 +816,7 @@
                     location: "胡佛水壩 / 鳳凰城", lat: 36.0160, lng: -114.7377,
                     title: "歷史大壩與南下",
                     type: "drive", icon: "fa-bridge-water", color: "bg-emerald-500",
+                    weather: { temp: "8°/17°C", icon: "fa-sun", color: "text-amber-500" },
                     desc: "離開賭城，參觀胡佛水壩 (Hoover Dam)。隨後沿沙漠公路南下回到鳳凰城。",
                     sop: "胡佛水壩有安檢，勿攜帶違禁品。經 93 號公路南下是一段筆直且枯燥的沙漠公路，途中需換手駕駛。",
                     risk: "【營業狀態查核】胡佛水壩僅於感恩節/聖誕節關閉，01/02 正常開放。長途駕駛易疲勞，注意時間控管。",
@@ -844,6 +864,7 @@
                     location: "鳳凰城 (Phoenix)", lat: 33.4600, lng: -111.9444,
                     title: "城市巡禮與夜間登機",
                     type: "flight", icon: "fa-plane-departure", color: "bg-red-500",
+                    weather: { temp: "9°/18°C", icon: "fa-cloud-sun", color: "text-amber-500" },
                     desc: "參觀博物館與植物園。晚上 19:30 前往 PHX 機場還車，搭乘 JX025 返台。",
                     sop: "退房後將行李放車上。還車前務必加滿油（選擇 Rental Car Return 標誌）。",
                     risk: "市區可能有下班車潮，前往機場務必多抓 30 分鐘緩衝。再次確認所有護照與貴重物品已從租車上帶走。",
@@ -929,6 +950,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initUI();
+            renderWeatherDashboard(); // 渲染天氣跳轉方塊
             renderTimeline();
             renderDateNav();
             renderBudget();
@@ -984,7 +1006,7 @@
             document.getElementById('theme-toggle').addEventListener('click', toggleDark);
             document.getElementById('theme-toggle-mobile').addEventListener('click', toggleDark);
 
-            // Itinerary View Toggle (Updated to use CSS classes)
+            // Itinerary View Toggle 
             const btnSimple = document.getElementById('view-simple');
             const btnDetail = document.getElementById('view-detail');
             const timelineContainer = document.getElementById('timeline-container');
@@ -996,7 +1018,6 @@
                 btnDetail.classList.remove('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-primary');
                 btnDetail.classList.add('text-gray-500', 'dark:text-gray-400');
                 
-                // Add class to hide detailed elements
                 timelineContainer.classList.add('timeline-simple-mode');
             });
 
@@ -1007,7 +1028,6 @@
                 btnSimple.classList.remove('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-primary');
                 btnSimple.classList.add('text-gray-500', 'dark:text-gray-400');
                 
-                // Remove class to show detailed elements
                 timelineContainer.classList.remove('timeline-simple-mode');
             });
 
@@ -1018,6 +1038,43 @@
                 const usd = parseFloat(e.target.value) || 0;
                 twdOutput.value = (usd * appData.state.exchangeRate).toLocaleString();
             });
+        }
+
+        // ==========================================
+        // 跨分頁快速跳轉功能 (給天氣與導航列使用)
+        // ==========================================
+        window.goToDay = function(id) {
+            // 切換至詳細行程 Tab
+            document.querySelector('.nav-btn[data-target="itinerary"]').click();
+            // 稍等 Tab 顯示後進行平滑捲動
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                if (el) {
+                    // 電腦版有 64px 的 sticky header，預留一些空間
+                    const yOffset = -90; 
+                    const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    window.scrollTo({top: y, behavior: 'smooth'});
+                }
+            }, 100);
+        }
+
+        // ==========================================
+        // 模組：天氣儀表板
+        // ==========================================
+        function renderWeatherDashboard() {
+            const container = document.getElementById('weather-dashboard');
+            let html = '';
+            appData.itinerary.forEach((day, idx) => {
+                html += `
+                <button onclick="goToDay('${day.id}')" class="flex-shrink-0 w-28 p-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-center hover:border-primary hover:shadow-md transition-all group cursor-pointer focus:outline-none">
+                    <div class="text-xs text-gray-500 font-bold mb-1">D${idx+1} ${day.date}</div>
+                    <div class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate mb-2">${day.location.split(' ')[0]}</div>
+                    <i class="fa-solid ${day.weather.icon} text-2xl ${day.weather.color} group-hover:scale-110 transition-transform mb-2 block"></i>
+                    <div class="text-xs font-mono text-gray-600 dark:text-gray-400">${day.weather.temp}</div>
+                </button>
+                `;
+            });
+            container.innerHTML = html;
         }
 
         // ==========================================
@@ -1099,8 +1156,8 @@
                 html += `
                 <div id="${day.id}" class="mb-14 scroll-mt-36">
                     
-                    <!-- Day Header Sticky -->
-                    <div class="sticky top-[125px] md:top-[100px] z-10 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur-md py-4 mb-6 border-b-2 border-gray-200 dark:border-slate-700">
+                    <!-- Day Header - 手機版不再 sticky，以免吃掉畫面 -->
+                    <div class="md:sticky md:top-[80px] z-10 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur-md py-4 mb-6 border-b-2 border-gray-200 dark:border-slate-700">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div class="flex items-center">
                                 <div class="w-12 h-12 rounded-xl ${day.color} text-white flex items-center justify-center text-xl shadow-lg mr-4 flex-shrink-0">
@@ -1134,17 +1191,15 @@
 
                 if (day.schedule) {
                     day.schedule.forEach((s) => {
-                        // 智慧判斷 Icon 與顏色
                         let iconClass = "fa-location-dot text-gray-400";
                         let ringColor = "ring-gray-100 dark:ring-slate-800";
                         
                         if (s.text.match(/飛|航班|機場|搭乘|起飛|降落/)) { iconClass = "fa-plane text-blue-500"; ringColor = "ring-blue-100 dark:ring-blue-900/30"; }
-                        else if (s.text.match(/車|駛|自駕|停車|加油/)) { iconClass = "fa-car text-emerald-500"; ringColor = "ring-emerald-100 dark:ring-emerald-900/30"; }
+                        else if (s.text.match(/車|駛|自駕|停車|加油|吉普車/)) { iconClass = "fa-car text-emerald-500"; ringColor = "ring-emerald-100 dark:ring-emerald-900/30"; }
                         else if (s.text.match(/餐|吃|咖啡|乾糧|早餐|午餐|晚餐/)) { iconClass = "fa-utensils text-orange-500"; ringColor = "ring-orange-100 dark:ring-orange-900/30"; }
                         else if (s.text.match(/飯店|Check-in|休息|退房|睡/)) { iconClass = "fa-bed text-indigo-500"; ringColor = "ring-indigo-100 dark:ring-indigo-900/30"; }
                         else if (s.text.match(/步|跑|拍|參觀|看|徒步|攝影|導覽|抵達/)) { iconClass = "fa-camera text-purple-500"; ringColor = "ring-purple-100 dark:ring-purple-900/30"; }
 
-                        // 組合額外的詳細資訊 (受 detail-element 控制顯示/隱藏)
                         let extraDetailsHtml = '';
                         if (s.route) {
                             extraDetailsHtml += `
@@ -1227,7 +1282,8 @@
             const nav = document.getElementById('date-nav');
             let html = '';
             appData.itinerary.forEach((day, idx) => {
-                html += `<a href="#${day.id}" class="px-4 py-1.5 bg-white dark:bg-slate-800 text-sm font-medium rounded-full shadow-sm border border-gray-200 dark:border-slate-700 hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors text-gray-600 dark:text-gray-300">D${idx+1} ${day.date}</a>`;
+                // 改為呼叫跳轉函數，取代純 href 錨點
+                html += `<button onclick="goToDay('${day.id}')" class="px-4 py-1.5 bg-white dark:bg-slate-800 text-sm font-medium rounded-full shadow-sm border border-gray-200 dark:border-slate-700 hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors text-gray-600 dark:text-gray-300 flex-shrink-0">D${idx+1} ${day.date}</button>`;
             });
             nav.innerHTML = html;
         }
