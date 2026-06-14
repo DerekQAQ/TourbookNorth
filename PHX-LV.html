@@ -194,10 +194,10 @@
         </section>
 
         <!-- ==================== TAB 2: ITINERARY ==================== -->
-        <!-- Added pb-24 so the bottom fixed nav doesn't cover the last item -->
-        <section id="itinerary" class="tab-content relative pb-24">
-            <!-- Removed Sticky for mobile (md:sticky) so it doesn't take up mobile screen space -->
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 md:sticky md:top-[64px] z-30 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur-md py-4 border-b border-gray-200 dark:border-slate-700">
+        <!-- Added pb-20 so the bottom fixed nav doesn't cover the last item -->
+        <section id="itinerary" class="tab-content relative pb-20">
+            <!-- Completely removed sticky from this header for both mobile and desktop -->
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-30 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur-md py-4 border-b border-gray-200 dark:border-slate-700">
                 <h1 class="text-3xl font-bold"><i class="fa-solid fa-list-check mr-2 text-primary"></i>詳細行程時間軸</h1>
                 
                 <div class="flex items-center space-x-4 mt-4 md:mt-0">
@@ -214,10 +214,10 @@
                 <!-- Content Populated by JS -->
             </div>
             
-            <!-- Bottom Fixed Date Navigator (Only visible in Itinerary tab) -->
-            <div class="fixed bottom-0 left-0 w-full z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-200 dark:border-slate-700 py-3 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
-                <div class="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar">
-                    <div id="date-nav" class="flex space-x-2 w-max mx-auto px-2 pb-1">
+            <!-- Bottom Fixed Date Navigator (Only visible in Itinerary tab - Made smaller) -->
+            <div class="fixed bottom-0 left-0 w-full z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-200 dark:border-slate-700 py-2 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
+                <div class="max-w-7xl mx-auto px-2 overflow-x-auto hide-scrollbar">
+                    <div id="date-nav" class="flex space-x-1.5 w-max mx-auto px-1 pb-1">
                         <!-- Populated by JS -->
                     </div>
                 </div>
@@ -355,12 +355,14 @@
 
     </main>
 
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="fixed bottom-16 right-4 md:right-8 z-50 bg-gray-800/40 hover:bg-gray-800/60 dark:bg-slate-600/40 dark:hover:bg-slate-600/60 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg backdrop-blur-md transition-all duration-300 opacity-0 translate-y-5 pointer-events-none">
+        <i class="fa-solid fa-chevron-up"></i>
+    </button>
+
     <script>
         /**
          * System Core Data (appData)
-         * 更新亮點：
-         * 1. 注入各天的 weather 屬性供儀表板呈現
-         * 2. D3 行程從晨跑改為著名的 Pink Jeep Tour 紅岩吉普車體驗
          */
         const appData = {
             state: {
@@ -1038,6 +1040,23 @@
                 const usd = parseFloat(e.target.value) || 0;
                 twdOutput.value = (usd * appData.state.exchangeRate).toLocaleString();
             });
+
+            // Back to Top Logic
+            const backToTopBtn = document.getElementById('back-to-top');
+            if (backToTopBtn) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 300) {
+                        backToTopBtn.classList.remove('opacity-0', 'translate-y-5', 'pointer-events-none');
+                        backToTopBtn.classList.add('opacity-100', 'translate-y-0');
+                    } else {
+                        backToTopBtn.classList.add('opacity-0', 'translate-y-5', 'pointer-events-none');
+                        backToTopBtn.classList.remove('opacity-100', 'translate-y-0');
+                    }
+                });
+                backToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
         }
 
         // ==========================================
@@ -1050,8 +1069,8 @@
             setTimeout(() => {
                 const el = document.getElementById(id);
                 if (el) {
-                    // 電腦版有 64px 的 sticky header，預留一些空間
-                    const yOffset = -90; 
+                    // 電腦版主導航列有 64px 的高度，預留一些空間
+                    const yOffset = -80; 
                     const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({top: y, behavior: 'smooth'});
                 }
@@ -1156,8 +1175,8 @@
                 html += `
                 <div id="${day.id}" class="mb-14 scroll-mt-36">
                     
-                    <!-- Day Header - 手機版不再 sticky，以免吃掉畫面 -->
-                    <div class="md:sticky md:top-[80px] z-10 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur-md py-4 mb-6 border-b-2 border-gray-200 dark:border-slate-700">
+                    <!-- Day Header - 完全移除 sticky，不論手機或電腦皆自然捲動 -->
+                    <div class="z-10 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur-md py-4 mb-6 border-b-2 border-gray-200 dark:border-slate-700">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div class="flex items-center">
                                 <div class="w-12 h-12 rounded-xl ${day.color} text-white flex items-center justify-center text-xl shadow-lg mr-4 flex-shrink-0">
@@ -1282,8 +1301,8 @@
             const nav = document.getElementById('date-nav');
             let html = '';
             appData.itinerary.forEach((day, idx) => {
-                // 改為呼叫跳轉函數，取代純 href 錨點
-                html += `<button onclick="goToDay('${day.id}')" class="px-4 py-1.5 bg-white dark:bg-slate-800 text-sm font-medium rounded-full shadow-sm border border-gray-200 dark:border-slate-700 hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors text-gray-600 dark:text-gray-300 flex-shrink-0">D${idx+1} ${day.date}</button>`;
+                // 導航列按鈕樣式縮小 (px-3 py-1 text-xs)
+                html += `<button onclick="goToDay('${day.id}')" class="px-3 py-1 bg-white dark:bg-slate-800 text-xs font-medium rounded-full shadow-sm border border-gray-200 dark:border-slate-700 hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors text-gray-600 dark:text-gray-300 flex-shrink-0">D${idx+1} ${day.date}</button>`;
             });
             nav.innerHTML = html;
         }
