@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="dark">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -788,18 +788,28 @@
                 {
                     date: "01/01", day: "週五", id: "day9",
                     location: "拉斯維加斯 (Las Vegas)", lat: 36.1610, lng: -115.1581,
-                    title: "元旦購物與沉浸大秀",
+                    title: "晨間景點與世紀大秀",
                     type: "activity", icon: "fa-bag-shopping", color: "bg-indigo-500",
                     weather: { temp: "4°/14°C", icon: "fa-sun", color: "text-amber-500", sunrise: "06:49", sunset: "16:40" },
-                    desc: "睡到自然醒。下午前往 Premium Outlets 享受折扣，接著參觀復古的霓虹博物館，晚上前往 Sphere 體驗震撼視聽大秀。",
-                    sop: "市區全程依賴 Uber 或單軌列車 (Monorail)，車子繼續停在飯店。Sphere 秀需提早 1 小時入場。",
+                    desc: "早晨造訪經典地標與溫室花園，下午前往 Premium Outlets 與復古的霓虹博物館，晚上接力體驗 Sphere 與太陽馬戲團大秀。",
+                    sop: "市區全程依賴 Uber 或單軌列車 (Monorail)，車子繼續停在飯店。晚間大秀時間緊湊，需提早掌握交通。",
                     risk: "元旦 Outlets 人潮較多。一月戶外風大，Outlets North 為戶外型請穿著適當外套保暖。",
-                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Las+Vegas+North+Premium+Outlets",
-                    stats: { driveHours: 0.5, actHours: 6 },
+                    mapsLink: "https://www.google.com/maps/search/?api=1&query=Welcome+to+Fabulous+Las+Vegas+Sign",
+                    stats: { driveHours: 0.5, actHours: 8 },
                     schedule: [
                         { 
+                            time: "08:30 - 09:15", text: "Welcome to Fabulous Las Vegas 經典招牌打卡", 
+                            tips: "【晨間推薦】早上人潮最少，不用在烈日下大排長龍即可與拉斯維加斯最經典的招牌合影。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Welcome+to+Fabulous+Las+Vegas+Sign" 
+                        },
+                        { 
+                            time: "09:30 - 10:45", text: "百樂宮溫室植物園 (Bellagio Conservatory)", 
+                            tips: "【晨間推薦】欣賞華麗的冬季與新年主題室內花園造景，晨間光線極佳且逛起來最舒適。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Bellagio+Conservatory" 
+                        },
+                        { 
                             time: "11:00 - 13:00", text: "【早午餐】Bacchanal Buffet (凱薩宮百樂宮自助餐)",
-                            tips: "元旦睡到自然醒，用澎湃的海鮮與烤肉開啟新的一年 (需提前預約)。",
+                            tips: "用澎湃的海鮮與精緻烤肉開啟新的一年 (強烈建議提前預約)。",
                             mapsLink: "https://www.google.com/maps/search/?api=1&query=Bacchanal+Buffet"
                         },
                         { 
@@ -815,18 +825,21 @@
                             mapsLink: "https://www.google.com/maps/search/?api=1&query=The+Neon+Museum" 
                         },
                         { 
-                            time: "17:30 - 18:30", text: "返回飯店放置戰利品，稍作休息" 
-                        },
-                        { 
-                            time: "18:30 - 19:30", text: "【晚餐】Shang Artisan Noodle (手工麵館)", 
-                            tips: "品嚐熱騰騰的道地亞洲牛肉湯麵，溫暖舒適。",
+                            time: "17:30 - 18:30", text: "【晚餐】Shang Artisan Noodle (手工麵館)", 
+                            tips: "品嚐熱騰騰的道地亞洲牛肉湯麵，距離 Downtown 與霓虹博物館很近。",
                             mapsLink: "https://www.google.com/maps/search/?api=1&query=Shang+Artisan+Noodle+Las+Vegas" 
                         },
                         { 
-                            time: "19:30 - 22:00", text: "前往 Sphere 體驗沉浸式大秀 (Postcard from Earth)", 
+                            time: "19:00 - 21:00", text: "前往 Sphere 體驗沉浸式大秀 (Postcard from Earth)", 
                             route: "可從 The Venetian (威尼斯人) 的室內連通道步行前往 Sphere。", 
-                            tips: "20:00 演出，建議 19:00 進場體驗大廳的互動設施。館內嚴格安檢，勿帶大背包。", 
+                            tips: "建議 18:30 進場體驗大廳的 AI 互動設施。館內嚴格安檢，勿帶大背包。", 
                             mapsLink: "https://www.google.com/maps/search/?api=1&query=Sphere+Las+Vegas" 
+                        },
+                        { 
+                            time: "21:30 - 23:00", text: "太陽馬戲團經典水秀《O》(Bellagio)", 
+                            route: "位於百樂宮酒店內，可從 Sphere 結束後搭乘 Uber 或步行穿越飯店連通道前往。", 
+                            tips: "【必看大秀】拉斯維加斯最傳奇的水上劇場，21:30 為晚場秀，絕對是新年的完美視聽饗宴 (需提前數月購票)。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=O+by+Cirque+du+Soleil" 
                         }
                     ]
                 },
@@ -836,42 +849,56 @@
                     title: "世紀水壩與 66號公路",
                     type: "drive", icon: "fa-route", color: "bg-emerald-500",
                     weather: { temp: "8°/17°C", icon: "fa-sun", color: "text-amber-500", sunrise: "07:30", sunset: "17:31" },
-                    desc: "離開賭城，順遊胡佛水壩 (Hoover Dam)，沿途停靠 66號公路經典小鎮 Seligman 感受復古風情，傍晚返回鳳凰城。",
-                    sop: "今日為長程自駕返程日。胡佛水壩可走旁通橋俯瞰全景。下午順遊 66號公路小鎮拍照留念。",
+                    desc: "離開賭城，順遊胡佛水壩與米德湖，接著駛入充滿懷舊風情的 66 號公路，探訪 Hackberry 雜貨店與 Seligman，傍晚返回鳳凰城。",
+                    sop: "今日為長程自駕返程日。沿途為您加入了順路的景點，讓漫長的公路之旅充滿驚喜。",
                     risk: "胡佛水壩有軍警安檢，勿帶違禁品。US-93 南下路段較長，建議適時換手駕駛保持精神。",
                     mapsLink: "https://www.google.com/maps/search/?api=1&query=Hoover+Dam",
-                    stats: { driveHours: 5.5, actHours: 2 },
+                    stats: { driveHours: 5.5, actHours: 2.5 },
                     schedule: [
                         { 
                             time: "08:00 - 09:00", text: "【早餐】退房取車，駛出拉斯維加斯" 
                         },
                         { 
-                            time: "09:00 - 10:00", text: "胡佛水壩 (Hoover Dam) 短暫停留", 
-                            tips: "【時間建議】可走上 Mike O'Callaghan–Pat Tillman 紀念大橋，在橋上欣賞水壩全景即可，保留後續車程體力。", 
+                            time: "09:00 - 09:45", text: "胡佛水壩 (Hoover Dam) 順遊", 
+                            tips: "走上 Mike O'Callaghan–Pat Tillman 紀念大橋，在橋上居高臨下欣賞壯觀的水壩全景。", 
                             mapsLink: "https://www.google.com/maps/search/?api=1&query=Hoover+Dam+Bypass+Bridge" 
                         },
                         { 
-                            time: "10:00 - 11:30", text: "沿 US-93 S 南下前往 Kingman" 
+                            time: "09:45 - 10:15", text: "米德湖觀景台 (Lake Mead Lakeview Overlook)", 
+                            tips: "【順路秘境】離開水壩後順路停靠，欣賞蔚藍的米德湖與荒漠交織的獨特美景。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Lake+Mead+Lakeview+Overlook" 
+                        },
+                        { 
+                            time: "10:15 - 11:30", text: "沿 US-93 S 南下前往 Kingman" 
                         },
                         { 
                             time: "11:30 - 12:30", text: "【午餐】Mr D'z Route 66 Diner (Kingman)", 
-                            tips: "品嚐復古美式 Diner 的餐點，順便與門口的粉紅復古車合影。", 
+                            tips: "品嚐復古美式 Diner 的餐點，順便與門口的粉紅復古老爺車合影。", 
                             mapsLink: "https://www.google.com/maps/search/?api=1&query=Mr+D'z+Route+66+Diner" 
                         },
                         { 
-                            time: "12:30 - 13:30", text: "行駛 I-40 E 前往 Seligman (66號公路發源鎮)" 
+                            time: "12:30 - 13:15", text: "轉往懷舊的 66 號公路 (Route 66) 行駛", 
+                            tips: "捨棄無聊的高速公路，改走一段最具歷史韻味的經典景觀路線。" 
                         },
                         { 
-                            time: "13:30 - 14:15", text: "Seligman 順遊打卡", 
-                            tips: "這裡充滿了復古的老式招牌與汽車，可輕鬆漫步拍照，感受經典的公路文化。",
+                            time: "13:15 - 14:00", text: "Hackberry General Store 懷舊雜貨店", 
+                            tips: "【順路打卡】66 號公路上極著名的復古雜貨店，店內外佈滿了老式車牌、古董加油機與生鏽老爺車，極度好拍。", 
+                            mapsLink: "https://www.google.com/maps/search/?api=1&query=Hackberry+General+Store" 
+                        },
+                        { 
+                            time: "14:00 - 14:45", text: "繼續沿 66 號公路前往 Seligman (汽車總動員小鎮原型)" 
+                        },
+                        { 
+                            time: "14:45 - 15:30", text: "Seligman 小鎮漫步", 
+                            tips: "這裡充滿了復古的老式招牌與文化，可輕鬆漫步拍照，為公路之旅留下美好回憶。",
                             mapsLink: "https://www.google.com/maps/search/?api=1&query=Seligman+Arizona"
                         },
                         { 
-                            time: "14:15 - 17:15", text: "南下返回鳳凰城 (Phoenix)", 
+                            time: "15:30 - 18:30", text: "南下返回鳳凰城 (Phoenix)", 
                             tips: "剩餘路程漫長，途中可隨時在休息站休息或換手駕駛。" 
                         },
                         { 
-                            time: "17:30 - 19:30", text: "飯店 Check-in 與 【晚餐】The Arrogant Butcher"
+                            time: "18:30 - 20:00", text: "飯店 Check-in 與 【晚餐】The Arrogant Butcher"
                         }
                     ]
                 },
@@ -933,7 +960,7 @@
                 { category: "住宿 (Hotel)", desc: "10晚住宿 (含賭城跨年高溢價時段)", amount: 3200, color: "#10b981" },
                 { category: "租車與交通 (Car)", desc: "AWD SUV 11天 + 油資 (公路旅程)", amount: 1300, color: "#f59e0b" },
                 { category: "餐飲 (Food)", desc: "早午晚餐 + 咖啡 + 跨年大餐", amount: 1500, color: "#ef4444" },
-                { category: "活動與門票 (Activity)", desc: "國家公園年票、羚羊谷、博物館、Sphere", amount: 900, color: "#8b5cf6" }
+                { category: "活動與門票 (Activity)", desc: "國家公園年票、羚羊谷、Sphere、太陽馬戲團", amount: 1200, color: "#8b5cf6" }
             ],
             equipment: [
                 { id: "eq1", item: "護照、ESTA 紙本備查、台灣駕照、國際駕照" },
