@@ -201,7 +201,7 @@
                 <button class="food-filter px-4 py-2 rounded-full border border-slate-200 text-sm whitespace-nowrap text-slate-600 hover:bg-slate-100 transition-colors" data-filter="meat">🥩 肉類大餐</button>
                 <button class="food-filter px-4 py-2 rounded-full border border-slate-200 text-sm whitespace-nowrap text-slate-600 hover:bg-slate-100 transition-colors" data-filter="cafe">☕ 咖啡甜點</button>
                 <button class="food-filter px-4 py-2 rounded-full border border-slate-200 text-sm whitespace-nowrap text-slate-600 hover:bg-slate-100 transition-colors" data-filter="local">🥨 在地特色</button>
-                <button class="food-filter px-4 py-2 rounded-full border border-slate-200 text-sm whitespace-nowrap text-slate-600 hover:bg-slate-100 transition-colors" data-filter="view">🌃 景觀餐廳</button>
+                <button class="food-filter px-4 py-2 rounded-full border border-slate-200 text-sm whitespace-nowrap text-slate-600 hover:bg-slate-100 transition-colors" data-filter="view">🌃 景觀餐廳/酒吧</button>
             </div>
 
             <!-- Grid -->
@@ -392,8 +392,8 @@
 
     </main>
 
-    <!-- Floating Bottom Control Panel (Redesigned for mobile friendliness) -->
-    <div class="glass-panel fixed bottom-4 left-4 right-4 md:bottom-0 md:left-0 md:right-0 md:w-full md:rounded-none rounded-2xl z-40 transition-transform duration-300 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] border border-slate-200 md:border-t md:border-l-0 md:border-r-0 md:border-b-0">
+    <!-- Floating Bottom Control Panel (Redesigned for mobile friendliness, hidden by default outside itinerary) -->
+    <div id="bottom-nav-panel" class="hidden glass-panel fixed bottom-4 left-4 right-4 md:bottom-0 md:left-0 md:right-0 md:w-full md:rounded-none rounded-2xl z-40 transition-transform duration-300 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] border border-slate-200 md:border-t md:border-l-0 md:border-r-0 md:border-b-0">
         <div class="max-w-7xl mx-auto px-3 sm:px-4 flex items-center justify-between h-14">
             
             <!-- Left: Toggle Mode -->
@@ -617,14 +617,36 @@
         ];
 
         const foodData = [
-            { category: 'meat', name: 'Figlmüller 炸肉排', city: '維也納', desc: '比臉還大的百年維也納炸肉排名店。', map: createGMapUrl('Figlmüller Bäckerstraße') },
-            { category: 'cafe', name: 'Café Central', city: '維也納', desc: '世界最美咖啡館之一，體驗傳統維也納咖啡文化。', map: createGMapUrl('Café Central Vienna') },
-            { category: 'local', name: 'Menza (Goulash)', city: '布達佩斯', desc: '復古風格餐廳，必點匈牙利燉牛肉湯。', map: createGMapUrl('Menza Étterem és Kávéház') },
-            { category: 'view', name: 'Terasa U Prince', city: '布拉格', desc: '老城廣場最佳俯瞰視角，適合喝杯調酒。', map: createGMapUrl('Terasa U Prince') },
-            { category: 'local', name: 'Trdelník 煙囪捲', city: '布拉格', desc: '街邊隨處可見的捷克傳統甜點，熱熱吃最好吃。', map: createGMapUrl('Trdelnik Prague') },
-            { category: 'meat', name: 'Pork\'s 烤豬腳', city: '布拉格', desc: '外皮酥脆、肉質軟嫩的捷克烤豬腳。', map: createGMapUrl('Pork\'s Prague') },
-            { category: 'local', name: 'Krumlovský mlýn', city: '庫倫洛夫', desc: '河畔餐廳，提供道地波西米亞料理。', map: createGMapUrl('Krumlovský mlýn') },
-            { category: 'cafe', name: 'Cafe Tomaselli', city: '薩爾斯堡', desc: '奧地利最古老的咖啡館，莫札特也愛來。', map: createGMapUrl('Café Tomaselli') }
+            // Vienna
+            { category: 'meat', name: 'Figlmüller', city: '維也納', stars: '4.4', desc: '比臉還大的百年維也納炸肉排名店。', map: createGMapUrl('Figlmüller Bäckerstraße') },
+            { category: 'meat', name: 'Ribs of Vienna', city: '維也納', stars: '4.5', desc: '在地超人氣地窖豬肋排，長達一公尺的美味。', map: createGMapUrl('Ribs of Vienna') },
+            { category: 'local', name: 'Plachutta', city: '維也納', stars: '4.4', desc: '皇帝最愛的清燉牛肉 (Tafelspitz) 經典名店。', map: createGMapUrl('Plachutta Wollzeile') },
+            { category: 'cafe', name: 'Café Central', city: '維也納', stars: '4.4', desc: '世界最美咖啡館之一，體驗傳統維也納咖啡文化。', map: createGMapUrl('Café Central Vienna') },
+            { category: 'cafe', name: 'Café Sperl', city: '維也納', stars: '4.5', desc: '電影《愛在黎明破曉時》拍攝地，傳統寧靜氛圍。', map: createGMapUrl('Café Sperl') },
+            { category: 'cafe', name: 'Demel (德梅爾)', city: '維也納', stars: '4.3', desc: '曾為皇室御用糕點店，推薦沙河蛋糕與紫羅蘭糖。', map: createGMapUrl('Demel Vienna') },
+
+            // Budapest
+            { category: 'local', name: 'Menza (Goulash)', city: '布達佩斯', stars: '4.5', desc: '復古風格餐廳，必點匈牙利燉牛肉湯。', map: createGMapUrl('Menza Étterem és Kávéház') },
+            { category: 'local', name: 'Hungarikum Bisztró', city: '布達佩斯', stars: '4.7', desc: '道地匈牙利家庭料理，氣氛溫馨，需提早預約。', map: createGMapUrl('Hungarikum Bisztró') },
+            { category: 'cafe', name: 'New York Café', city: '布達佩斯', stars: '4.3', desc: '華麗奢華的世界最美咖啡館，宛如置身皇宮。', map: createGMapUrl('New York Café Budapest') },
+            { category: 'view', name: 'Mazel Tov', city: '布達佩斯', stars: '4.6', desc: '猶太區廢墟酒吧餐廳，藤蔓與燈泡交織的絕美中東料理。', map: createGMapUrl('Mazel Tov Budapest') },
+            { category: 'cafe', name: 'Gelarto Rosa', city: '布達佩斯', stars: '4.6', desc: '聖史蒂芬大教堂旁超美玫瑰花造型冰淇淋。', map: createGMapUrl('Gelarto Rosa') },
+
+            // Prague
+            { category: 'meat', name: 'Pork\'s 烤豬腳', city: '布拉格', stars: '4.6', desc: '外皮酥脆、肉質軟嫩的捷克烤豬腳。', map: createGMapUrl('Pork\'s Prague') },
+            { category: 'meat', name: 'Kantýna', city: '布拉格', stars: '4.6', desc: '肉食愛好者天堂，在地人也愛的立吞牛排與生牛肉塔塔。', map: createGMapUrl('Kantyna Prague') },
+            { category: 'local', name: 'Trdelník 煙囪捲', city: '布拉格', stars: '4.5', desc: '街邊隨處可見的捷克傳統甜點，熱熱吃最好吃。', map: createGMapUrl('Trdelnik Prague') },
+            { category: 'view', name: 'Terasa U Prince', city: '布拉格', stars: '4.2', desc: '老城廣場最佳俯瞰視角，適合喝杯調酒。', map: createGMapUrl('Terasa U Prince') },
+            { category: 'local', name: 'U Fleků', city: '布拉格', stars: '4.3', desc: '擁有500年歷史的古老啤酒館，自釀黑啤酒極具特色。', map: createGMapUrl('U Fleků') },
+            { category: 'cafe', name: 'Café Louvre', city: '布拉格', stars: '4.5', desc: '卡夫卡與愛因斯坦曾造訪的百年咖啡館。', map: createGMapUrl('Café Louvre') },
+
+            // CK / Salzburg
+            { category: 'local', name: 'Krumlovský mlýn', city: '庫倫洛夫', stars: '4.4', desc: '河畔餐廳，提供道地波西米亞料理。', map: createGMapUrl('Krumlovský mlýn') },
+            { category: 'view', name: 'Papa\'s Living Restaurant', city: '庫倫洛夫', stars: '4.5', desc: '伏爾塔瓦河畔的超人氣餐廳，義大利麵與烤肉皆優。', map: createGMapUrl('Papa\'s Living Restaurant') },
+            { category: 'cafe', name: 'Cafe Tomaselli', city: '薩爾斯堡', stars: '4.2', desc: '奧地利最古老的咖啡館，莫札特也愛來。', map: createGMapUrl('Café Tomaselli') },
+            { category: 'local', name: 'Bärenwirt', city: '薩爾斯堡', stars: '4.6', desc: '薩爾斯堡超美味炸雞與奧地利傳統料理。', map: createGMapUrl('Bärenwirt Salzburg') },
+            { category: 'local', name: 'St. Peter Stiftskulinarium', city: '薩爾斯堡', stars: '4.5', desc: '歐洲最古老餐廳(超過1200年)，米其林推薦的洞穴晚宴。', map: createGMapUrl('St. Peter Stiftskulinarium') },
+            { category: 'meat', name: 'Augustiner Bräu', city: '薩爾斯堡', stars: '4.7', desc: '修道院大酒場，熱鬧非凡的大口吃肉喝酒聖地。', map: createGMapUrl('Augustiner Bräu Salzburg') }
         ];
 
         const accommodations = [
@@ -708,6 +730,14 @@
                 }
             });
             document.getElementById('mobile-menu').classList.add('hidden');
+
+            // Toggle floating bottom navigation panel visibility
+            const bottomNav = document.getElementById('bottom-nav-panel');
+            if (viewId === 'itinerary') {
+                bottomNav.classList.remove('hidden');
+            } else {
+                bottomNav.classList.add('hidden');
+            }
 
             currentView = viewId;
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -977,7 +1007,10 @@
                     <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
                         <div class="flex justify-between items-start mb-2">
                             <span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded font-medium">${food.city}</span>
-                            <span class="text-xl">${emoji}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md">⭐ ${food.stars}</span>
+                                <span class="text-xl">${emoji}</span>
+                            </div>
                         </div>
                         <h3 class="font-bold text-lg text-slate-800 mb-1">${food.name}</h3>
                         <p class="text-sm text-slate-500 mb-4 flex-1">${food.desc}</p>
