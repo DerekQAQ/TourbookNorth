@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Travel Diary | 我的旅行足跡</title>
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* 隱藏滾動條但保留滾動功能 */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* 圓潤可愛的字體設定 */
+    body {
+      background-color: #fdfbf7; /* 溫暖的米白色背景 */
+      color: #374151;
+      font-family: 'Nunito', ui-rounded, 'Hiragino Maru Gothic ProN', 'Quicksand', sans-serif;
+    }
+
+    /* 讓地圖上的點擊有 Q 彈的效果 */
+    .bounce-click:active {
+      transform: scale(0.9);
+    }
+  </style>
+</head>
+<body class="selection:bg-pink-200 relative overflow-x-hidden">
+
+  <!-- 環境背景可愛光暈 -->
+  <div class="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-pink-200/40 blur-[100px] pointer-events-none -z-10"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-sky-200/40 blur-[100px] pointer-events-none -z-10"></div>
+  <div class="fixed top-[40%] left-[30%] w-[40%] h-[40%] rounded-full bg-yellow-100/40 blur-[100px] pointer-events-none -z-10"></div>
+
+  <!-- 導航列 -->
+  <header class="px-6 py-4 sticky top-0 z-50 flex items-center justify-between bg-white/70 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <div class="flex items-center gap-3">
+      <div class="p-2 bg-pink-100 rounded-xl text-pink-500">
+        <i data-lucide="plane" class="w-6 h-6 animate-[bounce_3s_infinite]"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-wide text-gray-800">
+          My Travel Diary
+        </h1>
+        <p class="text-[11px] text-gray-500 tracking-wider font-medium">記錄每個美好的角落 ✨</p>
+      </div>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100">
+      <i data-lucide="sun" class="w-4 h-4 text-yellow-400"></i>
+      <span class="text-xs font-bold text-gray-600 tracking-wider">LET'S GO EXPLORING!</span>
+    </div>
+  </header>
+
+  <!-- 主要內容區 -->
+  <main class="max-w-[1400px] mx-auto px-4 md:px-6 py-8 md:py-10 flex flex-col xl:flex-row gap-8 items-start">
+    
+    <!-- 左側：世界地圖與座標 -->
+    <div class="w-full xl:w-2/3 flex flex-col gap-4">
+      <div class="flex items-center justify-between px-2">
+        <h2 class="text-xl font-bold flex items-center gap-2 text-gray-800">
+          <i data-lucide="map" class="w-6 h-6 text-sky-500"></i>
+          我的旅行足跡 <span class="text-gray-400 text-sm font-medium ml-1">| Where I've Been</span>
+        </h2>
+      </div>
+      
+      <!-- 地圖容器 - 手機版可水平滑動 -->
+      <div class="w-full overflow-x-auto pb-6 hide-scrollbar relative">
+        <div class="min-w-[800px] xl:min-w-0 w-full relative aspect-[2/1] bg-[#e0f2fe] rounded-[2.5rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center flex-shrink-0 group">
+          
+          <!-- 世界地圖底圖 (移除黑底與反轉，改為帶透明度的柔和呈現) -->
+          <img 
+            src="https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg"
+            alt="World Map"
+            class="absolute w-[92%] h-[92%] object-contain opacity-[0.15] pointer-events-none transition-all duration-700 group-hover:scale-[1.02]"
+            onerror="this.style.display='none';"
+          />
+          
+          <!-- 地圖標記點 (Pins) 將由 JS 動態生成 -->
+          <div id="map-pins-container" class="absolute w-[92%] h-[92%]"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右側：選中旅程詳細資訊面板 -->
+    <div class="w-full xl:w-1/3 flex flex-col gap-4">
+      <div class="flex items-center justify-between px-2">
+        <h2 class="text-xl font-bold flex items-center gap-2 text-gray-800">
+          <i data-lucide="book-open" class="w-6 h-6 text-pink-400"></i>
+          旅程小手札 <span class="text-gray-400 text-sm font-medium ml-1">| Trip Diary</span>
+        </h2>
+      </div>
+
+      <!-- 面板內容將由 JS 動態更新 -->
+      <div id="briefing-panel" class="relative rounded-[2rem] bg-white shadow-xl border border-gray-100 p-6 md:p-8 overflow-hidden flex flex-col min-h-[400px]">
+        <!-- 內容渲染區 -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 底部：所有旅程清單 -->
+  <section class="max-w-[1400px] mx-auto px-4 md:px-6 pb-16 pt-8 mt-4">
+    <div class="flex items-center gap-2 mb-6 px-2">
+      <i data-lucide="camera" class="w-6 h-6 text-indigo-400"></i>
+      <h2 class="text-2xl font-bold text-gray-800">所有的美好回憶 <span class="text-gray-400 font-medium text-base ml-2">| All Adventures</span></h2>
+    </div>
+    
+    <!-- 列表將由 JS 動態生成 -->
+    <div id="archives-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    </div>
+  </section>
+  
+  <!-- 頁尾 -->
+  <footer class="text-center py-8 text-gray-400 text-sm font-medium bg-white/50 border-t border-gray-100 backdrop-blur-sm">
+    © 2026 My Travel Diary. Created with love and beautiful memories. 💖
+  </footer>
+
+  <!-- 應用程式邏輯 -->
+  <script>
+    // --- 旅程資料庫 (更新配色與可愛文案) ---
+    const JOURNEYS = [
+      {
+        id: 1,
+        title: "北歐極地遠征",
+        subtitle: "Nordic Expedition 2025-26",
+        loc: "北歐・跨國",
+        desc: "準備好雪地裝備，探索芬蘭、挪威等地的冰雪奇緣與極光秘境。展開一場夢幻的跨國之旅！⛄",
+        url: "https://derekqaq.github.io/TourbookNorth/Tourbook",
+        top: "15%", left: "52%",
+        icon: "snowflake",
+        theme: {
+          bg: "bg-blue-100", text: "text-blue-600",
+          gradient: "from-blue-400 to-sky-400", shadow: "shadow-blue-200"
+        },
+        tags: ["#極地遠征", "#追極光", "#夢幻雪國"],
+        stats: { days: "14+ 天", type: "極地自駕", highlight: "極光秘境" }
+      },
+      {
+        id: 2,
+        title: "奧捷匈童話之旅",
+        subtitle: "A-C-H Winter Tour",
+        loc: "中歐・奧捷匈",
+        desc: "12天10夜的冬季雪國雙城深度自駕，漫步百年聖誕市集與浪漫的跨年煙火。🎄",
+        url: "https://derekqaq.github.io/TourbookNorth/A-C-H",
+        top: "26%", left: "53%",
+        icon: "castle", 
+        theme: {
+          bg: "bg-orange-100", text: "text-orange-600",
+          gradient: "from-orange-400 to-amber-400", shadow: "shadow-orange-200"
+        },
+        tags: ["#冬季童話", "#聖誕市集", "#浪漫跨年"],
+        stats: { days: "12 天", type: "跨國自駕", highlight: "聖誕市集" }
+      },
+      {
+        id: 3,
+        title: "北海道自駕之旅",
+        subtitle: "Hokkaido Summer",
+        loc: "日本・北海道",
+        desc: "夏日追花與積丹藍的7天6夜自駕攻略，輕鬆掌握道央至道南的完美路線。🌻",
+        url: "https://derekqaq.github.io/TourbookNorth/Hokkaido",
+        top: "28%", left: "86%",
+        icon: "flower-2", 
+        theme: {
+          bg: "bg-emerald-100", text: "text-emerald-600",
+          gradient: "from-emerald-400 to-teal-400", shadow: "shadow-emerald-200"
+        },
+        tags: ["#夏日追花", "#積丹藍", "#美味海鮮"],
+        stats: { days: "7 天", type: "輕鬆自駕", highlight: "富良野花海" }
+      },
+      {
+        id: 4,
+        title: "鳥取公路之旅",
+        subtitle: "Tottori Coastal Drive",
+        loc: "日本・山陰海岸",
+        desc: "4天3夜松葉蟹、海景溫泉與鳥取砂丘的療癒之旅，盡享山陰海岸風光。🦀",
+        url: "https://derekqaq.github.io/TourbookNorth/Birdtake",
+        top: "32%", left: "84%",
+        icon: "waves",
+        theme: {
+          bg: "bg-cyan-100", text: "text-cyan-600",
+          gradient: "from-cyan-400 to-blue-400", shadow: "shadow-cyan-200"
+        },
+        tags: ["#海景溫泉", "#松葉蟹", "#鳥取砂丘"],
+        stats: { days: "4 天", type: "海岸公路", highlight: "溫泉放鬆" }
+      },
+      {
+        id: 5,
+        title: "美西公路壯遊",
+        subtitle: "PHX to LAS Adventure",
+        loc: "美國・西南部",
+        desc: "從鳳凰城到拉斯維加斯的壯麗公路旅行，穿越無垠峽谷與不夜城的極致體驗。🏜️",
+        url: "https://derekqaq.github.io/TourbookNorth/PHX-LV",
+        top: "32%", left: "17%",
+        icon: "mountain",
+        theme: {
+          bg: "bg-rose-100", text: "text-rose-600",
+          gradient: "from-rose-400 to-pink-500", shadow: "shadow-rose-200"
+        },
+        tags: ["#大峽谷", "#公路旅行", "#不夜城"],
+        stats: { days: "10+ 天", type: "沙漠公路", highlight: "壯麗峽谷" }
+      },
+      {
+        id: 6,
+        title: "西澳秘境之旅",
+        subtitle: "Perth Discovery",
+        loc: "澳洲・伯斯",
+        desc: "探索西澳伯斯的自然生態與壯闊海岸線，感受南半球的無盡陽光與可愛短尾矮袋鼠！🦘",
+        url: "https://derekqaq.github.io/TourbookNorth/Perth",
+        top: "76%", left: "81%",
+        icon: "sun",
+        theme: {
+          bg: "bg-yellow-100", text: "text-yellow-600",
+          gradient: "from-yellow-400 to-amber-500", shadow: "shadow-yellow-200"
+        },
+        tags: ["#自然生態", "#無盡陽光", "#短尾矮袋鼠"],
+        stats: { days: "8+ 天", type: "自然探索", highlight: "野生動物" }
+      }
+    ];
+
+    // 目前選中的旅程 (預設第一筆)
+    let activeJourney = JOURNEYS[0];
+
+    // 切換旅程函數
+    function setActive(id, scrollToTop = false) {
+      activeJourney = JOURNEYS.find(j => j.id === id);
+      render();
+      if (scrollToTop) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // 渲染畫面
+    function render() {
+      // 1. 渲染地圖標記 (Pins) - 改為可愛的泡泡標記
+      const pinsHtml = JOURNEYS.map(j => {
+        const isActive = activeJourney.id === j.id;
+        return `
+          <button
+            class="absolute -ml-4 -mt-4 flex items-center justify-center transition-all duration-500 z-10 bounce-click
+              ${isActive ? 'scale-125 z-20' : 'hover:scale-110 opacity-80 hover:opacity-100'}"
+            style="left: ${j.left}; top: ${j.top}"
+            onclick="setActive(${j.id})"
+            aria-label="${j.title}"
+          >
+            <!-- 大頭針外觀 -->
+            <div class="relative w-7 h-7 rounded-full border-4 border-white shadow-md bg-gradient-to-br ${j.theme.gradient} flex items-center justify-center ${isActive ? 'animate-bounce shadow-xl' : ''}">
+              ${isActive ? '<div class="w-1.5 h-1.5 bg-white rounded-full"></div>' : ''}
+            </div>
+            
+            <!-- 選中時的底部小陰影 -->
+            ${isActive ? '<div class="absolute -bottom-2 w-4 h-1.5 bg-black/10 blur-[2px] rounded-full"></div>' : ''}
+            
+            <!-- Hover 提示標籤 (氣泡框) -->
+            <span class="absolute top-9 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1 bg-white border border-gray-100 shadow-lg rounded-full text-xs font-bold text-gray-700 opacity-0 transition-opacity duration-200 pointer-events-none ${!isActive ? 'group-hover/pin:opacity-100' : ''}">
+              ${j.title}
+            </span>
+          </button>
+        `;
+      }).join('');
+      document.getElementById('map-pins-container').innerHTML = pinsHtml;
+
+      // 2. 渲染右側旅程手札
+      const active = activeJourney;
+      const tagsHtml = active.tags.map(tag => `
+        <span class="px-3 py-1.5 rounded-full text-xs font-bold ${active.theme.bg} ${active.theme.text}">${tag}</span>
+      `).join('');
+
+      document.getElementById('briefing-panel').innerHTML = `
+        <!-- 背景柔和光暈 -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${active.theme.gradient} opacity-[0.08] rounded-bl-full pointer-events-none"></div>
+        
+        <div class="flex items-start gap-5 mb-6 relative z-10">
+          <div class="p-4 rounded-[1.5rem] bg-gradient-to-br ${active.theme.gradient} text-white shadow-lg ${active.theme.shadow} transition-all duration-500">
+            <i data-lucide="${active.icon}" class="w-8 h-8 stroke-[2]"></i>
+          </div>
+          <div class="pt-1">
+            <h3 class="text-xs font-extrabold ${active.theme.text} tracking-widest mb-1 flex items-center gap-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> ${active.loc}
+            </h3>
+            <h2 class="text-2xl font-bold text-gray-800 leading-tight">${active.title}</h2>
+            <p class="text-sm text-gray-400 font-medium mt-1">${active.subtitle}</p>
+          </div>
+        </div>
+        
+        <p class="text-gray-600 leading-relaxed mb-8 text-base relative z-10 flex-grow font-medium">
+          ${active.desc}
+        </p>
+        
+        <!-- 統計資料網格 -->
+        <div class="grid grid-cols-2 gap-4 mb-8 relative z-10">
+          <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+            <span class="block text-[11px] text-gray-400 font-bold tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="calendar" class="w-3.5 h-3.5"></i> 日期長度
+            </span>
+            <span class="font-bold text-gray-700 text-lg">${active.stats.days}</span>
+          </div>
+          <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+            <span class="block text-[11px] text-gray-400 font-bold tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="compass" class="w-3.5 h-3.5"></i> 旅程類型
+            </span>
+            <span class="font-bold text-gray-700 text-lg">${active.stats.type}</span>
+          </div>
+        </div>
+
+        <!-- 標籤 -->
+        <div class="flex flex-wrap gap-2 mb-8 relative z-10">
+          ${tagsHtml}
+        </div>
+
+        <!-- 前往連結按鈕 -->
+        <a 
+          href="${active.url}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="relative z-10 w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-white bg-gradient-to-r ${active.theme.gradient} hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${active.theme.shadow}"
+        >
+          出發去看看 ✨ (Let's Go!)
+          <i data-lucide="arrow-right" class="w-5 h-5 ml-1"></i>
+        </a>
+      `;
+
+      // 3. 渲染底部清單
+      const archivesHtml = JOURNEYS.map(j => {
+        const isActive = activeJourney.id === j.id;
+        return `
+          <button 
+            onclick="setActive(${j.id}, true)"
+            class="text-left relative p-6 rounded-[2rem] bg-white border-2 transition-all duration-300 hover:-translate-y-2 group overflow-hidden shadow-sm hover:shadow-xl bounce-click
+              ${isActive ? `border-transparent ring-4 ring-offset-2 ring-opacity-50 ring-${j.theme.text.split('-')[1]}-400 shadow-md` : 'border-gray-100 hover:border-gray-200'}"
+          >
+            <!-- 右上角小裝飾圖案 -->
+            <div class="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br ${j.theme.gradient} opacity-[0.05] rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            
+            <div class="flex items-center justify-between mb-4 relative z-10">
+              <div class="p-3 rounded-2xl ${j.theme.bg} ${j.theme.text} group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="${j.icon}" class="w-6 h-6 stroke-[2]"></i>
+              </div>
+              <span class="text-[11px] font-bold tracking-widest text-gray-400 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">${j.loc}</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-1 relative z-10">${j.title}</h3>
+            <p class="text-sm text-gray-500 line-clamp-1 relative z-10 font-medium">${j.subtitle}</p>
+          </button>
+        `;
+      }).join('');
+      document.getElementById('archives-container').innerHTML = archivesHtml;
+
+      // 重新繪製 Lucide Icons
+      lucide.createIcons();
+    }
+
+    // 程式啟動入口
+    window.onload = () => {
+      render(); // 初次渲染
+    };
+  </script>
+</body>
+</html>
