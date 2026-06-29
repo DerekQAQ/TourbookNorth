@@ -1,1181 +1,186 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 奧捷匈 12日自駕深度之旅</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Diary | 旅行足跡</title>
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* 隱藏滾動條但保留滾動功能 */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Leaflet CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    /* 溫暖的字體與背景設定 */
+    body {
+      background-color: #fdfbf7;
+      color: #374151;
+      font-family: 'Nunito', ui-rounded, 'Hiragino Maru Gothic ProN', 'Quicksand', sans-serif;
+    }
 
-    <style>
-        /* Custom Styles & Utilities */
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
-        
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f8fafc; /* bg-slate-50 */
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* Glassmorphism */
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-        }
-
-        /* Hide Scrollbar but keep functionality */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        /* Timeline specific (Desktop only, mobile removed to avoid clutter) */
-        .timeline-container {
-            position: relative;
-        }
-        @media (min-width: 768px) {
-            .timeline-container::before {
-                content: '';
-                position: absolute;
-                top: 2.5rem;
-                bottom: 0;
-                left: 44px; /* Exact center of the 40px icon with 24px left padding */
-                width: 2px;
-                background-color: #e2e8f0; /* slate-200 */
-                z-index: 0;
-            }
-        }
-
-        /* Detail/Compact Mode Toggle */
-        body.compact-mode .detail-block {
-            display: none !important;
-        }
-        
-        /* Smooth Scroll behavior handled by JS for precision, but keep CSS fallback */
-        html { scroll-behavior: smooth; }
-        
-        .tab-btn.active {
-            color: #2563eb; /* blue-600 */
-            border-bottom-width: 2px;
-            border-color: #2563eb;
-            font-weight: 600;
-        }
-        
-        .food-filter.active {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
-    </style>
+    /* 讓地圖上的點擊有 Q 彈的效果 */
+    .bounce-click:active {
+      transform: scale(0.9);
+    }
+  </style>
 </head>
-<body class="text-slate-800 pb-28 pt-16"> <!-- Padding increased to pb-28 for floating bottom panel -->
+<body class="selection:bg-pink-200 relative overflow-x-hidden">
 
-    <!-- Top Navigation -->
-    <nav class="glass-nav fixed top-0 w-full z-50 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <!-- Logo/Title (Clickable to Dashboard) -->
-                <div class="flex-shrink-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity" onclick="switchView('dashboard')">
-                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                        🏔️ 奧捷匈深度之旅
-                    </span>
-                </div>
-                
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex space-x-8 items-center overflow-x-auto no-scrollbar">
-                    <button onclick="switchView('dashboard')" class="tab-btn active px-1 py-4 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors whitespace-nowrap" data-target="dashboard">儀表盤</button>
-                    <button onclick="switchView('itinerary')" class="tab-btn px-1 py-4 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors whitespace-nowrap" data-target="itinerary">每日行程</button>
-                    <button onclick="switchView('food')" class="tab-btn px-1 py-4 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors whitespace-nowrap" data-target="food">美食地圖</button>
-                    <button onclick="switchView('tools')" class="tab-btn px-1 py-4 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors whitespace-nowrap" data-target="tools">實用工具</button>
-                    <button onclick="switchView('info')" class="tab-btn px-1 py-4 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors whitespace-nowrap" data-target="info">準備與資訊</button>
-                </div>
+  <!-- 環境背景可愛光暈 -->
+  <div class="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-pink-200/40 blur-[100px] pointer-events-none -z-10"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-sky-200/40 blur-[100px] pointer-events-none -z-10"></div>
+  <div class="fixed top-[40%] left-[30%] w-[40%] h-[40%] rounded-full bg-yellow-100/40 blur-[100px] pointer-events-none -z-10"></div>
 
-                <!-- Mobile Menu Button -->
-                <div class="flex items-center md:hidden">
-                    <button id="mobile-menu-btn" class="text-slate-500 hover:text-slate-700 focus:outline-none p-2">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobile Dropdown -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 shadow-lg absolute w-full">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <button onclick="switchView('dashboard')" class="mobile-tab-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-blue-600 bg-blue-50" data-target="dashboard">儀表盤</button>
-                <button onclick="switchView('itinerary')" class="mobile-tab-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50" data-target="itinerary">每日行程</button>
-                <button onclick="switchView('food')" class="mobile-tab-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50" data-target="food">美食地圖</button>
-                <button onclick="switchView('tools')" class="mobile-tab-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50" data-target="tools">實用工具</button>
-                <button onclick="switchView('info')" class="mobile-tab-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50" data-target="info">準備與資訊</button>
-            </div>
-        </div>
-    </nav>
+  <!-- 導航列 -->
+  <header class="px-6 py-4 sticky top-0 z-50 flex items-center justify-between bg-white/70 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <div class="flex items-center gap-3">
+      <div class="p-2 bg-pink-100 rounded-xl text-pink-500">
+        <i data-lucide="plane" class="w-6 h-6 animate-[bounce_3s_infinite]"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-wide text-gray-800">
+          Travel Diary
+        </h1>
+        <p class="text-[11px] text-gray-500 tracking-wider font-medium">記錄每個美好的角落 ✨</p>
+      </div>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100">
+      <i data-lucide="sun" class="w-4 h-4 text-yellow-400"></i>
+      <span class="text-xs font-bold text-gray-600 tracking-wider">LET'S GO EXPLORING!</span>
+    </div>
+  </header>
 
-    <!-- Main Content Area -->
-    <main id="app-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        
-        <!-- ================= VIEW 1: Dashboard ================= -->
-        <section id="view-dashboard" class="view-section active space-y-6">
-            <!-- Hero Banner -->
-            <div class="bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl p-6 md:p-10 text-white shadow-lg relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 opacity-10 text-9xl">🏰</div>
-                <div class="relative z-10">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-2">2026 冬季奧捷匈童話之旅</h1>
-                    <p class="text-blue-100 mb-6 text-lg">12天10夜 ‧ 自然風光與雙城深度自駕</p>
-                    <div class="flex flex-wrap gap-3">
-                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">📅 2026/12/23 - 2027/01/04</span>
-                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">👥 2人小團</span>
-                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">🚗 SUV 尊榮自駕</span>
-                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">❄️ 聖誕市集 & 跨年煙火</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Weather Forecast (Horizontal Scroll) -->
-            <div>
-                <h2 class="text-xl font-bold mb-3 flex items-center text-slate-700">⛅ 每日氣象預測 <span class="text-sm font-normal text-slate-400 ml-2">(冬季均溫)</span></h2>
-                <div class="flex overflow-x-auto space-x-4 pb-2 no-scrollbar" id="weather-container">
-                    <!-- Weather cards injected by JS -->
-                </div>
-            </div>
-
-            <!-- Map & Chart Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Map -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-                    <h2 class="text-lg font-bold mb-3 text-slate-700">📍 行程總覽地圖</h2>
-                    <div id="overview-map" class="h-64 md:h-80 w-full rounded-xl z-10"></div>
-                </div>
-                
-                <!-- Chart -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-                    <h2 class="text-lg font-bold mb-3 text-slate-700">📊 行程強度分析 (時數)</h2>
-                    <div class="h-64 md:h-80 w-full relative">
-                        <canvas id="intensity-chart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Highlights List -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-                <h2 class="text-lg font-bold mb-3 text-slate-700">✨ 每日精華快覽</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="highlights-container">
-                    <!-- Highlights injected by JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= VIEW 2: Daily Itinerary ================= -->
-        <section id="view-itinerary" class="view-section hidden">
-            <!-- Rendered by JS -->
-            <div id="itinerary-container" class="space-y-8"></div>
-        </section>
-
-        <!-- ================= VIEW 3: Food Map ================= -->
-        <section id="view-food" class="view-section hidden space-y-6">
-            <h2 class="text-2xl font-bold text-slate-800">🍽️ 奧捷匈美食地圖</h2>
-            
-            <!-- Filters -->
-            <div class="flex overflow-x-auto space-x-2 pb-2 no-scrollbar" id="food-filters">
-                <button class="food-filter active px-4 py-2 rounded-full border border-slate-200 text-sm whitespace-nowrap transition-colors" data-filter="all">全部</button>
-                <button class="food-filter px-4 py-2 rounded-full border border-slate-200 text-sm whitespace-nowrap text-slate-600 hover:bg-slate-100 transition-colors" data-filter="meat">🥩 肉類大餐</button>
-                <button class="food-filter px-4 py-2 rounded-full border border-slate-200 text-sm whitespace-nowrap text-slate-600 hover:bg-slate-100 transition-colors" data-filter="cafe">☕ 咖啡甜點</button>
-                <button class="food-filter px-4 py-2 rounded-full border border-slate-200 text-sm whitespace-nowrap text-slate-600 hover:bg-slate-100 transition-colors" data-filter="local">🥨 在地特色</button>
-                <button class="food-filter px-4 py-2 rounded-full border border-slate-200 text-sm whitespace-nowrap text-slate-600 hover:bg-slate-100 transition-colors" data-filter="view">🌃 景觀餐廳/酒吧</button>
-            </div>
-
-            <!-- Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="food-grid">
-                <!-- Food cards injected by JS -->
-            </div>
-        </section>
-
-        <!-- ================= VIEW 4: Tools ================= -->
-        <section id="view-tools" class="view-section hidden space-y-6">
-            <h2 class="text-2xl font-bold text-slate-800 mb-6">🧮 實用工具</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Exchange Rate -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                    <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center">💶 匯率換算器 (EUR/CZK/HUF -> TWD)</h3>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200">
-                            <span class="text-sm text-slate-500 font-medium">自訂基準匯率 (1 歐元 = 台幣)</span>
-                            <input type="number" id="base-rate" value="34.5" step="0.1" class="w-24 text-right bg-white border border-slate-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-
-                        <div class="flex items-center space-x-4">
-                            <div class="flex-1">
-                                <label class="block text-xs text-slate-500 mb-1">外幣金額 (歐元 EUR)</label>
-                                <div class="relative">
-                                    <span class="absolute left-3 top-2 text-slate-400">€</span>
-                                    <input type="number" id="input-foreign" placeholder="0" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg font-semibold">
-                                </div>
-                            </div>
-                            <div class="text-slate-400 pt-5">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                            </div>
-                            <div class="flex-1">
-                                <label class="block text-xs text-slate-500 mb-1">新台幣 (TWD)</label>
-                                <div class="relative">
-                                    <span class="absolute left-3 top-2 text-slate-400">$</span>
-                                    <input type="number" id="input-twd" placeholder="0" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg font-semibold">
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-2">* 捷克克朗(CZK)約為 TWD x 1.4，匈牙利福林(HUF)約為 TWD x 0.09。本計算器以歐元為主。</p>
-                    </div>
-                </div>
-
-                <!-- Ledger -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col h-[400px]">
-                    <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center justify-between">
-                        <span>📝 簡易記帳本</span>
-                        <span class="text-sm font-normal text-blue-600 bg-blue-50 px-2 py-1 rounded">總計: NT$ <span id="ledger-total">0</span></span>
-                    </h3>
-                    
-                    <div class="flex space-x-2 mb-4">
-                        <input type="text" id="expense-name" placeholder="項目 (如: 晚餐)" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <input type="number" id="expense-amount" placeholder="€ 金額" class="w-24 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <button onclick="addExpense()" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors">新增</button>
-                    </div>
-
-                    <div class="flex-1 overflow-y-auto no-scrollbar border border-slate-100 rounded-lg p-2 bg-slate-50">
-                        <ul id="expense-list" class="space-y-2">
-                            <!-- Expenses injected here -->
-                            <li class="text-center text-slate-400 text-sm mt-4">尚無紀錄</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= VIEW 5: Info & Prep ================= -->
-        <section id="view-info" class="view-section hidden space-y-8">
-            <!-- Flights -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="bg-slate-100 px-6 py-4 border-b border-slate-200">
-                    <h2 class="text-lg font-bold text-slate-800 flex items-center">✈️ 關鍵航班資訊</h2>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-                            <tr>
-                                <th class="px-6 py-3 font-medium">去/回程</th>
-                                <th class="px-6 py-3 font-medium">日期</th>
-                                <th class="px-6 py-3 font-medium">航班編號</th>
-                                <th class="px-6 py-3 font-medium">行程 (當地時間)</th>
-                                <th class="px-6 py-3 font-medium">狀態追蹤</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-6 py-4 font-medium text-slate-800">去程</td>
-                                <td class="px-6 py-4">2026/12/23 (三)</td>
-                                <td class="px-6 py-4 flex items-center gap-2">
-                                    <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-bold">長榮</span>
-                                    BR65
-                                </td>
-                                <td class="px-6 py-4">23:35 TPE ➔ 06:45<sup>+1</sup> VIE</td>
-                                <td class="px-6 py-4">
-                                    <a href="https://zh-tw.flightaware.com/live/flight/EVA65" target="_blank" class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1">
-                                        FlightAware 追蹤
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-6 py-4 font-medium text-slate-800">回程</td>
-                                <td class="px-6 py-4">2027/01/04 (一)</td>
-                                <td class="px-6 py-4 flex items-center gap-2">
-                                    <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-bold">長榮</span>
-                                    BR66
-                                </td>
-                                <td class="px-6 py-4">12:05 VIE ➔ 06:40<sup>+1</sup> TPE</td>
-                                <td class="px-6 py-4">
-                                    <a href="https://zh-tw.flightaware.com/live/flight/EVA66" target="_blank" class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1">
-                                        FlightAware 追蹤
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Accommodations -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center">🏨 住宿安排</h2>
-                <div class="space-y-3" id="accom-list">
-                    <!-- Injected by JS -->
-                </div>
-            </div>
-
-            <!-- Car Rental -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center">🚗 租車資訊</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="flex items-start gap-3">
-                        <div class="text-2xl">🚙</div>
-                        <div>
-                            <p class="font-bold text-slate-700">預定車型</p>
-                            <p class="text-sm text-slate-600">SUV (如 VW Tiguan 或同級) 自排</p>
-                            <p class="text-xs text-slate-400 mt-1">含冬季雪胎配備</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <div class="text-2xl">🛡️</div>
-                        <div>
-                            <p class="font-bold text-slate-700 text-red-600">保險與注意事項</p>
-                            <p class="text-sm text-slate-600 font-medium">已保全險 (Zero Excess / 零自付額)</p>
-                            <p class="text-xs text-slate-500 mt-1">取車時請務必錄影車況。需準備國際駕照與台灣駕照正本。</p>
-                            <p class="text-xs text-slate-500">跨國需購買高速公路通行證 (Vignette)。</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Packing List Accordion -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="bg-slate-100 px-6 py-4 border-b border-slate-200">
-                    <h2 class="text-lg font-bold text-slate-800 flex items-center">🧳 智慧行李清單</h2>
-                </div>
-                <div class="divide-y divide-slate-100" id="packing-accordion">
-                    <!-- Injected by JS -->
-                </div>
-            </div>
-
-            <!-- Emergency Card -->
-            <div class="bg-red-50 rounded-2xl shadow-sm border border-red-200 p-6 mt-8">
-                <h2 class="text-xl font-bold text-red-700 mb-4 flex items-center gap-2">
-                    <span>🆘</span> 緊急救援卡
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-red-900">
-                    <div>
-                        <p class="font-bold border-b border-red-200 pb-1 mb-2">通用緊急電話</p>
-                        <p>歐盟緊急求救：<strong class="text-lg">112</strong></p>
-                        <p>奧地利警察/急救：133 / 144</p>
-                        <p>捷克警察/急救：158 / 155</p>
-                        <p>匈牙利警察/急救：107 / 104</p>
-                    </div>
-                    <div>
-                        <p class="font-bold border-b border-red-200 pb-1 mb-2">駐外館處聯絡</p>
-                        <p>駐奧地利代表處急難救助：<br><a href="tel:+436643450455" class="underline">+43-664-345-0455</a></p>
-                        <p>駐捷克代表處急難救助：<br><a href="tel:+420603166707" class="underline">+420-603-166-707</a></p>
-                    </div>
-                </div>
-                <p class="text-xs text-red-600 mt-4 text-center">* 建議將此畫面截圖儲存於手機中</p>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Floating Bottom Control Panel (Redesigned for mobile friendliness, hidden by default outside itinerary) -->
-    <div id="bottom-nav-panel" class="hidden glass-panel fixed bottom-4 left-4 right-4 md:bottom-0 md:left-0 md:right-0 md:w-full md:rounded-none rounded-2xl z-40 transition-transform duration-300 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] border border-slate-200 md:border-t md:border-l-0 md:border-r-0 md:border-b-0">
-        <div class="max-w-7xl mx-auto px-3 sm:px-4 flex items-center justify-between h-14">
-            
-            <!-- Left: Toggle Mode -->
-            <div class="flex-shrink-0 flex items-center pr-3 border-r border-slate-200/50">
-                <button id="toggle-detail-btn" onclick="toggleDetailMode()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors bg-blue-100 text-blue-700">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
-                    <span id="toggle-text" class="hidden sm:inline">詳細模式</span>
-                </button>
-            </div>
-
-            <!-- Right: Horizontal Day Scroller -->
-            <div class="flex-1 overflow-x-auto no-scrollbar px-3 flex items-center space-x-2 md:justify-center" id="day-scroller">
-                <!-- Day buttons injected by JS -->
-            </div>
-            
-        </div>
+  <!-- 主要內容區 -->
+  <main class="max-w-[1400px] mx-auto px-4 md:px-6 py-8 md:py-10 flex flex-col xl:flex-row gap-8 items-start">
+    
+    <!-- 左側：世界地圖 -->
+    <div class="w-full xl:w-2/3 flex flex-col gap-4">
+      <div class="flex items-center justify-between px-2">
+        <h2 class="text-xl font-bold flex items-center gap-2 text-gray-800">
+          <i data-lucide="map" class="w-6 h-6 text-sky-500"></i>
+          旅行足跡 <span class="text-gray-400 text-sm font-medium ml-1">| My Journey</span>
+        </h2>
+      </div>
+      
+      <!-- 地圖容器：修正了手機版響應式寬度 -->
+      <div class="w-full relative aspect-[16/9] md:aspect-[2/1] bg-[#e0f2fe] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border-4 border-white shadow-lg flex items-center justify-center">
+          
+          <!-- 世界地圖底圖 -->
+          <img 
+            src="https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg"
+            alt="World Map"
+            class="absolute w-[90%] h-[90%] object-contain opacity-[0.2] pointer-events-none"
+            onerror="this.style.display='none';"
+          />
+          
+          <!-- 地圖標記點 (Pins) -->
+          <div id="map-pins-container" class="absolute w-[90%] h-[90%]"></div>
+      </div>
     </div>
 
-    <!-- Back to Top Button -->
-    <button id="back-to-top" onclick="scrollToTop()" class="fixed bottom-24 right-4 md:bottom-20 md:right-8 bg-white/90 backdrop-blur border border-slate-200 text-slate-600 p-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-300 hover:scale-110 hover:text-blue-600 hover:border-blue-300 z-40">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
-    </button>
+    <!-- 右側：詳細資訊 -->
+    <div class="w-full xl:w-1/3 flex flex-col gap-4">
+      <div class="flex items-center justify-between px-2">
+        <h2 class="text-xl font-bold flex items-center gap-2 text-gray-800">
+          <i data-lucide="book-open" class="w-6 h-6 text-pink-400"></i>
+          旅程小手札 <span class="text-gray-400 text-sm font-medium ml-1">| Trip Diary</span>
+        </h2>
+      </div>
 
-    <!-- JavaScript Logic -->
-    <script>
-        // ================= STATE & DATA =================
-        let currentView = 'dashboard';
-        let isDetailMode = true;
-        let mapInstance = null;
-        let chartInstance = null;
-        
-        const mapCenter = [48.2082, 16.3738]; // Vienna
+      <div id="briefing-panel" class="relative rounded-[2rem] bg-white shadow-xl border border-gray-100 p-6 md:p-8 overflow-hidden flex flex-col min-h-[400px]">
+        <!-- 內容渲染區 -->
+      </div>
+    </div>
+  </main>
 
-        // 建立安全的 Google Maps 搜尋 URL 輔助函數
-        function createGMapUrl(query) {
-            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-        }
+  <!-- 底部：所有旅程清單 -->
+  <section class="max-w-[1400px] mx-auto px-4 md:px-6 pb-16 pt-8 mt-4">
+    <div class="flex items-center gap-2 mb-6 px-2">
+      <i data-lucide="camera" class="w-6 h-6 text-indigo-400"></i>
+      <h2 class="text-2xl font-bold text-gray-800">所有的美好回憶 <span class="text-gray-400 font-medium text-base ml-2">| All Adventures</span></h2>
+    </div>
+    
+    <div id="archives-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    </div>
+  </section>
+  
+  <footer class="text-center py-8 text-gray-400 text-sm font-medium bg-white/50 border-t border-gray-100 backdrop-blur-sm">
+    © 2026 Travel Diary. Keep exploring the world. 🌍
+  </footer>
 
-        // Itinerary Data parsed from text file
-        const itineraryData = [
-            {
-                day: 1, date: '12/24', weekday: '週四', title: '維也納抵達 ➜ 布達佩斯', weather: { emoji: '🌥️', temp: '2°C' },
-                drive: 2.5, play: 4.5, coords: [47.4979, 19.0402], stay: '布達佩斯',
-                events: [
-                    { time: '06:45', title: '抵達維也納機場', icon: '🛬', tag: 'VIE', stayTime: '1.5h', depTime: '08:15', detail: '長榮 BR65 抵達。完成通關、提領行李。', tips: '先在機場超市或咖啡廳買點簡便早餐，補充體力。', gmap: createGMapUrl('Vienna International Airport') },
-                    { time: '08:15', title: '機場取車', icon: '🚗', tag: '租車中心', stayTime: '1h', depTime: '09:15', detail: '辦理取車手續，檢查車況、確認是否配備冬季雪胎與保險範圍。', tips: '務必錄影車身外觀。確認租車公司已授權跨國駕駛，並購買匈牙利高速公路電子通行證 (e-Vignette)。', gmap: createGMapUrl('Vienna International Airport Car Rental') },
-                    { time: '09:15', title: '直奔布達佩斯', icon: '🛣️', tag: '跨國公路', stayTime: '2h', depTime: '11:15', detail: '走 A4 高速公路跨越奧匈邊境。', tips: '' },
-                    { time: '11:15', title: '中繼站：高速公路休息區', icon: '☕', tag: '短暫休息', stayTime: '45m', depTime: '12:00', detail: '在進入布達佩斯前於休息站活動筋骨，適應左駕與歐洲路況。', tips: '可購買簡單的三明治當作午餐備案。' },
-                    { time: '12:30', title: '飯店放行李與簡餐', icon: '🏨', tag: '布達佩斯市區', stayTime: '1.5h', depTime: '14:00', detail: '抵達住宿點寄放行李。今天是平安夜，許多商店下午 14:00 後就會提早打烊。', tips: '午餐建議在飯店附近快速解決。', gmap: createGMapUrl('Hotel Clark Budapest') },
-                    { time: '14:00', title: '城堡山與布達皇宮外觀', icon: '🏰', tag: '城堡區', stayTime: '2h', depTime: '16:00', detail: '搭乘纜車或步行上城堡山，感受節慶前夕的寧靜氛圍。', tips: '平安夜多數博物館提早閉館，以戶外建築巡禮與拍照為主。', gmap: createGMapUrl('Buda Castle') },
-                    { time: '16:30', title: '漁人堡', icon: '🏰', tag: '漁人堡', stayTime: '1h', depTime: '17:30', detail: '帶上相機捕捉多瑙河與匈牙利國會大廈的美景。', tips: '高處風大注意保暖。', gmap: createGMapUrl('Fisherman\'s Bastion') },
-                    { time: '17:30', title: '蓋勒特山 (Gellert Hill) 夜景', icon: '📸', tag: '觀景台', stayTime: '45m', depTime: '18:15', detail: '前往蓋勒特山觀景台 (Citadella)，此處無須走遠路即可拍攝整個布達佩斯的壯闊夜景。', tips: '這晚遊客極少，是拍攝金黃夜景的最佳時機。', gmap: createGMapUrl('Citadella Budapest') },
-                    { time: '19:00', title: '平安夜聖誕晚餐', icon: '🍽️', tag: '飯店餐廳', stayTime: '2h', depTime: '-', detail: '享用預訂好的節慶晚餐，體驗歐洲過節氣氛。', tips: '強烈提醒：務必提前預訂飯店內的聖誕晚餐，外面幾乎沒有獨立餐廳營業。', gmap: createGMapUrl('Budapest Restaurant') },
-                    { time: '21:00', title: '抵達住宿', icon: '🏠', tag: '布達佩斯飯店', stayTime: '-', depTime: '-', detail: '好好休息，調整時差。', tips: '' }
-                ]
-            },
-            {
-                day: 2, date: '12/25', weekday: '週五', title: '布達佩斯 (聖誕節)', weather: { emoji: '❄️', temp: '-1°C' },
-                drive: 0, play: 7, coords: [47.5186, 19.0823], stay: '布達佩斯',
-                events: [
-                    { time: '09:30', title: '多瑙河畔與塞切尼鏈橋', icon: '🌉', tag: '多瑙河畔', stayTime: '1h', depTime: '10:30', detail: '趁著聖誕節早晨市區寧靜，漫步多瑙河畔，欣賞鏈橋與國會大廈白日之美。', tips: '河畔風大，帽子與手套必備。可順遊「多瑙河畔之鞋」紀念碑。', gmap: createGMapUrl('Széchenyi Chain Bridge') },
-                    { time: '10:30', title: '聖史蒂芬大教堂', icon: '⛪', tag: '大教堂', stayTime: '1h', depTime: '11:30', detail: '參觀雄偉的聖史蒂芬大教堂，廣場前方通常有聖誕市集攤位可逛。', tips: '可自費搭乘電梯登上穹頂俯瞰市區。', gmap: createGMapUrl('St. Stephen\'s Basilica') },
-                    { time: '11:30', title: '城市公園與沃伊達奇城堡', icon: '🌲', tag: '城市公園', stayTime: '1h', depTime: '12:30', detail: '漫步在布達佩斯最大的公園，欣賞融合多種建築風格的沃伊達奇城堡 (Vajdahunyad Castle)。', tips: '冬季公園內的湖面可能會變成大型溜冰場。', gmap: createGMapUrl('Vajdahunyad Castle') },
-                    { time: '12:30', title: '聖誕節午餐', icon: '🍲', tag: '市區', stayTime: '1.5h', depTime: '14:00', detail: '尋找有營業的餐廳或異國料理。', tips: '部分亞洲餐廳或中東料理在聖誕節依然會營業，可作為備案。', gmap: createGMapUrl('Menza Étterem és Kávéház') },
-                    { time: '14:00', title: '塞切尼溫泉浴場', icon: '♨️', tag: '溫泉', stayTime: '1.5h', depTime: '15:30', detail: '體驗全年無休的戶外蒸氣溫泉！在 0 度的氣溫下泡在暖呼呼的黃色巴洛克建築溫泉池中，是非常道地的東歐體驗。', tips: '記得自己帶泳衣、拖鞋與大浴巾。泡 1.5 小時剛剛好，避免身體過於疲勞。', gmap: createGMapUrl('Széchenyi Thermal Bath') },
-                    { time: '15:45', title: '紐約咖啡館 (New York Café)', icon: '☕', tag: '最美咖啡館', stayTime: '1.5h', depTime: '17:15', detail: '前往有「世界最美咖啡館」之稱的紐約咖啡館感受極致奢華的宮廷氛圍。', tips: '請確認聖誕節營業時間，若客滿可改至瓦茨街 (Váci Street) 漫步。', gmap: createGMapUrl('New York Café Budapest') },
-                    { time: '17:30', title: '國會大廈廣場夜景', icon: '📸', tag: '國會大廈', stayTime: '45m', depTime: '18:15', detail: '近距離欣賞點燈後的匈牙利國會大廈，感受其無與倫比的壯麗。', tips: '無需走遠，在建築物旁短暫拍照即可。', gmap: createGMapUrl('Hungarian Parliament Building') },
-                    { time: '18:30', title: '晚餐', icon: '🍽️', tag: '市區', stayTime: '1.5h', depTime: '-', detail: '享用晚餐，為明天的跨國旅程做準備。', tips: '' },
-                    { time: '20:30', title: '抵達住宿', icon: '🏠', tag: '布達佩斯飯店', stayTime: '-', depTime: '-', detail: '', tips: '' }
-                ]
-            },
-            {
-                day: 3, date: '12/26', weekday: '週六', title: '布達佩斯 ➜ 聖安德烈 ➜ 斯洛伐克', weather: { emoji: '⛅', temp: '1°C' },
-                drive: 2.5, play: 6.5, coords: [48.1486, 17.1077], stay: '布拉提斯拉瓦 (斯洛伐克)',
-                events: [
-                    { time: '09:00', title: '啟程前往聖安德烈', icon: '🚗', tag: '近郊', stayTime: '40m', depTime: '09:40', detail: '用完早餐後退房，開車前往布達佩斯近郊的藝術小鎮。', tips: '' },
-                    { time: '09:40', title: '聖安德烈 (Szentendre)', icon: '🎨', tag: '馬德里不思議', stayTime: '1.5h', depTime: '11:10', detail: '蔡依林《馬德里不思議》MV拍攝地點！這裡充滿濃厚的地中海與塞爾維亞風情。漫步於鵝卵石街道 (Fő Tér 主廣場)。', tips: '小鎮不大，買個匈牙利煙囪捲 (Kürtőskalács) 邊走邊吃，各個巷弄都極好拍照。', gmap: createGMapUrl('Szentendre') },
-                    { time: '11:10', title: '驅車跨國前往斯洛伐克', icon: '🛣️', tag: '跨國公路', stayTime: '2h', depTime: '13:10', detail: '準備跨越邊境進入斯洛伐克首都 - 布拉提斯拉瓦。', tips: '注意需提前上網購買斯洛伐克的電子通行證 (e-Vignette)。' },
-                    { time: '13:10', title: '布拉提斯拉瓦舊城區與午餐', icon: '🇸🇰', tag: '斯洛伐克', stayTime: '1.5h', depTime: '14:40', detail: '漫步舊城區尋找著名的「工作中的男人 (Cumil)」銅像，並在此享用午餐。', tips: '試試傳統麵疙瘩 (Halušky)。', gmap: createGMapUrl('Bratislava Old Town') },
-                    { time: '14:40', title: '布拉提斯拉瓦城堡觀景', icon: '🏰', tag: '觀景台', stayTime: '45m', depTime: '15:25', detail: '外型像倒放桌子的純白城堡。此處為單純拍照點，可俯瞰多瑙河與舊城區。', tips: '不進入室內參觀，戶外花園拍完照即可離開，約停留45分鐘。', gmap: createGMapUrl('Bratislava Castle') },
-                    { time: '15:35', title: '藍色教堂拍照', icon: '⛪', tag: '特色建築', stayTime: '30m', depTime: '16:05', detail: '這座如童話般夢幻的粉藍色新藝術風格教堂。', tips: '僅在外觀短暫拍照打卡即可，停留約30分鐘。', gmap: createGMapUrl('Blue Church Bratislava') },
-                    { time: '16:20', title: 'UFO 飛碟觀景台', icon: '🛸', tag: '多瑙河畔', stayTime: '1h', depTime: '17:20', detail: '搭乘電梯登上位於橋樑頂端、造型前衛的飛碟觀景台，欣賞市區黃昏美景。', tips: '', gmap: createGMapUrl('UFO Observation Deck') },
-                    { time: '17:30', title: '飯店 Check-in 與休息', icon: '🏨', tag: '布拉提斯拉瓦', stayTime: '1h', depTime: '18:30', detail: '辦理入住手續，放妥行李。', tips: '', gmap: createGMapUrl('Marrol\'s Boutique Hotel Bratislava') },
-                    { time: '18:30', title: '斯洛伐克傳統晚餐', icon: '🍺', tag: 'Slovak Pub', stayTime: '1.5h', depTime: '-', detail: '大口喝啤酒並品嚐傳統料理。', tips: '', gmap: createGMapUrl('Slovak Pub') },
-                    { time: '20:30', title: '抵達住宿', icon: '🏠', tag: '斯洛伐克飯店', stayTime: '-', depTime: '-', detail: '', tips: '今晚在斯洛伐克過夜，養足精神。' }
-                ]
-            },
-            {
-                day: 4, date: '12/27', weekday: '週日', title: '斯洛伐克 ➜ 布爾諾 ➜ 布拉格', weather: { emoji: '☀️', temp: '0°C' },
-                drive: 3.5, play: 6.5, coords: [50.0865, 14.4114], stay: '布拉格',
-                events: [
-                    { time: '09:00', title: '啟程前往捷克', icon: '🚗', tag: '跨國公路', stayTime: '1.5h', depTime: '10:30', detail: '告別斯洛伐克，驅車前往捷克。', tips: '記得確認已購買捷克的高速公路電子通行證 (e-Vignette)。' },
-                    { time: '10:30', title: '中繼站：布爾諾 (Brno)', icon: '🇨🇿', tag: '捷克第二大城', stayTime: '1.5h', depTime: '12:00', detail: '在布爾諾稍作停留。參觀宏偉的「聖彼得與保羅大教堂」或在「包心菜廣場 (Zelný trh)」散步。', tips: '這是完美的休息中繼站，讓長途駕駛不那麼疲累。', gmap: createGMapUrl('Cathedral of St. Peter and Paul Brno') },
-                    { time: '12:00', title: '布爾諾午餐', icon: '🍽️', tag: '市中心', stayTime: '1.5h', depTime: '13:30', detail: '在布爾諾市中心享用午餐。', tips: '', gmap: createGMapUrl('Brno Restaurant') },
-                    { time: '13:30', title: '驅車前往布拉格', icon: '🛣️', tag: '捷克公路', stayTime: '2h', depTime: '15:30', detail: '繼續沿著 D1 高速公路前往捷克首都布拉格。', tips: '捷克高速公路偶有修路，注意車速限制。' },
-                    { time: '15:30', title: '高堡區 (Vyšehrad) 觀景', icon: '🏰', tag: '布拉格', stayTime: '1h', depTime: '16:30', detail: '進市區前先到高堡區，這裡遊客較少，可悠閒俯瞰伏爾塔瓦河與布拉格全景。', tips: '也是傳說中布拉格的發源地。', gmap: createGMapUrl('Vyšehrad Prague') },
-                    { time: '16:30', title: '抵達布拉格飯店', icon: '🏨', tag: '布拉格', stayTime: '45m', depTime: '17:15', detail: '辦理入住，將車輛停妥。', tips: '布拉格市區石板路多，盡量將車停在飯店專屬車庫。', gmap: createGMapUrl('Grand Hotel Bohemia') },
-                    { time: '17:15', title: '火藥塔 (Powder Tower)', icon: '🗼', tag: '快速打卡', stayTime: '30m', depTime: '17:45', detail: '布拉格老城區的哥德式城門，是布拉格的地標之一。可以快速拍攝建築外觀。', tips: '就位在市民會館旁邊，順路拍照不需花費太多時間。', gmap: createGMapUrl('Powder Tower Prague') },
-                    { time: '17:45', title: '老城廣場聖誕市集與天文鐘', icon: '🎄', tag: '老城廣場', stayTime: '1.75h', depTime: '19:30', detail: '布拉格的聖誕市集會一路開到1月初！欣賞天文鐘報時，享受熱紅酒 (Svařák) 與烤麵團，感受節慶點燈的魔幻氣氛。', tips: '廣場人潮極度擁擠，請務必將背包往前揹以防專業扒手。', gmap: createGMapUrl('Prague Astronomical Clock') },
-                    { time: '19:30', title: '晚餐：捷克烤豬腳', icon: '🍖', tag: 'Pork\'s', stayTime: '1.5h', depTime: '21:00', detail: '品嚐外皮酥脆、肉質軟嫩的捷克傳統烤豬腳，搭配一杯當地黑啤酒。', tips: '份量極大，建議 2-3 人點一份分享即可。', gmap: createGMapUrl('Pork\'s Prague') },
-                    { time: '21:00', title: '抵達住宿', icon: '🏠', tag: '布拉格飯店', stayTime: '-', depTime: '-', detail: '市區自由活動後返回飯店休息。', tips: '' }
-                ]
-            },
-            {
-                day: 5, date: '12/28', weekday: '週一', title: '布拉格 (城堡區與市區深度)', weather: { emoji: '☁️', temp: '-2°C' },
-                drive: 0, play: 8, coords: [50.0909, 14.4005], stay: '布拉格',
-                events: [
-                    { time: '07:30', title: '清晨查理大橋', icon: '🌉', tag: '查理大橋', stayTime: '1h', depTime: '08:30', detail: '從容地在清晨人少時走上橋，拍攝空無一人的絕美空景與橋上雕像群。', tips: '冬季早晨氣溫常在零度以下，務必穿戴齊全保暖衣物。', gmap: createGMapUrl('Charles Bridge') },
-                    { time: '09:00', title: '前往布拉格城堡', icon: '🚋', tag: '交通', stayTime: '30m', depTime: '09:30', detail: '搭乘路面電車 22 號至 Pražský hrad 站，從後方進入城堡區。', tips: '需進行簡單的安檢，避免帶大型背包。' },
-                    { time: '09:30', title: '布拉格城堡與聖維特大教堂', icon: '⛪', tag: '城堡區', stayTime: '2h', depTime: '11:30', detail: '參觀這座耗時近 600 年才完工的哥德式大教堂，欣賞慕夏創作的彩繪玻璃窗。', tips: '建議購買城堡 B 路線套票 (Circuit B)。', gmap: createGMapUrl('Prague Castle') },
-                    { time: '11:30', title: '舊皇宮與黃金巷', icon: '🏘️', tag: '城堡區', stayTime: '1.5h', depTime: '13:00', detail: '參觀波西米亞國王的舊皇宮，接著走訪色彩繽紛的黃金巷（卡夫卡曾居於 22 號）。', tips: '黃金巷內有許多特色紀念品與錫製書籤可購買。', gmap: createGMapUrl('Golden Lane Prague') },
-                    { time: '13:00', title: '小城區午餐', icon: '🍽️', tag: 'Mala Strana', stayTime: '1h', depTime: '14:00', detail: '沿著城堡坡道走下山，在小城區尋找特色餐廳用餐。', tips: '', gmap: createGMapUrl('Mala Strana Prague') },
-                    { time: '14:15', title: '斯特拉霍夫修道院圖書館', icon: '📖', tag: '修道院', stayTime: '1h', depTime: '15:15', detail: '擁有絕美濕壁畫的神學與哲學圖書館。', tips: '拍照需額外購買攝影許可。', gmap: createGMapUrl('Strahov Monastery') },
-                    { time: '15:30', title: '藍儂牆與坎帕島', icon: '☮️', tag: 'Mala Strana', stayTime: '45m', depTime: '16:15', detail: '前往充滿塗鴉與和平精神的約翰藍儂牆拍照留念。', tips: '', gmap: createGMapUrl('Lennon Wall') },
-                    { time: '16:30', title: '萊特納公園拍照', icon: '📷', tag: 'Letná Park', stayTime: '45m', depTime: '17:15', detail: '在萊特納公園涼亭附近捕捉伏爾塔瓦河多座橋樑疊加的經典畫面。', tips: '為純拍照點，無須走完公園全程，停留約45分鐘。', gmap: createGMapUrl('Letna Park Viewpoint') },
-                    { time: '17:30', title: '跳舞的房子外觀', icon: '🏢', tag: '現代建築', stayTime: '30m', depTime: '18:00', detail: '順路來到伏爾塔瓦河畔，拍攝這棟造型奇特、如同一對舞者的新解構主義建築。', tips: '純外觀拍照，停留30分鐘。', gmap: createGMapUrl('Dancing House Prague') },
-                    { time: '18:15', title: '景觀餐廳晚餐', icon: '🍷', tag: 'Terasa U Prince', stayTime: '2h', depTime: '20:15', detail: '在老城區的頂樓景觀餐廳用餐，俯瞰整個紅屋頂之城。', tips: '極度熱門，需提前 1-2 個月預訂靠窗座位。', gmap: createGMapUrl('Terasa U Prince') },
-                    { time: '20:30', title: '抵達住宿', icon: '🏠', tag: '布拉格飯店', stayTime: '-', depTime: '-', detail: '整理行李，準備明日移動。', tips: '' }
-                ]
-            },
-            {
-                day: 6, date: '12/29', weekday: '週二', title: '布拉格 ➜ 卡羅維瓦利 ➜ 胡波卡 ➜ CK小鎮', weather: { emoji: '🌨️', temp: '-3°C' },
-                drive: 5.5, play: 6, coords: [48.8127, 14.3175], stay: '庫倫洛夫',
-                events: [
-                    { time: '08:00', title: '出發前往卡羅維瓦利', icon: '🚗', tag: '向西行駛', stayTime: '1.5h', depTime: '09:30', detail: '提早出發，展開史詩級的波西米亞公路旅行。開車離開布拉格，先往西前往著名溫泉鄉。', tips: '今日車程較長，建議由兩位駕駛輪流開車。' },
-                    { time: '09:30', title: '卡羅維瓦利 (Karlovy Vary) 溫泉鎮', icon: '♨️', tag: '買溫泉杯', stayTime: '1.5h', depTime: '11:00', detail: '捷克最著名的溫泉鄉。買一個精緻的陶瓷「溫泉杯」，順著長廊品嚐不同溫度的礦泉水，漫步於優雅的巴洛克式建築群中。', tips: '在此可順便品嚐當地的溫泉餅 (Oplatky)。', gmap: createGMapUrl('Karlovy Vary') },
-                    { time: '11:00', title: '驅車南下波西米亞', icon: '🛣️', tag: '捷克公路', stayTime: '3h', depTime: '14:00', detail: '長途駕駛前往南波西米亞地區，建議中途在休息站或沿途小鎮購買簡餐在車上享用，節省時間。', tips: '冬季常有積雪，務必放慢車速，留意路面結冰。' },
-                    { time: '14:00', title: '胡波卡城堡 (Hluboká Castle)', icon: '🏰', tag: '最美純白城堡', stayTime: '1h', depTime: '15:00', detail: '被譽為捷克最美的城堡，仿溫莎城堡的純白哥德式建築。', tips: '冬季內部可能不開放導覽，但在被雪覆蓋的英式花園與城堡外觀拍照也非常值得！', gmap: createGMapUrl('Hluboká Castle') },
-                    { time: '15:00', title: '驅車前往 CK 小鎮', icon: '🚗', tag: '公路', stayTime: '30m', depTime: '15:30', detail: '完成今日最後一段車程，前往被譽為歐洲最美童話小鎮的庫倫洛夫 (Český Krumlov)。', tips: '' },
-                    { time: '15:30', title: '抵達 CK 與停車', icon: '🅿️', tag: 'CK 外圍', stayTime: '45m', depTime: '16:15', detail: '小鎮內管制車輛且皆為顛簸石板路，需停在外圍停車場（建議停 P1 或 P2），並慢慢步行進入。', tips: '建議將大行李留在車上，只帶一晚的輕便盥洗包進入小鎮。', gmap: createGMapUrl('Český Krumlov Parking P1') },
-                    { time: '16:15', title: '登彩繪塔與觀景台拍照', icon: '🗼', tag: '城堡區', stayTime: '1h', depTime: '17:15', detail: '趁著天黑前，爬上樓梯俯瞰全鎮 360 度被河流環繞的太極地形美景，接著到第五庭院觀景台拍攝經典全景。', tips: '注意冬季彩繪塔關門時間較早，若已關閉則改在各觀景台拍攝外觀與全景。', gmap: createGMapUrl('Český Krumlov Castle') },
-                    { time: '17:15', title: '漫步童話小鎮與斗篷橋', icon: '🏘️', tag: 'CK 老城', stayTime: '45m', depTime: '18:00', detail: '欣賞點燈後的 CK 小鎮，冬季蓋上白雪宛如童話。走上壯觀的斗篷橋 (Cloak Bridge) 感受中世紀氛圍。', tips: '橋上的拱門是拍攝 CK 經典紅屋頂夜景的最佳畫框。', gmap: createGMapUrl('Cloak Bridge Český Krumlov') },
-                    { time: '18:00', title: '地窖餐廳晚餐', icon: '🍖', tag: 'Krčma v Šatlavské', stayTime: '1.5h', depTime: '19:30', detail: '在著名的中世紀洞穴地窖餐廳享用炭烤肉排，慰勞一天的長途駕駛。', tips: '生意極好，強烈建議出發前預訂。', gmap: createGMapUrl('Krčma v Šatlavské') },
-                    { time: '19:30', title: '抵達住宿', icon: '🏠', tag: 'CK 民宿', stayTime: '-', depTime: '-', detail: '在河畔的民宿休息，享受靜謐的童話之夜。', tips: '', gmap: createGMapUrl('Hotel Růže Český Krumlov') }
-                ]
-            },
-            {
-                day: 7, date: '12/30', weekday: '週三', title: '庫倫洛夫 ➜ 特勞恩湖 ➜ 薩爾斯堡', weather: { emoji: '⛅', temp: '0°C' },
-                drive: 3, play: 6, coords: [47.8095, 13.0436], stay: '薩爾斯堡',
-                events: [
-                    { time: '08:30', title: 'CK 清晨散步', icon: '🚶', tag: 'CK 老城', stayTime: '1h', depTime: '09:30', detail: '在團客抵達前，享受無人的童話小鎮，拍攝清晨的河畔倒影。', tips: '' },
-                    { time: '09:30', title: '前往奧地利', icon: '🚗', tag: '跨國公路', stayTime: '2h', depTime: '11:30', detail: '取車後跨越邊境進入奧地利湖區方向。', tips: '記得進入奧地利前要在邊境加油站購買高速公路通行證 (Vignette) 並貼在擋風玻璃上！' },
-                    { time: '11:30', title: '中繼站：特勞恩湖 (Gmunden)', icon: '🌊', tag: '奧地利湖區', stayTime: '1h', depTime: '12:30', detail: '在風景秀麗的特勞恩湖畔城鎮 Gmunden 稍作停留。漫步欣賞湖面與「奧特堡 (Schloss Ort)」。', tips: '不走遠路，湖畔散步拍照約1小時即可。', gmap: createGMapUrl('Schloss Ort Gmunden') },
-                    { time: '12:30', title: '湖畔午餐', icon: '🍽️', tag: 'Gmunden', stayTime: '1h', depTime: '13:30', detail: '在湖畔找間小餐廳悠閒吃頓午餐。', tips: '', gmap: createGMapUrl('Gmunden Restaurant') },
-                    { time: '13:30', title: '驅車前往薩爾斯堡', icon: '🛣️', tag: 'A1公路', stayTime: '1h', depTime: '14:30', detail: '繼續前往音樂之都薩爾斯堡。', tips: '' },
-                    { time: '14:30', title: '米拉貝爾宮', icon: '🌸', tag: '新城區', stayTime: '45m', depTime: '15:15', detail: '電影《真善美》(Do-Re-Mi) 的經典拍攝場景。', tips: '冬季花園無花，欣賞幾何對稱的法式庭園構圖即可。', gmap: createGMapUrl('Mirabell Palace') },
-                    { time: '15:30', title: '薩爾斯堡要塞', icon: '🏰', tag: '老城區', stayTime: '1.5h', depTime: '17:00', detail: '搭乘纜車登上中世紀要塞，俯瞰舊城區與阿爾卑斯山脈，並為明天的跨年先勘景。', tips: '可購買基本套票含來回纜車。', gmap: createGMapUrl('Fortress Hohensalzburg') },
-                    { time: '17:00', title: '莫札特出生地與糧食胡同', icon: '🛍️', tag: '老城區', stayTime: '1.5h', depTime: '18:30', detail: '漫步在擁有華麗鍛鐵招牌的購物街 (Getreidegasse)，參觀莫札特出生地外觀。', tips: '記得買正宗的銀色包裝莫札特巧克力 (Cafe Konditorei Fürst)。', gmap: createGMapUrl('Mozart\'s Birthplace') },
-                    { time: '18:45', title: '修道院酒場晚餐', icon: '🍺', tag: 'Augustiner Bräu', stayTime: '2h', depTime: '-', detail: '去 Augustiner Bräu 修道院酒場體驗道地啤酒與大口吃肉的熱鬧氣氛。', tips: '這是一種類似啤酒花園的大型室內酒場，氣氛極佳。', gmap: createGMapUrl('Augustiner Bräu Salzburg') },
-                    { time: '21:00', title: '抵達住宿', icon: '🏠', tag: '薩爾斯堡飯店', stayTime: '-', depTime: '-', detail: '', tips: '', gmap: createGMapUrl('Hotel Sacher Salzburg') }
-                ]
-            },
-            {
-                day: 8, date: '12/31', weekday: '週四', title: '鹽礦探險 ➜ 國王湖區 (跨年夜)', weather: { emoji: '☀️', temp: '-2°C' },
-                drive: 1.5, play: 7, coords: [47.5878, 12.9867], stay: '薩爾斯堡',
-                events: [
-                    { time: '09:00', title: '前往德國國王湖區', icon: '🚗', tag: '跨國(德)', stayTime: '40m', depTime: '09:40', detail: '距離薩爾斯堡極近，驅車前往德國邊境。', tips: '雖無海關，但仍請隨身攜帶護照備查。' },
-                    { time: '09:40', title: '鹽礦探險 (Berchtesgaden)', icon: '⛏️', tag: '全年無休', stayTime: '2h', depTime: '11:40', detail: '冬季正常開放的鹽礦！換上礦工服，搭乘小火車深入地底，體驗刺激的木製長滑梯與地底鹽湖船。', tips: '非常受歡迎且不受天氣影響，絕對是行程亮點。建議提前於官網買票。', gmap: createGMapUrl('Salzbergwerk Berchtesgaden') },
-                    { time: '12:00', title: '國王湖遊船', icon: '⛴️', tag: '國王湖', stayTime: '2h', depTime: '14:00', detail: '搭乘環保電動船，聆聽船長在群山中吹奏小號的迴音，抵達紅蔥頭教堂 (St. Bartholomä) 並於該處吃午餐。', tips: '冬季國王湖上湖 (Obersee) 結冰停駛，遊船僅開到紅蔥頭教堂，2小時來回剛好。', gmap: createGMapUrl('Königssee') },
-                    { time: '14:20', title: '藍紹教堂與魔法森林', icon: '🏞️', tag: 'Ramsau', stayTime: '1h', depTime: '15:20', detail: '開車前往僅 15 分鐘車程的藍紹，拍攝溪流、木橋與教堂的絕美阿爾卑斯山水倒影。', tips: '在教堂橋邊拍照後稍微散步即可，無需走完魔法森林全程。', gmap: createGMapUrl('Parish Church of St. Sebastian Ramsau') },
-                    { time: '16:00', title: '返回薩爾斯堡休息', icon: '🔙', tag: '市區', stayTime: '3h', depTime: '19:00', detail: '下午返回市區飯店休息，為今晚的跨年儲備體力。', tips: '' },
-                    { time: '19:00', title: '跨年晚餐', icon: '🍽️', tag: '餐廳', stayTime: '2h', depTime: '21:00', detail: '享用豐盛的跨年晚宴。', tips: '跨年夜餐廳務必半年前預訂！', gmap: createGMapUrl('Salzburg Restaurant') },
-                    { time: '23:00', title: '跨年煙火卡位', icon: '🎆', tag: '卡普齊納山', stayTime: '1h', depTime: '00:00', detail: '前往卡普齊納山 (Kapuzinerberg) 觀景台或馬克大橋架設相機。', tips: '穿上最保暖的裝備（暖暖包、厚手套），提早抵達卡位。', gmap: createGMapUrl('Kapuzinerberg') },
-                    { time: '00:00', title: '迎接2027!', icon: '🥂', tag: '市區上空', stayTime: '1h', depTime: '01:00', detail: '全城教堂敲響鐘聲，霍亨薩爾斯堡要塞上空施放壯麗煙火！將煙火、城堡與薩爾察赫河的倒影一次收錄。', tips: '享受周遭人群互道 Happy New Year 的熱情。' },
-                    { time: '01:30', title: '抵達住宿', icon: '🏠', tag: '薩爾斯堡飯店', stayTime: '-', depTime: '-', detail: '帶著美好的回憶入睡。', tips: '' }
-                ]
-            },
-            {
-                day: 9, date: '01/01', weekday: '週五', title: '薩爾斯堡 ➜ 哈修塔特 (元旦)', weather: { emoji: '🌨️', temp: '-4°C' },
-                drive: 1.5, play: 5.5, coords: [47.5622, 13.6493], stay: '哈修塔特湖區',
-                events: [
-                    { time: '10:30', title: '新年啟程入湖區', icon: '🚗', tag: '奧地利湖區', stayTime: '1h', depTime: '11:30', detail: '新年第一天，睡飽後悠閒退房，開車進入高山湖區。', tips: '沿途風景如畫，盡情享受。' },
-                    { time: '11:30', title: '高薩湖 (Gosausee) 雪景拍照', icon: '❄️', tag: '隱藏秘境', stayTime: '45m', depTime: '12:15', detail: '在進入哈修塔特前，稍微繞道前往高薩湖。冬季這裡會有被冰雪覆蓋的阿爾卑斯達赫斯坦山脈倒影。', tips: '就在湖畔觀景台拍照打卡，不走環湖步道，約停留45分鐘即可。', gmap: createGMapUrl('Gosausee') },
-                    { time: '12:45', title: '抵達與停車', icon: '🅿️', tag: 'Hallstatt', stayTime: '15m', depTime: '13:00', detail: '將車輛停放在小鎮外的 P2 停車場，步行進入小鎮。', tips: '若預訂鎮內特定飯店，會有接駁車到停車場接送行李。', gmap: createGMapUrl('Hallstatt P2 Parking') },
-                    { time: '13:00', title: '明信片視角拍照', icon: '📸', tag: '經典視角', stayTime: '45m', depTime: '13:45', detail: '擁抱高山與冰川湖。走到小鎮北側，捕捉最經典的哈修塔特教堂與湖面倒影。', tips: '不須走遠步道，在此拍照約需45分鐘。當地禁飛空拍機。', gmap: createGMapUrl('Hallstatt Viewpoint') },
-                    { time: '14:00', title: '天空步道觀景台', icon: '🚠', tag: 'Skywalk', stayTime: '1.5h', depTime: '15:30', detail: '搭乘纜車登上鹽礦山上方的天空步道 (Skywalk)，從 360 公尺高空俯瞰哈修塔特湖。', tips: '冬季鹽礦內部不開放，但纜車與觀景台仍會營運（需再次確認官網冬季時刻表）。', gmap: createGMapUrl('Hallstatt Skywalk') },
-                    { time: '15:30', title: '人骨教堂與小鎮漫步', icon: '💀', tag: '小鎮漫步', stayTime: '1h', depTime: '16:30', detail: '參觀半山腰的骸骨教堂 (Charnel House)，欣賞畫有彩繪裝飾的頭骨，隨後於小鎮巷弄漫步。', tips: '', gmap: createGMapUrl('Charnel House Hallstatt') },
-                    { time: '16:30', title: '湖畔市集廣場', icon: '☕', tag: '馬克廣場', stayTime: '1h', depTime: '17:30', detail: '在被繽紛彩色木屋環繞的廣場喝杯熱可可。', tips: '天黑得早，小鎮夜晚非常安靜。', gmap: createGMapUrl('Marktplatz Hallstatt') },
-                    { time: '18:00', title: '抵達住宿與晚餐', icon: '🏠', tag: '湖區木屋/飯店', stayTime: '-', depTime: '-', detail: '在飯店享用晚餐（湖區特產烤鱒魚）。', tips: '', gmap: createGMapUrl('Seehotel Grüner Baum') }
-                ]
-            },
-            {
-                day: 10, date: '01/02', weekday: '週六', title: '哈修塔特 ➜ 梅爾克 ➜ 維也納 (皇家音樂會)', weather: { emoji: '⛅', temp: '1°C' },
-                drive: 3.5, play: 6.5, coords: [48.2082, 16.3738], stay: '維也納',
-                events: [
-                    { time: '08:30', title: '湖區晨間散步', icon: '🚶', tag: '湖畔', stayTime: '45m', depTime: '09:15', detail: '早起享受完全無遊客的寧靜早晨，此時湖面常有晨霧，仙氣十足。', tips: '湖畔散步拍照約45分鐘。' },
-                    { time: '09:30', title: '驅車返維也納', icon: '🚗', tag: 'A1公路', stayTime: '1.5h', depTime: '11:00', detail: '沿著 A1 高速公路返回首都方向。', tips: '' },
-                    { time: '11:00', title: '中繼站：梅爾克修道院 (Melk Abbey)', icon: '⛪', tag: '世界文化遺產', stayTime: '1h', depTime: '12:00', detail: '在多瑙河畔的梅爾克稍作停留。這座黃色的巴洛克式修道院極其宏偉，被譽為世上最美的圖書館之一。', tips: '以參觀修道院精華區與圖書館為主，停留1小時。', gmap: createGMapUrl('Melk Abbey') },
-                    { time: '12:00', title: '修道院周邊午餐', icon: '🍽️', tag: 'Melk', stayTime: '1h', depTime: '13:00', detail: '在修道院附近簡單吃午餐。', tips: '', gmap: createGMapUrl('Melk Restaurant') },
-                    { time: '13:00', title: '繼續前往維也納', icon: '🛣️', tag: '公路', stayTime: '1.5h', depTime: '14:30', detail: '完成最後一段車程進入維也納市區。', tips: '' },
-                    { time: '14:30', title: '市區還車與放行李', icon: '🔑', tag: '租車點', stayTime: '1h', depTime: '15:30', detail: '先至維也納飯店卸下行李，隨後前往租車公司辦理還車。', tips: '記得還車前要加滿油！並保留最後的加油收據與還車確認單。', gmap: createGMapUrl('Vienna Car Rental') },
-                    { time: '15:45', title: '克恩滕大街採買', icon: '🛍️', tag: '購物街', stayTime: '2h', depTime: '17:45', detail: '在 Kärntner Straße 與 Graben 大道輕鬆採買伴手禮。', tips: '超級重點：明天是週日，奧地利法規規定超市與零售店全面休息！今天是最後採買機會。', gmap: createGMapUrl('Kärntner Straße') },
-                    { time: '18:00', title: '炸肉排大餐', icon: '🍖', tag: 'Figlmüller', stayTime: '1.5h', depTime: '19:30', detail: '提前享用比臉還大的維也納百年經典炸肉排 (Schnitzel)。', tips: '為了晚上的音樂會，晚餐必須提早。需提前網路預約。', gmap: createGMapUrl('Figlmüller Bäckerstraße') },
-                    { time: '20:15', title: '🎵 皇家古典音樂會 (Imperial Gala Konzert)', icon: '🎻', tag: '音樂饗宴', stayTime: '2h', depTime: '22:15', detail: '來到維也納怎能錯過音樂會！在金碧輝煌的宮廷廳內（如霍夫堡），穿著正式服裝欣賞由樂團演奏的莫札特與約翰史特勞斯名曲。', tips: '需提前幾個月線上購票，並準備Smart Casual (微正式) 服裝出席。', gmap: createGMapUrl('Hofburg Vienna') },
-                    { time: '22:30', title: '抵達住宿', icon: '🏠', tag: '維也納飯店', stayTime: '-', depTime: '-', detail: '', tips: '', gmap: createGMapUrl('Steigenberger Hotel Herrenhof') }
-                ]
-            },
-            {
-                day: 11, date: '01/03', weekday: '週日', title: '維也納 (皇宮巡禮與國家歌劇院)', weather: { emoji: '☀️', temp: '3°C' },
-                drive: 0, play: 8.5, coords: [48.1848, 16.3122], stay: '維也納',
-                events: [
-                    { time: '09:30', title: '美泉宮 (熊布朗宮)', icon: '🏰', tag: 'Schönbrunn', stayTime: '2.5h', depTime: '12:00', detail: '搭乘地鐵 U4 前往參觀哈布斯堡家族氣勢磅礡的夏宮。參加 Grand Tour 導覽看 40 個華麗房間。', tips: '宮殿內部嚴禁拍照。結束後可到後方花園與凱旋門 (Gloriette) 眺望市景。', gmap: createGMapUrl('Schönbrunn Palace') },
-                    { time: '12:30', title: '納旭市場 (Naschmarkt) 午餐', icon: '🍽️', tag: '百年市場', stayTime: '1.5h', depTime: '14:00', detail: '前往維也納最大的露天市場，雖然週日攤販不開，但周邊的餐廳與異國料理依然熱鬧營業。', tips: '在這裡可以找到各種中東或地中海風情的美食。', gmap: createGMapUrl('Naschmarkt') },
-                    { time: '14:15', title: '霍夫堡與奧地利國家圖書館', icon: '🏛️', tag: 'Hofburg', stayTime: '1.5h', depTime: '15:45', detail: '參觀冬宮霍夫堡建築群，並進入絕美的巴洛克式國家圖書館 (Prunksaal) 參觀。', tips: '這天非常適合純粹的建築與藝文巡禮。', gmap: createGMapUrl('Austrian National Library') },
-                    { time: '16:00', title: '百年咖啡館', icon: '☕', tag: 'Cafe Central', stayTime: '1h', depTime: '17:00', detail: '在中央咖啡館享受傳統維也納咖啡文化與皇帝煎餅 (Kaiserschmarrn)。', tips: '因時間緊湊，若排隊過長可改外帶或其他不需排隊的經典咖啡館。', gmap: createGMapUrl('Café Central Vienna') },
-                    { time: '17:15', title: '聖史蒂芬大教堂', icon: '⛪', tag: '內城區', stayTime: '45m', depTime: '18:00', detail: '參觀維也納的地標，欣賞其獨特的拼花屋頂。', tips: '外觀與內部大廳參觀，停留約45分鐘。', gmap: createGMapUrl('St. Stephen\'s Cathedral Vienna') },
-                    { time: '18:00', title: '晚餐 (歌劇前簡餐)', icon: '🥪', tag: '市區', stayTime: '45m', depTime: '18:45', detail: '為了趕上19:00的歌劇，建議吃點香腸攤 (Würstelstand) 或簡餐。', tips: '看劇前不要吃太飽以免想睡覺。' },
-                    { time: '19:00', title: '🎭 維也納國家歌劇院《蝙蝠》', icon: '🏛️', tag: 'Wiener Staatsoper', stayTime: '3h', depTime: '22:00', detail: '新年必看劇目！在世界最頂級的歌劇院欣賞約翰史特勞斯的經典輕歌劇《蝙蝠》(Die Fledermaus) 或當季劇目。', tips: '此為頂級社交場合，務必著正式服裝。門票需在幾個月前一開賣就上網搶購！', gmap: createGMapUrl('Wiener Staatsoper') },
-                    { time: '22:30', title: '抵達住宿', icon: '🏠', tag: '維也納飯店', stayTime: '-', depTime: '-', detail: '整理行李，確認退稅單據皆已填妥。', tips: '' }
-                ]
-            },
-            {
-                day: 12, date: '01/04', weekday: '週一', title: '賦歸', weather: { emoji: '✈️', temp: '-' },
-                drive: 0.5, play: 0, coords: [48.1103, 16.5697], stay: '飛機上',
-                events: [
-                    { time: '08:00', title: '飯店早餐與退房', icon: '🥐', tag: '飯店', stayTime: '45m', depTime: '08:45', detail: '享用最後的歐洲早餐。', tips: '' },
-                    { time: '08:45', title: '前往機場', icon: '🚊', tag: '大眾運輸', stayTime: '30m', depTime: '09:15', detail: '搭乘機場快線 CAT (16分鐘) 或一般 S-Bahn/Railjet 前往維也納國際機場 (VIE)。', tips: '' },
-                    { time: '09:15', title: '辦理退稅手續', icon: '💰', tag: 'VIE 機場', stayTime: '45m', depTime: '10:00', detail: '拿著填寫好的退稅單與購買商品，前往海關蓋章並至 Global Blue / Planet 櫃檯領取退稅款。', tips: '超級重點：若退稅商品要放進「托運行李」，請先去海關蓋章再辦理登機報到！', gmap: createGMapUrl('Vienna International Airport') },
-                    { time: '10:00', title: '航班報到與安檢', icon: '🛂', tag: '出境', stayTime: '2h', depTime: '12:05', detail: '長榮航空櫃台報到，通過安檢前往登機門。', tips: '' },
-                    { time: '12:05', title: '搭機返台', icon: '🛫', tag: 'BR66', stayTime: '-', depTime: '-', detail: '搭乘長榮班機直飛返台。', tips: '結束美好充實的 12 日奧捷匈深度之旅！' }
-                ]
-            }
-        ];
+  <!-- 應用程式邏輯 -->
+  <script>
+    const JOURNEYS = [
+      { id: 1, title: "北歐極地遠征", subtitle: "Nordic Expedition 2025-26", loc: "北歐・跨國", desc: "準備好雪地裝備，探索芬蘭、挪威等地的冰雪奇緣與極光秘境。⛄", url: "https://derekqaq.github.io/TourbookNorth/Tourbook", top: "14%", left: "54%", icon: "snowflake", theme: { bg: "bg-blue-100", text: "text-blue-600", gradient: "from-blue-400 to-sky-400", shadow: "shadow-blue-200" }, tags: ["#極地遠征", "#追極光", "#夢幻雪國"], stats: { days: "14+ 天", type: "極地自駕", highlight: "極光秘境" } },
+      { id: 2, title: "奧捷匈童話之旅", subtitle: "A-C-H Winter Tour", loc: "中歐・奧捷匈", desc: "12天10夜的冬季雪國雙城深度自駕，漫步百年聖誕市集與浪漫的跨年煙火。🎄", url: "https://derekqaq.github.io/TourbookNorth/A-C-H", top: "25%", left: "53.5%", icon: "castle", theme: { bg: "bg-orange-100", text: "text-orange-600", gradient: "from-orange-400 to-amber-400", shadow: "shadow-orange-200" }, tags: ["#冬季童話", "#聖誕市集", "#浪漫跨年"], stats: { days: "12 天", type: "跨國自駕", highlight: "聖誕市集" } },
+      { id: 3, title: "北海道自駕之旅", subtitle: "Hokkaido Summer", loc: "日本・北海道", desc: "夏日追花與積丹藍的7天6夜自駕攻略，輕鬆掌握道央至道南的完美路線。🌻", url: "https://derekqaq.github.io/TourbookNorth/Hokkaido", top: "26%", left: "87.5%", icon: "flower-2", theme: { bg: "bg-emerald-100", text: "text-emerald-600", gradient: "from-emerald-400 to-teal-400", shadow: "shadow-emerald-200" }, tags: ["#夏日追花", "#積丹藍", "#美味海鮮"], stats: { days: "7 天", type: "輕鬆自駕", highlight: "富良野花海" } },
+      { id: 4, title: "鳥取公路之旅", subtitle: "Tottori Coastal Drive", loc: "日本・山陰海岸", desc: "4天3夜松葉蟹、海景溫泉與鳥取砂丘的療癒之旅，盡享山陰海岸風光。🦀", url: "https://derekqaq.github.io/TourbookNorth/Birdtake", top: "33%", left: "85.5%", icon: "waves", theme: { bg: "bg-cyan-100", text: "text-cyan-600", gradient: "from-cyan-400 to-blue-400", shadow: "shadow-cyan-200" }, tags: ["#海景溫泉", "#松葉蟹", "#鳥取砂丘"], stats: { days: "4 天", type: "海岸公路", highlight: "溫泉放鬆" } },
+      { id: 5, title: "美西公路壯遊", subtitle: "PHX to LAS Adventure", loc: "美國・西南部", desc: "從鳳凰城到拉斯維加斯的壯麗公路旅行，穿越無垠峽谷與不夜城的極致體驗。🏜️", url: "https://derekqaq.github.io/TourbookNorth/PHX-LV", top: "31%", left: "18%", icon: "mountain", theme: { bg: "bg-rose-100", text: "text-rose-600", gradient: "from-rose-400 to-pink-500", shadow: "shadow-rose-200" }, tags: ["#大峽谷", "#公路旅行", "#不夜城"], stats: { days: "10+ 天", type: "沙漠公路", highlight: "壯麗峽谷" } },
+      { id: 6, title: "西澳秘境之旅", subtitle: "Perth Discovery", loc: "澳洲・伯斯", desc: "探索西澳伯斯的自然生態與壯闊海岸線，感受南半球的無盡陽光與可愛短尾矮袋鼠！🦘", url: "https://derekqaq.github.io/TourbookNorth/Perth", top: "76%", left: "80.5%", icon: "sun", theme: { bg: "bg-yellow-100", text: "text-yellow-600", gradient: "from-yellow-400 to-amber-500", shadow: "shadow-yellow-200" }, tags: ["#自然生態", "#無盡陽光", "#短尾矮袋鼠"], stats: { days: "8+ 天", type: "自然探索", highlight: "野生動物" } }
+    ];
 
-        const foodData = [
-            // Vienna
-            { category: 'meat', name: 'Figlmüller', city: '維也納', stars: '4.4', desc: '比臉還大的百年維也納炸肉排名店。', map: createGMapUrl('Figlmüller Bäckerstraße') },
-            { category: 'meat', name: 'Ribs of Vienna', city: '維也納', stars: '4.5', desc: '在地超人氣地窖豬肋排，長達一公尺的美味。', map: createGMapUrl('Ribs of Vienna') },
-            { category: 'local', name: 'Plachutta', city: '維也納', stars: '4.4', desc: '皇帝最愛的清燉牛肉 (Tafelspitz) 經典名店。', map: createGMapUrl('Plachutta Wollzeile') },
-            { category: 'cafe', name: 'Café Central', city: '維也納', stars: '4.4', desc: '世界最美咖啡館之一，體驗傳統維也納咖啡文化。', map: createGMapUrl('Café Central Vienna') },
-            { category: 'cafe', name: 'Café Sperl', city: '維也納', stars: '4.5', desc: '電影《愛在黎明破曉時》拍攝地，傳統寧靜氛圍。', map: createGMapUrl('Café Sperl') },
-            { category: 'cafe', name: 'Demel (德梅爾)', city: '維也納', stars: '4.3', desc: '曾為皇室御用糕點店，推薦沙河蛋糕與紫羅蘭糖。', map: createGMapUrl('Demel Vienna') },
+    let activeJourney = JOURNEYS[0];
 
-            // Budapest
-            { category: 'local', name: 'Menza (Goulash)', city: '布達佩斯', stars: '4.5', desc: '復古風格餐廳，必點匈牙利燉牛肉湯。', map: createGMapUrl('Menza Étterem és Kávéház') },
-            { category: 'local', name: 'Hungarikum Bisztró', city: '布達佩斯', stars: '4.7', desc: '道地匈牙利家庭料理，氣氛溫馨，需提早預約。', map: createGMapUrl('Hungarikum Bisztró') },
-            { category: 'cafe', name: 'New York Café', city: '布達佩斯', stars: '4.3', desc: '華麗奢華的世界最美咖啡館，宛如置身皇宮。', map: createGMapUrl('New York Café Budapest') },
-            { category: 'view', name: 'Mazel Tov', city: '布達佩斯', stars: '4.6', desc: '猶太區廢墟酒吧餐廳，藤蔓與燈泡交織的絕美中東料理。', map: createGMapUrl('Mazel Tov Budapest') },
-            { category: 'cafe', name: 'Gelarto Rosa', city: '布達佩斯', stars: '4.6', desc: '聖史蒂芬大教堂旁超美玫瑰花造型冰淇淋。', map: createGMapUrl('Gelarto Rosa') },
+    function setActive(id, scrollToTop = false) {
+      activeJourney = JOURNEYS.find(j => j.id === id);
+      render();
+      if (scrollToTop) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
 
-            // Prague
-            { category: 'meat', name: 'Pork\'s 烤豬腳', city: '布拉格', stars: '4.6', desc: '外皮酥脆、肉質軟嫩的捷克烤豬腳。', map: createGMapUrl('Pork\'s Prague') },
-            { category: 'meat', name: 'Kantýna', city: '布拉格', stars: '4.6', desc: '肉食愛好者天堂，在地人也愛的立吞牛排與生牛肉塔塔。', map: createGMapUrl('Kantyna Prague') },
-            { category: 'local', name: 'Trdelník 煙囪捲', city: '布拉格', stars: '4.5', desc: '街邊隨處可見的捷克傳統甜點，熱熱吃最好吃。', map: createGMapUrl('Trdelnik Prague') },
-            { category: 'view', name: 'Terasa U Prince', city: '布拉格', stars: '4.2', desc: '老城廣場最佳俯瞰視角，適合喝杯調酒。', map: createGMapUrl('Terasa U Prince') },
-            { category: 'local', name: 'U Fleků', city: '布拉格', stars: '4.3', desc: '擁有500年歷史的古老啤酒館，自釀黑啤酒極具特色。', map: createGMapUrl('U Fleků') },
-            { category: 'cafe', name: 'Café Louvre', city: '布拉格', stars: '4.5', desc: '卡夫卡與愛因斯坦曾造訪的百年咖啡館。', map: createGMapUrl('Café Louvre') },
+    function render() {
+      // 繪製地圖標記
+      const pinsHtml = JOURNEYS.map(j => {
+        const isActive = activeJourney.id === j.id;
+        return `
+          <button class="absolute -ml-3 -mt-3 flex items-center justify-center transition-all duration-500 z-10 ${isActive ? 'scale-125 z-20' : 'hover:scale-110'}" style="left: ${j.left}; top: ${j.top}" onclick="setActive(${j.id})">
+            <div class="w-6 h-6 rounded-full border-4 border-white shadow-md bg-gradient-to-br ${j.theme.gradient} flex items-center justify-center ${isActive ? 'animate-bounce' : ''}"></div>
+          </button>
+        `;
+      }).join('');
+      document.getElementById('map-pins-container').innerHTML = pinsHtml;
 
-            // CK / Salzburg
-            { category: 'local', name: 'Krumlovský mlýn', city: '庫倫洛夫', stars: '4.4', desc: '河畔餐廳，提供道地波西米亞料理。', map: createGMapUrl('Krumlovský mlýn') },
-            { category: 'view', name: 'Papa\'s Living Restaurant', city: '庫倫洛夫', stars: '4.5', desc: '伏爾塔瓦河畔的超人氣餐廳，義大利麵與烤肉皆優。', map: createGMapUrl('Papa\'s Living Restaurant') },
-            { category: 'cafe', name: 'Cafe Tomaselli', city: '薩爾斯堡', stars: '4.2', desc: '奧地利最古老的咖啡館，莫札特也愛來。', map: createGMapUrl('Café Tomaselli') },
-            { category: 'local', name: 'Bärenwirt', city: '薩爾斯堡', stars: '4.6', desc: '薩爾斯堡超美味炸雞與奧地利傳統料理。', map: createGMapUrl('Bärenwirt Salzburg') },
-            { category: 'local', name: 'St. Peter Stiftskulinarium', city: '薩爾斯堡', stars: '4.5', desc: '歐洲最古老餐廳(超過1200年)，米其林推薦的洞穴晚宴。', map: createGMapUrl('St. Peter Stiftskulinarium') },
-            { category: 'meat', name: 'Augustiner Bräu', city: '薩爾斯堡', stars: '4.7', desc: '修道院大酒場，熱鬧非凡的大口吃肉喝酒聖地。', map: createGMapUrl('Augustiner Bräu Salzburg') }
-        ];
+      // 繪製右側簡報面板
+      const active = activeJourney;
+      document.getElementById('briefing-panel').innerHTML = `
+        <div class="flex items-start gap-5 mb-6 relative z-10">
+          <div class="p-4 rounded-[1.5rem] bg-gradient-to-br ${active.theme.gradient} text-white shadow-lg">
+            <i data-lucide="${active.icon}" class="w-8 h-8"></i>
+          </div>
+          <div>
+            <h3 class="text-xs font-extrabold ${active.theme.text} tracking-widest">${active.loc}</h3>
+            <h2 class="text-2xl font-bold text-gray-800">${active.title}</h2>
+          </div>
+        </div>
+        <p class="text-gray-600 mb-8 flex-grow font-medium">${active.desc}</p>
+        <div class="grid grid-cols-2 gap-4 mb-8">
+          <div class="bg-gray-50 rounded-2xl p-4 font-bold text-gray-700">日期: ${active.stats.days}</div>
+          <div class="bg-gray-50 rounded-2xl p-4 font-bold text-gray-700">類型: ${active.stats.type}</div>
+        </div>
+        <a href="${active.url}" target="_blank" class="w-full text-center py-4 rounded-2xl font-bold text-white bg-gradient-to-r ${active.theme.gradient}">出發去看看 ✨</a>
+      `;
 
-        const accommodations = [
-            { day: 'Day 1-2', city: '布達佩斯', name: 'Hotel Clark Budapest', type: '多瑙河景雙人房 x1', checkin: '15:00 後', map: createGMapUrl('Hotel Clark Budapest') },
-            { day: 'Day 3', city: '斯洛伐克', name: 'Marrol\'s Boutique Hotel', type: '經典雙人房 x1', checkin: '14:00 後', map: createGMapUrl('Marrol\'s Boutique Hotel Bratislava') },
-            { day: 'Day 4-5', city: '布拉格', name: 'Grand Hotel Bohemia', type: '豪華雙人房 x1', checkin: '14:00 後', map: createGMapUrl('Grand Hotel Bohemia') },
-            { day: 'Day 6', city: '庫倫洛夫', name: 'Hotel Růže', type: '古典雙人房 x1', checkin: '15:00 後', map: createGMapUrl('Hotel Růže Český Krumlov') },
-            { day: 'Day 7-8', city: '薩爾斯堡', name: 'Hotel Sacher Salzburg', type: '河景雙人房 x1', checkin: '15:00 後', map: createGMapUrl('Hotel Sacher Salzburg') },
-            { day: 'Day 9', city: '哈修塔特', name: 'Seehotel Grüner Baum', type: '湖景陽台房 x1', checkin: '15:00 - 18:00 (留意限時)', map: createGMapUrl('Seehotel Grüner Baum') },
-            { day: 'Day 10-11', city: '維也納', name: 'Steigenberger Hotel Herrenhof', type: '經典雙人房 x1', checkin: '15:00 後', map: createGMapUrl('Steigenberger Hotel Herrenhof') }
-        ];
+      // 繪製底部卡片列表
+      const archivesHtml = JOURNEYS.map(j => `
+        <button onclick="setActive(${j.id}, true)" class="text-left p-6 rounded-[2rem] bg-white border-2 border-gray-100 hover:border-gray-200 hover:-translate-y-2 transition-all shadow-sm hover:shadow-md">
+          <h3 class="text-xl font-bold text-gray-800 mb-2">${j.title}</h3>
+          <p class="text-sm text-gray-500">${j.subtitle}</p>
+        </button>
+      `).join('');
+      document.getElementById('archives-container').innerHTML = archivesHtml;
+      
+      // 重新生成 Lucide Icons
+      lucide.createIcons();
+    }
 
-        const packingList = [
-            { category: '📜 證件與重要文件', items: ['護照正本 (效期>6個月)', '申根保險英文證明', '國際駕照 & 台灣駕照正本', '租車預訂單', '信用卡 (備2-3張)', '歐元現金 (約500-1000)'] },
-            { category: '🧥 衣物 (洋蔥式穿法)', items: ['防風防水保暖外套', '發熱衣褲 x3', '毛衣/帽T x3', '保暖毛帽、圍巾、手套', '防滑好走的靴子', '一般長褲 x3', '厚襪子'] },
-            { category: '🔌 電子產品', items: ['歐洲雙圓孔轉接頭 x2', '行動電源', '相機、腳架 (拍夜景必備)', '各式充電線'] },
-            { category: '💊 個人藥品', items: ['感冒藥、退燒藥', '腸胃藥', '個人慢性處方箋', '保濕乳液、護唇膏 (歐洲極乾)'] },
-            { category: '🚗 自駕必備', items: ['手機車架', '車充', '太陽眼鏡 (雪地反光)', '車用音樂歌單'] }
-        ];
-
-
-        // ================= INITIALIZATION =================
-        document.addEventListener('DOMContentLoaded', () => {
-            initWeatherCards();
-            initDayScroller();
-            renderItinerary();
-            renderFoodMap('all');
-            initTools();
-            renderInfoPrep();
-            
-            // Mobile menu toggle
-            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-                document.getElementById('mobile-menu').classList.toggle('hidden');
-            });
-
-            // Scroll listener for Back to Top
-            window.onscroll = function() {
-                const btn = document.getElementById('back-to-top');
-                if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-                    btn.classList.remove('opacity-0', 'pointer-events-none');
-                    btn.classList.add('opacity-100');
-                } else {
-                    btn.classList.add('opacity-0', 'pointer-events-none');
-                    btn.classList.remove('opacity-100');
-                }
-            };
-            
-            // Delay map and chart init slightly to ensure DOM is fully ready
-            setTimeout(() => {
-                initMap();
-                initChart();
-            }, 100);
-        });
-
-        // ================= NAVIGATION LOGIC =================
-        function switchView(viewId) {
-            // Hide all views
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden', 'active'));
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            
-            // Show target view
-            const target = document.getElementById(`view-${viewId}`);
-            target.classList.remove('hidden');
-            // Slight delay to trigger opacity transition if we added one
-            setTimeout(() => target.classList.add('active'), 10);
-
-            // Update Desktop Nav UI
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                if(btn.dataset.target === viewId) btn.classList.add('active', 'text-blue-600');
-                else btn.classList.remove('active', 'text-blue-600');
-            });
-
-            // Update Mobile Nav UI and close menu
-            document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
-                if(btn.dataset.target === viewId) {
-                    btn.classList.add('text-blue-600', 'bg-blue-50');
-                    btn.classList.remove('text-slate-700', 'hover:bg-slate-50');
-                } else {
-                    btn.classList.remove('text-blue-600', 'bg-blue-50');
-                    btn.classList.add('text-slate-700', 'hover:bg-slate-50');
-                }
-            });
-            document.getElementById('mobile-menu').classList.add('hidden');
-
-            // Toggle floating bottom navigation panel visibility
-            const bottomNav = document.getElementById('bottom-nav-panel');
-            if (viewId === 'itinerary') {
-                bottomNav.classList.remove('hidden');
-            } else {
-                bottomNav.classList.add('hidden');
-            }
-
-            currentView = viewId;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            // Fix map rendering issue if initialized while hidden
-            if (viewId === 'dashboard' && mapInstance) {
-                setTimeout(() => mapInstance.invalidateSize(), 200);
-            }
-        }
-
-        function scrollToDay(dayNum) {
-            if (currentView !== 'itinerary') {
-                switchView('itinerary');
-            }
-            setTimeout(() => {
-                const element = document.getElementById(`day-${dayNum}`);
-                if (element) {
-                    // 偏移頂部導覽列的高度 (64px) + 小間距 (6px) = 70px
-                    const y = element.getBoundingClientRect().top + window.pageYOffset - 70;
-                    window.scrollTo({ top: y, behavior: 'smooth' });
-                }
-            }, 100);
-        }
-
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function toggleDetailMode() {
-            isDetailMode = !isDetailMode;
-            const btn = document.getElementById('toggle-detail-btn');
-            const text = document.getElementById('toggle-text');
-            
-            if (isDetailMode) {
-                document.body.classList.remove('compact-mode');
-                btn.classList.replace('bg-slate-200', 'bg-blue-100');
-                btn.classList.replace('text-slate-600', 'text-blue-700');
-                text.innerText = '詳細模式';
-            } else {
-                document.body.classList.add('compact-mode');
-                btn.classList.replace('bg-blue-100', 'bg-slate-200');
-                btn.classList.replace('text-blue-700', 'text-slate-600');
-                text.innerText = '簡潔模式';
-            }
-        }
-
-        // ================= VIEW 1: DASHBOARD =================
-        function initWeatherCards() {
-            const container = document.getElementById('weather-container');
-            let html = '';
-            itineraryData.forEach(day => {
-                html += `
-                    <div class="flex-shrink-0 bg-white border border-slate-100 rounded-xl p-3 text-center min-w-[80px] shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="scrollToDay(${day.day})">
-                        <div class="text-xs text-slate-500 mb-1">D${day.day} <br> ${day.date}</div>
-                        <div class="text-2xl mb-1">${day.weather.emoji}</div>
-                        <div class="font-bold text-slate-700">${day.weather.temp}</div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-
-            // Init Highlights
-            const hlContainer = document.getElementById('highlights-container');
-            let hlHtml = '';
-            itineraryData.forEach(day => {
-                const hlEvent = day.events.find(e => e.gmap) || day.events[1] || day.events[0];
-                hlHtml += `
-                    <div onclick="scrollToDay(${day.day})" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-100 cursor-pointer transition-colors">
-                        <div class="bg-blue-50 text-blue-600 rounded-lg p-2 font-bold text-sm min-w-[40px] text-center">D${day.day}</div>
-                        <div class="flex-1 overflow-hidden">
-                            <p class="text-sm font-bold text-slate-800 truncate">${day.stay}: ${hlEvent.title}</p>
-                            <p class="text-xs text-slate-500 truncate">${day.title}</p>
-                        </div>
-                        <div class="text-slate-300">❯</div>
-                    </div>
-                `;
-            });
-            hlContainer.innerHTML = hlHtml;
-        }
-
-        function initMap() {
-            mapInstance = L.map('overview-map').setView(mapCenter, 6);
-            
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
-                maxZoom: 19
-            }).addTo(mapInstance);
-
-            const pathCoords = [];
-
-            itineraryData.forEach(day => {
-                if (day.coords) {
-                    pathCoords.push(day.coords);
-                    
-                    const customIcon = L.divIcon({
-                        className: 'custom-div-icon',
-                        html: `<div style="background-color:#3b82f6; color:white; border-radius:50%; width:24px; height:24px; display:flex; justify-content:center; align-items:center; font-weight:bold; font-size:12px; border:2px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.3);">D${day.day}</div>`,
-                        iconSize: [24, 24],
-                        iconAnchor: [12, 12]
-                    });
-
-                    const marker = L.marker(day.coords, {icon: customIcon}).addTo(mapInstance);
-                    
-                    const popupContent = `
-                        <div class="text-center p-1">
-                            <h3 class="font-bold text-sm mb-1">Day ${day.day}: ${day.stay}</h3>
-                            <p class="text-xs text-gray-500 mb-2">${day.title}</p>
-                            <button onclick="scrollToDay(${day.day})" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium hover:bg-blue-700">查看行程</button>
-                        </div>
-                    `;
-                    marker.bindPopup(popupContent);
-                }
-            });
-
-            L.polyline(pathCoords, {color: '#3b82f6', weight: 2, opacity: 0.5, dashArray: '5, 5'}).addTo(mapInstance);
-        }
-
-        function initChart() {
-            const ctx = document.getElementById('intensity-chart').getContext('2d');
-            
-            const labels = itineraryData.map(d => `D${d.day}`);
-            const driveData = itineraryData.map(d => d.drive);
-            const playData = itineraryData.map(d => d.play);
-
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: '🚗 車程 (小時)',
-                            data: driveData,
-                            backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                            borderRadius: 4
-                        },
-                        {
-                            label: '🚶 遊玩 (小時)',
-                            data: playData,
-                            backgroundColor: 'rgba(56, 189, 248, 0.8)',
-                            borderRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { stacked: true, grid: { display: false } },
-                        y: { stacked: true, beginAtZero: true, grid: { borderDash: [2, 4], color: '#e2e8f0' } }
-                    },
-                    plugins: {
-                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } }
-                    }
-                }
-            });
-        }
-
-        function initDayScroller() {
-            const container = document.getElementById('day-scroller');
-            let html = '';
-            itineraryData.forEach(day => {
-                html += `
-                    <button onclick="scrollToDay(${day.day})" class="flex-shrink-0 px-3 py-1.5 rounded-full border border-slate-200 bg-white/50 text-slate-600 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors">
-                        Day ${day.day}
-                    </button>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        // ================= VIEW 2: ITINERARY =================
-        function renderItinerary() {
-            const container = document.getElementById('itinerary-container');
-            let html = '';
-
-            itineraryData.forEach(day => {
-                html += `
-                    <div id="day-${day.day}" class="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8 scroll-mt-20">
-                        <!-- Day Header -->
-                        <div class="sticky top-16 z-30 bg-white/95 backdrop-blur-md px-6 py-4 border-b border-slate-100 flex items-center justify-between rounded-t-2xl shadow-sm">
-                            <div>
-                                <span class="text-blue-600 font-black text-xl mr-2">Day ${day.day}</span>
-                                <span class="text-slate-500 text-sm font-medium">${day.date} ${day.weekday}</span>
-                                <h2 class="text-lg font-bold text-slate-800 mt-1">${day.title}</h2>
-                            </div>
-                            <div class="text-right hidden sm:block">
-                                <span class="bg-indigo-50 text-indigo-700 text-xs px-2 py-1 rounded-md">🚗 ${day.drive}h</span>
-                            </div>
-                        </div>
-
-                        <!-- Timeline Events -->
-                        <div class="px-5 md:px-6 pb-6 pt-6 relative timeline-container">
-                            <div class="space-y-6">
-                `;
-
-                day.events.forEach((event, idx) => {
-                    const isLast = idx === day.events.length - 1;
-                    
-                    html += `
-                        <div class="relative flex flex-col md:flex-row items-start z-10 group">
-                            
-                            <!-- Left: Time, Icon, Stay Info (Redesigned for Mobile) -->
-                            <div class="flex items-center md:items-start md:w-32 mb-3 md:mb-0 md:pr-4 flex-shrink-0 w-full md:w-auto">
-                                <div class="bg-white border-2 border-slate-200 rounded-full w-10 h-10 flex items-center justify-center text-lg shadow-sm z-10 group-hover:border-blue-400 group-hover:scale-110 transition-transform flex-shrink-0">
-                                    ${event.icon}
-                                </div>
-                                <div class="ml-3 flex flex-col w-full">
-                                    <div class="font-bold text-slate-700 font-mono text-[17px] md:text-base">${event.time}</div>
-                                    ${!isLast && event.stayTime !== '-' ? `
-                                    <div class="text-[11px] text-slate-500 font-mono mt-0.5 whitespace-nowrap">
-                                        ⏳ ${event.stayTime} | 🚀 ${event.depTime}
-                                    </div>
-                                    ` : ''}
-                                </div>
-                            </div>
-
-                            <!-- Right: Card Content -->
-                            <div class="flex-1 bg-white border border-slate-100 rounded-xl p-4 shadow-sm group-hover:shadow-md transition-shadow w-full md:w-auto z-10 md:ml-4">
-                                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                                    <h3 class="text-base font-bold text-slate-800">${event.title}</h3>
-                                    <div class="flex flex-wrap items-center gap-1.5 ml-auto">
-                                        <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-1 rounded-md font-medium whitespace-nowrap">${event.tag}</span>
-                                        ${event.gmap ? `
-                                            <a href="${event.gmap}" target="_blank" class="inline-flex items-center gap-1 bg-blue-50 text-blue-600 hover:bg-blue-100 text-[11px] px-2 py-1 rounded-md font-medium transition-colors whitespace-nowrap">
-                                                📍導航
-                                            </a>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                                
-                                <!-- Detail Block -->
-                                <div class="detail-block space-y-2 mt-2">
-                                    ${event.detail ? `<div class="bg-slate-50 border-l-2 border-blue-300 rounded-r-lg p-2.5 text-[13px] text-slate-700 leading-relaxed">${event.detail}</div>` : ''}
-                                    ${event.tips ? `<div class="bg-yellow-50/50 rounded-lg p-2.5 text-[13px] text-slate-700 flex items-start gap-2 leading-relaxed"><span>💡</span> <span>${event.tips}</span></div>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                html += `
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        // ================= VIEW 3: FOOD MAP =================
-        function renderFoodMap(filter) {
-            const grid = document.getElementById('food-grid');
-            let html = '';
-            
-            const filteredData = filter === 'all' ? foodData : foodData.filter(f => f.category === filter);
-
-            filteredData.forEach(food => {
-                let emoji = '🍽️';
-                if(food.category === 'meat') emoji = '🥩';
-                if(food.category === 'cafe') emoji = '☕';
-                if(food.category === 'local') emoji = '🥨';
-                if(food.category === 'view') emoji = '🌃';
-
-                html += `
-                    <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded font-medium">${food.city}</span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md">⭐ ${food.stars}</span>
-                                <span class="text-xl">${emoji}</span>
-                            </div>
-                        </div>
-                        <h3 class="font-bold text-lg text-slate-800 mb-1">${food.name}</h3>
-                        <p class="text-sm text-slate-500 mb-4 flex-1">${food.desc}</p>
-                        <a href="${food.map}" target="_blank" class="block w-full text-center bg-blue-50 text-blue-600 hover:bg-blue-100 text-sm font-bold py-2 rounded transition-colors">
-                            📍 地圖導航
-                        </a>
-                    </div>
-                `;
-            });
-            grid.innerHTML = html;
-
-            document.querySelectorAll('.food-filter').forEach(btn => {
-                if(btn.dataset.filter === filter) {
-                    btn.classList.add('active', 'bg-blue-500', 'text-white', 'border-blue-500');
-                    btn.classList.remove('text-slate-600', 'hover:bg-slate-100');
-                } else {
-                    btn.classList.remove('active', 'bg-blue-500', 'text-white', 'border-blue-500');
-                    btn.classList.add('text-slate-600', 'hover:bg-slate-100');
-                }
-            });
-        }
-
-        document.querySelectorAll('.food-filter').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                renderFoodMap(e.target.dataset.filter);
-            });
-        });
-
-        // ================= VIEW 4: TOOLS =================
-        let expenses = [];
-        
-        function initTools() {
-            const baseRateInput = document.getElementById('base-rate');
-            const eurInput = document.getElementById('input-foreign');
-            const twdInput = document.getElementById('input-twd');
-
-            function updateFromEur() {
-                const rate = parseFloat(baseRateInput.value) || 0;
-                const eur = parseFloat(eurInput.value) || 0;
-                twdInput.value = Math.round(eur * rate);
-            }
-
-            function updateFromTwd() {
-                const rate = parseFloat(baseRateInput.value) || 0;
-                const twd = parseFloat(twdInput.value) || 0;
-                if(rate > 0) eurInput.value = (twd / rate).toFixed(2);
-            }
-
-            baseRateInput.addEventListener('input', () => { updateFromEur(); updateLedgerTotal(); });
-            eurInput.addEventListener('input', updateFromEur);
-            twdInput.addEventListener('input', updateFromTwd);
-        }
-
-        function addExpense() {
-            const nameInput = document.getElementById('expense-name');
-            const amtInput = document.getElementById('expense-amount');
-            
-            const name = nameInput.value.trim();
-            const amt = parseFloat(amtInput.value);
-
-            if (name && amt > 0) {
-                expenses.push({ name, amount: amt, id: Date.now() });
-                nameInput.value = '';
-                amtInput.value = '';
-                renderLedger();
-            }
-        }
-
-        function removeExpense(id) {
-            expenses = expenses.filter(e => e.id !== id);
-            renderLedger();
-        }
-
-        function renderLedger() {
-            const list = document.getElementById('expense-list');
-            
-            if (expenses.length === 0) {
-                list.innerHTML = '<li class="text-center text-slate-400 text-sm mt-4">尚無紀錄</li>';
-            } else {
-                let html = '';
-                expenses.forEach(exp => {
-                    html += `
-                        <li class="flex justify-between items-center bg-white p-2 rounded border border-slate-100 shadow-sm text-sm">
-                            <span class="font-medium text-slate-700">${exp.name}</span>
-                            <div class="flex items-center gap-3">
-                                <span class="text-slate-600">€ ${exp.amount.toFixed(2)}</span>
-                                <button onclick="removeExpense(${exp.id})" class="text-red-400 hover:text-red-600 text-lg leading-none">&times;</button>
-                            </div>
-                        </li>
-                    `;
-                });
-                list.innerHTML = html;
-            }
-            updateLedgerTotal();
-        }
-
-        function updateLedgerTotal() {
-            const totalEur = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-            const rate = parseFloat(document.getElementById('base-rate').value) || 34.5;
-            const totalTwd = Math.round(totalEur * rate);
-            document.getElementById('ledger-total').innerText = totalTwd.toLocaleString();
-        }
-
-        // ================= VIEW 5: INFO & PREP =================
-        function renderInfoPrep() {
-            const accomList = document.getElementById('accom-list');
-            let accomHtml = '';
-            accommodations.forEach(acc => {
-                accomHtml += `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
-                        <div class="mb-2 sm:mb-0">
-                            <div class="flex items-center gap-2">
-                                <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded font-bold">${acc.day}</span>
-                                <span class="text-slate-500 text-sm">${acc.city}</span>
-                            </div>
-                            <h3 class="font-bold text-slate-800 mt-1">${acc.name}</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">${acc.type} | Check-in: ${acc.checkin}</p>
-                        </div>
-                        <a href="${acc.map}" target="_blank" class="inline-block text-center text-xs bg-white border border-slate-200 text-slate-600 px-3 py-2 rounded hover:bg-slate-100 transition-colors whitespace-nowrap">
-                            📍 地圖
-                        </a>
-                    </div>
-                `;
-            });
-            accomList.innerHTML = accomHtml;
-
-            const accordion = document.getElementById('packing-accordion');
-            let packHtml = '';
-            packingList.forEach((cat, idx) => {
-                packHtml += `
-                    <div class="border-b border-slate-100 last:border-0">
-                        <button class="w-full text-left px-6 py-4 font-bold text-slate-700 hover:bg-slate-50 flex justify-between items-center transition-colors" onclick="toggleAccordion('pack-${idx}')">
-                            ${cat.category}
-                            <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="icon-pack-${idx}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div id="pack-${idx}" class="hidden px-6 pb-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                                ${cat.items.map(item => `
-                                    <label class="flex items-start space-x-3 cursor-pointer p-2 hover:bg-slate-50 rounded">
-                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 mt-0.5">
-                                        <span class="text-slate-600 text-sm">${item}</span>
-                                    </label>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            accordion.innerHTML = packHtml;
-        }
-
-        function toggleAccordion(id) {
-            const content = document.getElementById(id);
-            const icon = document.getElementById(`icon-${id}`);
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                icon.classList.add('rotate-180');
-            } else {
-                content.classList.add('hidden');
-                icon.classList.remove('rotate-180');
-            }
-        }
-
-    </script>
+    // 啟動渲染
+    window.onload = render;
+  </script>
 </body>
 </html>
