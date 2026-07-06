@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2024-25 東澳跨年旅 🇦🇺</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <!-- Custom CSS -->
+    <style>
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        /* Smooth Scrolling */
+        html { scroll-behavior: smooth; }
+        
+        /* Hide Scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Timeline specific */
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 24px;
+            width: 2px;
+            background-color: #cbd5e1; /* slate-300 */
+        }
+        
+        /* Detail Mode Toggle */
+        .compact-mode .detail-block { display: none !important; }
+        
+        /* Custom Checkbox */
+        .custom-checkbox:checked + div { background-color: #3b82f6; border-color: #3b82f6; }
+        .custom-checkbox:checked + div svg { display: block; }
+        
+        /* Leaflet Map Height */
+        #map { height: 400px; z-index: 10; border-radius: 0.75rem;}
+        .leaflet-popup-content-wrapper { border-radius: 0.5rem; }
+        
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 transition-all duration-300">
+
+    <!-- Top Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass transition-all duration-300" id="top-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo / Title -->
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="switchView('dashboard')">
+                    <span class="text-2xl">🦘</span>
+                    <span class="font-bold text-lg tracking-tight text-slate-800">東澳跨年特攻隊</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-1">
+                    <button onclick="switchView('dashboard')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-blue-600 bg-blue-50 transition-colors" data-target="dashboard">📊 儀表盤</button>
+                    <button onclick="switchView('itinerary')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors" data-target="itinerary">📅 行程細節</button>
+                    <button onclick="switchView('food')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors" data-target="food">🍔 美食地圖</button>
+                    <button onclick="switchView('tools')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors" data-target="tools">🧮 實用工具</button>
+                    <button onclick="switchView('info')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors" data-target="info">ℹ️ 準備與資訊</button>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-slate-900 focus:outline-none p-2">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white shadow-lg absolute w-full z-40">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <button onclick="switchView('dashboard')" class="nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-blue-600 bg-blue-50" data-target="dashboard">📊 行程儀表盤</button>
+                <button onclick="switchView('itinerary')" class="nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50" data-target="itinerary">📅 每日行程細節</button>
+                <button onclick="switchView('food')" class="nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50" data-target="food">🍔 美食地圖</button>
+                <button onclick="switchView('tools')" class="nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50" data-target="tools">🧮 實用工具</button>
+                <button onclick="switchView('info')" class="nav-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50" data-target="info">ℹ️ 準備與資訊</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="pt-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen">
+        
+        <!-- ================= VIEW 1: Dashboard ================= -->
+        <section id="view-dashboard" class="space-y-6 animate-fade-in pb-10">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 sm:p-10 text-white shadow-lg relative overflow-hidden">
+                <div class="relative z-10">
+                    <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-semibold tracking-wider mb-3 backdrop-blur-sm">2024.12.25 - 2025.01.05</span>
+                    <h1 class="text-3xl sm:text-5xl font-extrabold mb-4">墨爾本 ✈️ 雪梨跨年行</h1>
+                    <div class="flex flex-wrap gap-4 text-blue-100">
+                        <div class="flex items-center gap-2"><span class="text-xl">🧑‍🤝‍🧑</span> 4 人同行</div>
+                        <div class="flex items-center gap-2"><span class="text-xl">🚌</span> 輕鬆 One Day Tour + 國內線</div>
+                        <div class="flex items-center gap-2"><span class="text-xl">⛴️</span> 郵輪海上賞煙火</div>
+                    </div>
+                </div>
+                <!-- Decorative SVG -->
+                <svg class="absolute -bottom-10 -right-10 opacity-20 w-64 h-64" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+
+            <!-- Weather Forecast (Mock) -->
+            <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200">
+                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">🌤️ 天氣預測 (示意)</h3>
+                <div class="flex overflow-x-auto gap-4 pb-2 no-scrollbar">
+                    <!-- Dynamic weather generated by JS -->
+                    <div id="weather-container" class="flex gap-3"></div>
+                </div>
+            </div>
+
+            <!-- Map & Chart Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Interactive Map -->
+                <div class="bg-white rounded-2xl shadow-sm p-1 border border-slate-200 relative">
+                    <div id="map"></div>
+                </div>
+                
+                <!-- Chart & Highlights -->
+                <div class="space-y-6">
+                    <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">📊 體力分析 (交通 vs 遊玩)</h3>
+                        <!-- CHART WRAPPER: Fixed height absolutely prevents infinite resize bug -->
+                        <div class="relative w-full h-[250px]">
+                            <canvas id="intensityChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200">
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">✨ 行程亮點快搜</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="jumpToDay(2)" class="text-left p-3 rounded-xl bg-slate-50 hover:bg-blue-50 transition border border-slate-100 group">
+                                <div class="text-sm text-slate-500 mb-1">Day 2</div>
+                                <div class="font-bold text-slate-800 group-hover:text-blue-700">🌊 大洋路絕景</div>
+                            </button>
+                            <button onclick="jumpToDay(4)" class="text-left p-3 rounded-xl bg-slate-50 hover:bg-blue-50 transition border border-slate-100 group">
+                                <div class="text-sm text-slate-500 mb-1">Day 4</div>
+                                <div class="font-bold text-slate-800 group-hover:text-blue-700">🐧 企鵝歸巢</div>
+                            </button>
+                            <button onclick="jumpToDay(7)" class="text-left p-3 rounded-xl bg-slate-50 hover:bg-blue-50 transition border border-slate-100 group">
+                                <div class="text-sm text-slate-500 mb-1">Day 7</div>
+                                <div class="font-bold text-slate-800 group-hover:text-blue-700">⛴️ 郵輪跨年煙火</div>
+                            </button>
+                            <button onclick="jumpToDay(8)" class="text-left p-3 rounded-xl bg-slate-50 hover:bg-blue-50 transition border border-slate-100 group">
+                                <div class="text-sm text-slate-500 mb-1">Day 8</div>
+                                <div class="font-bold text-slate-800 group-hover:text-blue-700">⛰️ 藍山一日遊</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 2: Daily Itinerary ================= -->
+        <section id="view-itinerary" class="hidden animate-fade-in pb-10">
+            <div class="mb-6 flex justify-between items-end">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">📅 完整行程表</h2>
+                    <p class="text-slate-500 text-sm mt-1">往下滑動查看每日細節，或使用下方快捷鍵跳轉。</p>
+                </div>
+            </div>
+            
+            <!-- Itinerary Container (Generated by JS) -->
+            <div id="itinerary-container" class="space-y-12"></div>
+        </section>
+
+        <!-- ================= VIEW 3: Food Map ================= -->
+        <section id="view-food" class="hidden animate-fade-in pb-10">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">🍔 美食口袋名單</h2>
+            
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-2 mb-6" id="food-filters">
+                <button class="px-4 py-2 rounded-full bg-slate-800 text-white text-sm font-medium transition filter-btn shadow-sm" data-filter="all">全部</button>
+                <button class="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium transition filter-btn shadow-sm" data-filter="seafood">🦞 海鮮大餐</button>
+                <button class="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium transition filter-btn shadow-sm" data-filter="brunch">🍳 早午餐</button>
+                <button class="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium transition filter-btn shadow-sm" data-filter="asian">🍜 亞洲風味</button>
+                <button class="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium transition filter-btn shadow-sm" data-filter="snack">🍦 小吃甜點</button>
+            </div>
+            
+            <!-- Food Grid (Generated by JS) -->
+            <div id="food-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- ================= VIEW 4: Tools ================= -->
+        <section id="view-tools" class="hidden animate-fade-in pb-10">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">🧮 實用工具</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Currency Converter -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="text-2xl p-2 bg-blue-50 rounded-xl">💱</span>
+                        <h3 class="text-xl font-bold">匯率換算器</h3>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                            <span class="text-sm font-medium text-slate-600">自訂匯率 (AUD to TWD)</span>
+                            <input type="number" id="custom-rate" value="21.5" step="0.1" class="w-24 px-3 py-1 border border-slate-300 rounded text-right focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white">
+                        </div>
+                        
+                        <div class="relative">
+                            <div class="flex flex-col gap-4">
+                                <div class="flex items-center border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 bg-white">
+                                    <div class="bg-slate-100 px-4 py-3 font-bold text-slate-600 w-24 text-center border-r border-slate-200">🇦🇺 AUD</div>
+                                    <input type="number" id="aud-input" class="flex-1 px-4 py-3 text-lg focus:outline-none" placeholder="輸入澳幣">
+                                </div>
+                                
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-full p-1 border border-slate-200 shadow-sm z-10">
+                                    <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                                </div>
+                                
+                                <div class="flex items-center border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 bg-white">
+                                    <div class="bg-slate-100 px-4 py-3 font-bold text-slate-600 w-24 text-center border-r border-slate-200">🇹🇼 TWD</div>
+                                    <input type="number" id="twd-input" class="flex-1 px-4 py-3 text-lg focus:outline-none" placeholder="輸入台幣">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expense Tracker -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col h-[500px]">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="text-2xl p-2 bg-green-50 rounded-xl">💸</span>
+                        <h3 class="text-xl font-bold">公積金記帳本</h3>
+                    </div>
+                    
+                    <form id="expense-form" class="flex gap-2 mb-4">
+                        <input type="text" id="expense-name" required placeholder="項目 (如: 晚餐)" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+                        <input type="number" id="expense-amount" required placeholder="AUD" step="0.01" class="w-24 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition shadow-sm">新增</button>
+                    </form>
+                    
+                    <div class="flex-1 overflow-y-auto mb-4 border border-slate-100 rounded-lg bg-slate-50 p-2 shadow-inner">
+                        <ul id="expense-list" class="space-y-2">
+                            <!-- Items via JS -->
+                            <li class="text-center text-slate-400 py-4 text-sm">尚無紀錄，開始新增吧！</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-slate-800 text-white p-4 rounded-xl shadow-md">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-slate-300">總計 (AUD)</span>
+                            <span class="text-2xl font-bold" id="total-aud">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">約合台幣 (TWD)</span>
+                            <span class="text-green-400 font-medium" id="total-twd">NT$0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 5: Info & Prep ================= -->
+        <section id="view-info" class="hidden animate-fade-in space-y-8 pb-10">
+            <h2 class="text-2xl font-bold text-slate-800">ℹ️ 準備與重要資訊</h2>
+            
+            <!-- Flight Info -->
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+                <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100 flex items-center gap-2">
+                    <span class="text-xl">✈️</span> <h3 class="font-bold text-indigo-900">關鍵航班資訊</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-sm">
+                                <th class="py-3 px-6 font-medium">日期</th>
+                                <th class="py-3 px-6 font-medium">航段</th>
+                                <th class="py-3 px-6 font-medium">航班號碼</th>
+                                <th class="py-3 px-6 font-medium">時間</th>
+                                <th class="py-3 px-6 font-medium text-center">動態追蹤</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr>
+                                <td class="py-3 px-6">12/25</td>
+                                <td class="py-3 px-6">台北 (TPE) ➔ 墨爾本 (MEL)</td>
+                                <td class="py-3 px-6 font-mono font-bold text-slate-700">酷航 TR899/TGW899</td>
+                                <td class="py-3 px-6">01:30 - 12:15</td>
+                                <td class="py-3 px-6 text-center">
+                                    <a href="https://zh-tw.flightaware.com/live/flight/TGW899" target="_blank" class="inline-flex items-center justify-center p-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition shadow-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-6">12/30</td>
+                                <td class="py-3 px-6">墨爾本 (MEL) ➔ 雪梨 (SYD)</td>
+                                <td class="py-3 px-6 font-mono font-bold text-slate-700">捷星 JQ506</td>
+                                <td class="py-3 px-6">09:20 - 10:45</td>
+                                <td class="py-3 px-6 text-center">
+                                    <a href="https://zh-tw.flightaware.com/live/flight/JST506" target="_blank" class="inline-flex items-center justify-center p-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition shadow-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Accommodation -->
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-800">🏨 住宿安排</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 shadow-sm">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h4 class="font-bold text-blue-900 text-lg">Aspire Melbourne</h4>
+                                    <p class="text-sm text-slate-500 font-medium mt-0.5">12/25 - 12/30 (5晚)</p>
+                                </div>
+                                <a href="https://maps.google.com/?q=Aspire+Melbourne" target="_blank" class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-md hover:bg-blue-200 transition font-bold">📍 導航</a>
+                            </div>
+                            <p class="text-sm text-slate-700 mb-1 flex items-center gap-1"><span class="text-slate-400">▪</span> 房型: 雙臥室公寓 (4人)</p>
+                            <p class="text-sm text-red-600 font-bold flex items-center gap-1"><span>⚠️</span> Check-in: 15:00 後</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 shadow-sm">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h4 class="font-bold text-blue-900 text-lg">Adina Apartment Hotel</h4>
+                                    <p class="text-sm text-slate-500 font-medium mt-0.5">12/30 - 01/05 (6晚) · Chippendale</p>
+                                </div>
+                                <a href="https://maps.google.com/?q=Adina+Apartment+Hotel+Sydney+Chippendale" target="_blank" class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-md hover:bg-blue-200 transition font-bold">📍 導航</a>
+                            </div>
+                            <p class="text-sm text-slate-700 mb-1 flex items-center gap-1"><span class="text-slate-400">▪</span> 房型: 家庭套房 (4人)</p>
+                            <p class="text-sm text-red-600 font-bold flex items-center gap-1"><span>⚠️</span> Check-in: 14:00 後</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day Tour Info -->
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-800">🚌 旅遊團 (Day Tour) 須知</h3>
+                    <div class="p-5 bg-amber-50 rounded-xl border border-amber-200 h-full shadow-sm">
+                        <h4 class="font-bold text-amber-900 mb-3 text-lg border-b border-amber-200 pb-2">行前與集合注意事項</h4>
+                        <ul class="space-y-3 text-sm text-amber-800">
+                            <li class="flex items-start gap-2"><span>✅</span> <span><strong class="text-amber-900">準時抵達：</strong>旅行團通常不等人，請務必提早 10-15 分鐘抵達指定集合地點。</span></li>
+                            <li class="flex items-start gap-2"><span>🧾</span> <span><strong class="text-amber-900">憑證準備：</strong>將電子憑證 (Voucher) 存於手機，部分導遊可能要求出示護照核對姓名。</span></li>
+                            <li class="flex items-start gap-2"><span>🎒</span> <span><strong class="text-amber-900">隨身防寒：</strong>大洋路與企鵝島日夜溫差大、海風強，強烈建議攜帶防風保暖衣物。</span></li>
+                            <li class="flex items-start gap-2"><span>🍔</span> <span><strong class="text-amber-900">餐飲自理：</strong>行程多半不含餐，郊外物價高，建議自行攜帶乾糧、水及零食在車上吃。</span></li>
+                            <li class="flex items-start gap-2 mt-2"><span>💊</span> <span class="font-bold text-red-600">大洋路山路蜿蜒車程極長，易暈車者請務必提早服用暈車藥！</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Luggage -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-800">🎒 智慧行李清單</h3>
+                <div class="space-y-3" id="luggage-accordion">
+                    <!-- JS Generated Accordions -->
+                </div>
+            </div>
+
+            <!-- SOS Card -->
+            <div class="bg-red-50 rounded-2xl shadow-sm p-6 border border-red-200 mb-10 mt-10">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2 text-red-700">🆘 緊急救援卡 (SOS)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-xl border border-red-100 text-center shadow-sm hover:shadow transition">
+                        <div class="text-4xl mb-2">🚓</div>
+                        <div class="text-sm font-medium text-slate-500">澳洲報警/急救/消防</div>
+                        <a href="tel:000" class="text-3xl font-extrabold text-red-600 hover:underline block mt-1 tracking-wider">000</a>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-red-100 text-center shadow-sm hover:shadow transition">
+                        <div class="text-4xl mb-2">🇹🇼</div>
+                        <div class="text-sm font-medium text-slate-500">駐雪梨辦事處急難救助</div>
+                        <a href="tel:+61418283243" class="text-xl font-extrabold text-red-600 hover:underline block mt-2">+61-418-283-243</a>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-red-100 text-center flex flex-col justify-center items-center shadow-sm hover:shadow transition">
+                        <div class="text-4xl mb-2">🏥</div>
+                        <div class="text-sm font-medium text-slate-500 mb-3">尋找附近醫院</div>
+                        <a href="https://www.google.com/maps/search/hospital/" target="_blank" class="px-4 py-2.5 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition w-full shadow-md">一鍵搜尋 (Google Maps)</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <!-- Bottom Control Panel (Day Shortcuts) -->
+    <!-- Initially hidden via translate-y-full and opacity-0 -->
+    <div id="bottom-panel" class="fixed bottom-0 w-full z-40 glass-dark text-white border-t border-slate-700 transition-all duration-300 transform translate-y-full opacity-0">
+        <div class="max-w-7xl mx-auto px-2 sm:px-4 flex items-center justify-between h-14">
+            
+            <!-- Left: Detail Toggle -->
+            <button id="toggle-detail-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-sm font-bold transition-colors hover:bg-blue-700 shrink-0 shadow-sm">
+                <svg id="detail-icon-on" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                <svg id="detail-icon-off" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
+                <span id="detail-text" class="hidden sm:inline">詳細模式</span>
+            </button>
+            
+            <!-- Right/Center: Day Scroller -->
+            <div class="flex-1 overflow-x-auto no-scrollbar flex items-center px-4 space-x-2 md:justify-center">
+                <!-- Generated by JS -->
+                <script>
+                    for(let i=1; i<=12; i++) {
+                        document.write(`<button onclick="jumpToDay(${i})" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-700 border border-slate-600 text-slate-200 hover:bg-blue-600 hover:border-blue-500 hover:text-white transition whitespace-nowrap shadow-sm">Day ${i}</button>`);
+                    }
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="fixed bottom-20 right-4 z-40 p-3 rounded-full bg-white border border-slate-200 shadow-lg text-slate-700 opacity-0 pointer-events-none transition-all duration-300 transform hover:scale-110 hover:bg-slate-50 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+    </button>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // ==========================================
+        // 1. Data Structures (Fully accurate to CSV & Feedback)
+        // ==========================================
+
+        const itineraryData = [
+            {
+                day: 1, date: "12/25 (三)", title: "啟程與抵達墨爾本",
+                events: [
+                    { time: "07:00", title: "搭乘酷航前往墨爾本", emoji: "✈️", loc: "飛機上", stay: "5h", depart: "12:15", route: "TR899 轉 TGW899 抵達墨爾本 (T2)。", tips: "請提前在機場完成報到。" },
+                    { time: "12:15", title: "抵達墨爾本轉乘 Skybus", emoji: "🛬", loc: "墨爾本機場", stay: "45m", depart: "13:00", route: "抵達 T2 後，出關並步行前往 T3 搭乘 Skybus 或接機專車。" },
+                    { time: "13:00", title: "接送到市區", emoji: "🚐", loc: "往 CBD", stay: "1h", depart: "14:00", map: "https://maps.google.com/?q=Melbourne+CBD" },
+                    { time: "14:00", title: "辦理入住 Check-in", emoji: "🏨", loc: "Aspire Melbourne", stay: "1h", depart: "15:00", map: "https://maps.google.com/?q=Aspire+Melbourne" },
+                    { time: "15:00", title: "弗林德斯街車站與塗鴉街", emoji: "📸", loc: "墨爾本市中心", stay: "1h", depart: "16:00", tips: "拍攝墨爾本最具代表性的百年車站，並漫步至 Hosier Lane 欣賞標誌性街頭塗鴉。", map: "https://maps.google.com/?q=Flinders+Street+Railway+Station" },
+                    { time: "16:00", title: "維多利亞州立圖書館", emoji: "🏛️", loc: "State Library Victoria", stay: "2h", depart: "18:00", tips: "百年古蹟圖書館，八角形穹頂閱讀室是必拍亮點。", map: "https://maps.google.com/?q=State+Library+Victoria" },
+                    { time: "18:00", title: "抵達住宿", emoji: "🏠", loc: "Aspire Melbourne", stay: "-", depart: "-", route: "結束第一天行程，好好休息準備明日早起參加 Day Tour。" }
+                ]
+            },
+            {
+                day: 2, date: "12/26 (四)", title: "大洋路一日遊",
+                events: [
+                    { time: "07:00", title: "集合出發大洋路", emoji: "🚌", loc: "指定集合點", stay: "-", depart: "07:00", route: "搭乘 One Day Tour 專車出發，沿途欣賞壯麗海岸線。", tips: "車程極長且多山路，強烈建議提前服用暈車藥！" },
+                    { time: "13:00", title: "十二門徒岩 & 洛克阿德峽谷", emoji: "🌊", loc: "Great Ocean Road", stay: "3h", depart: "16:00", tips: "海風強勁且日照強烈，需攜帶防風外套與高係數防曬。", map: "https://maps.google.com/?q=Twelve+Apostles" },
+                    { time: "19:00", title: "抵達住宿", emoji: "🏠", loc: "Aspire Melbourne", stay: "-", depart: "-", route: "一日遊專車返回市區解散後，步行返回住宿。" }
+                ]
+            },
+            {
+                day: 3, date: "12/27 (五)", title: "疏芬山淘金體驗",
+                events: [
+                    { time: "07:00", title: "集合前往疏芬山", emoji: "🚌", loc: "指定集合點", stay: "-", depart: "07:00", route: "搭乘 One Day Tour 專車前往 Ballarat 淘金鎮。" },
+                    { time: "10:00", title: "疏芬山淘金鎮體驗", emoji: "⛏️", loc: "Sovereign Hill", stay: "5h", depart: "15:00", tips: "記得體驗免費淘金，砂金可以帶走！入礦坑會冷，備妥薄外套。", map: "https://maps.google.com/?q=Sovereign+Hill" },
+                    { time: "18:00", title: "抵達住宿", emoji: "🏠", loc: "Aspire Melbourne", stay: "-", depart: "-" }
+                ]
+            },
+            {
+                day: 4, date: "12/28 (六)", title: "企鵝島萌物尋訪",
+                events: [
+                    { time: "07:00", title: "集合前往企鵝島", emoji: "🚌", loc: "指定集合點", stay: "-", depart: "07:00", route: "參加企鵝島 (Phillip Island) 一日遊專車出發。" },
+                    { time: "10:00", title: "DFO 購物時間", emoji: "🛍️", loc: "DFO", stay: "3h", depart: "13:00", tips: "行程途中或早上的購物安排，把握折扣撿便宜。" },
+                    { time: "18:00", title: "觀賞企鵝歸巢", emoji: "🐧", loc: "Penguin Parade", stay: "3h", depart: "21:00", tips: "⚠️ 嚴禁拍照錄影 (含無閃光燈)，會傷害企鵝眼睛。海邊入夜極冷，必穿羽絨衣！", map: "https://maps.google.com/?q=Penguin+Parade" },
+                    { time: "23:00", title: "抵達住宿", emoji: "🏠", loc: "Aspire Melbourne", stay: "-", depart: "-" }
+                ]
+            },
+            {
+                day: 5, date: "12/29 (日)", title: "普芬比利蒸汽火車",
+                events: [
+                    { time: "07:00", title: "集合前往丹頓農山脈", emoji: "🚌", loc: "指定集合點", stay: "-", depart: "07:00", route: "搭乘 One Day Tour 專車前往 Belgrave 車站。" },
+                    { time: "10:00", title: "搭乘古董蒸汽火車", emoji: "🚂", loc: "Puffing Billy", stay: "3h", depart: "13:00", tips: "聽從站務員指示，享受坐在窗台將腳伸出車外的經典體驗。", map: "https://maps.google.com/?q=Puffing+Billy+Railway" },
+                    { time: "17:00", title: "抵達住宿", emoji: "🏠", loc: "Aspire Melbourne", stay: "-", depart: "-", route: "打包行李，準備明日一早搭機前往雪梨。" }
+                ]
+            },
+            {
+                day: 6, date: "12/30 (一)", title: "轉戰雪梨與市區採買",
+                events: [
+                    { time: "07:00", title: "前往墨爾本機場 T4", emoji: "🚕", loc: "MEL 機場", stay: "2h", depart: "09:20", route: "國內線請提早至少 1.5 小時抵達辦理報到手續。" },
+                    { time: "09:20", title: "捷星航空 JQ506", emoji: "✈️", loc: "MEL to SYD", stay: "1.5h", depart: "10:50", tips: "飛行時間短暫，雪梨與墨爾本無時差。" },
+                    { time: "10:50", title: "抵達雪梨 T2", emoji: "🛬", loc: "雪梨機場", stay: "1h", depart: "11:50" },
+                    { time: "12:00", title: "午餐與市區移動", emoji: "🍝", loc: "雪梨市區", stay: "2h", depart: "14:00", map: "https://maps.google.com/?q=Adina+Apartment+Hotel+Sydney+Chippendale" },
+                    { time: "14:00", title: "住宿 Check in 與安置", emoji: "🏨", loc: "Adina Apartment", stay: "1h", depart: "15:00" },
+                    { time: "15:00", title: "達令港漫步與市區探險", emoji: "🏙️", loc: "雪梨市區", stay: "1.5h", depart: "16:30", tips: "沿著達令港享受海港風情，途經雪梨市政廳與維多利亞女王大廈(QVB)周邊。", map: "https://maps.google.com/?q=Darling+Harbour" },
+                    { time: "16:30", title: "DFO 商場與超市採買", emoji: "🛍️", loc: "市區商場/超市", stay: "2.5h", depart: "19:00", tips: "把握時間逛街，並務必到超市為明天的跨年郵輪與後天的一日遊採買零食與水。" },
+                    { time: "19:00", title: "抵達住宿", emoji: "🏠", loc: "Adina Apartment Hotel", stay: "-", depart: "-", route: "早點休息，儲備明天跨年的體力！" }
+                ]
+            },
+            {
+                day: 7, date: "12/31 (二)", title: "⛴️ 海灣郵輪跨年倒數",
+                events: [
+                    { time: "12:00", title: "海德公園散步", emoji: "🌳", loc: "Hyde Park", stay: "1.5h", depart: "13:30", map: "https://maps.google.com/?q=Hyde+Park+Sydney" },
+                    { time: "14:00", title: "聖母主教座堂", emoji: "⛪", loc: "St Mary's Cathedral", stay: "1.5h", depart: "15:30", map: "https://maps.google.com/?q=St+Marys+Cathedral+Sydney" },
+                    { time: "16:00", title: "前往碼頭報到", emoji: "🚶", loc: "指定登船碼頭", stay: "1h", depart: "17:00", route: "跨年日市區交通管制極其嚴格，請務必提早步行至郵輪公司指定的碼頭報到。" },
+                    { time: "17:00", title: "登上海灣跨年郵輪", emoji: "⛴️", loc: "雪梨海灣", stay: "7h", depart: "00:30", tips: "免去陸地人擠人！在專屬的雪梨海灣船上享受表演、餐飲，以最完美且舒適的角度等待跨年煙火。", map: "https://maps.google.com/?q=Sydney+Harbour" },
+                    { time: "23:59", title: "跨年倒數 2025!", emoji: "🎊", loc: "郵輪甲板", stay: "15m", depart: "-", tips: "Happy New Year! 🎆 享受一生必看一次的雪梨港灣大橋與歌劇院絢麗煙火！" },
+                    { time: "01:30", title: "抵達住宿", emoji: "🏠", loc: "Adina Apartment Hotel", stay: "-", depart: "-", route: "下船後步行返回住宿，路上人潮仍多，請注意安全結伴同行。" }
+                ]
+            },
+            {
+                day: 8, date: "01/01 (三)", title: "藍山與大學巡禮",
+                events: [
+                    { time: "10:00", title: "藍山國家公園一日遊", emoji: "⛰️", loc: "Blue Mountains", stay: "6h", depart: "16:00", route: "參加 One Day Tour 前往藍山，新年親近大自然。", tips: "必搭景觀世界的三種纜車/火車，並欣賞三姐妹岩。", map: "https://maps.google.com/?q=Blue+Mountains+National+Park" },
+                    { time: "17:00", title: "返回市區", emoji: "🚌", loc: "雪梨市區", stay: "1h", depart: "18:00" },
+                    { time: "18:00", title: "雪梨大學", emoji: "🎓", loc: "The University of Sydney", stay: "1.5h", depart: "19:30", tips: "被譽為哈利波特樓的 Main Quadrangle 是必拍打卡點。", map: "https://maps.google.com/?q=The+University+of+Sydney" },
+                    { time: "20:00", title: "抵達住宿", emoji: "🏠", loc: "Adina Apartment Hotel", stay: "-", depart: "-" }
+                ]
+            },
+            {
+                day: 9, date: "01/02 (四)", title: "大橋、動物園與海灘",
+                events: [
+                    { time: "10:00", title: "雪梨港灣大橋步道", emoji: "🌉", loc: "Sydney Harbour Bridge", stay: "2h", depart: "12:00", route: "漫步大橋人行道，俯瞰絕佳海港風景。", map: "https://maps.google.com/?q=Sydney+Harbour+Bridge" },
+                    { time: "13:00", title: "搭乘渡輪與午餐", emoji: "⛴️", loc: "環形碼頭", stay: "2h", depart: "15:00" },
+                    { time: "16:00", title: "塔龍加動物園", emoji: "🦁", loc: "Taronga Zoo", stay: "3h", depart: "19:00", tips: "擁有無敵海景的動物園，可以拍到長頸鹿與歌劇院同框。", map: "https://maps.google.com/?q=Taronga+Zoo+Sydney" },
+                    { time: "20:00", title: "抵達住宿", emoji: "🏠", loc: "Adina Apartment Hotel", stay: "-", depart: "-" }
+                ]
+            },
+            {
+                day: 10, date: "01/03 (五)", title: "岩石區與歌劇院",
+                events: [
+                    { time: "10:00", title: "市區悠閒時光", emoji: "☕", loc: "雪梨市區", stay: "2h", depart: "12:00" },
+                    { time: "13:00", title: "岩石區市集", emoji: "🧱", loc: "The Rocks Markets", stay: "2h", depart: "15:00", tips: "充滿歷史氛圍的街區，適合挖寶手工藝品與享受街頭美食。", map: "https://maps.google.com/?q=The+Rocks+Markets" },
+                    { time: "15:00", title: "雪梨歌劇院近距離巡禮", emoji: "🎭", loc: "Sydney Opera House", stay: "2h", depart: "17:00", map: "https://maps.google.com/?q=Sydney+Opera+House" },
+                    { time: "19:00", title: "抵達住宿", emoji: "🏠", loc: "Adina Apartment Hotel", stay: "-", depart: "-" }
+                ]
+            },
+            {
+                day: 11, date: "01/04 (六)", title: "植物園與最後巡禮",
+                events: [
+                    { time: "10:00", title: "邦代海灘放鬆", emoji: "🏄", loc: "Bondi Beach", stay: "3h", depart: "13:00", tips: "享受陽光沙灘，或走一段知名的 Bondi to Coogee 步道。", map: "https://maps.google.com/?q=Bondi+Beach" },
+                    { time: "16:00", title: "雪梨皇家植物園", emoji: "🌿", loc: "Royal Botanic Garden", stay: "2h", depart: "18:00", tips: "前往麥覺理夫人椅 (Mrs Macquarie's Chair) 拍攝完美明信片角度。", map: "https://maps.google.com/?q=Royal+Botanic+Garden+Sydney" },
+                    { time: "19:00", title: "最後的晚餐犒賞", emoji: "🥩", loc: "達令港", stay: "2h", depart: "21:00", tips: "挑選一間氣氛好的餐廳，吃頓牛排海鮮大餐！" },
+                    { time: "22:00", title: "抵達住宿", emoji: "🏠", loc: "Adina Apartment Hotel", stay: "-", depart: "-", route: "打包行李，準備明日回台。" }
+                ]
+            },
+            {
+                day: 12, date: "01/05 (日)", title: "滿載而歸",
+                events: [
+                    { time: "07:00", title: "前往機場", emoji: "🚕", loc: "SYD Airport", stay: "2h", depart: "09:00", route: "搭乘機場快線或叫車前往雪梨機場報到。" },
+                    { time: "10:00", title: "搭機返台", emoji: "✈️", loc: "飛機上", stay: "-", depart: "-", tips: "結束美好的跨年旅程，期待下次再見！" },
+                    { time: "18:00", title: "抵達溫暖的家", emoji: "🏠", loc: "台灣", stay: "-", depart: "-", route: "順利抵達，結束旅程。" }
+                ]
+            }
+        ];
+
+        const foodData = [
+            { name: "Sydney Fish Market", tags: ["seafood"], loc: "雪梨", review: "南半球最大魚市場，生蠔龍蝦必吃。", map: "https://maps.google.com/?q=Sydney+Fish+Market" },
+            { name: "Hurricane's Grill", tags: ["seafood", "asian"], loc: "雪梨 Darling Harbour", review: "超巨無霸烤豬肋排，份量極大。", map: "https://maps.google.com/?q=Hurricane's+Grill+Darling+Harbour" },
+            { name: "Hardware Société", tags: ["brunch"], loc: "墨爾本 CBD", review: "墨爾本超人氣早午餐，烤蛋必點。", map: "https://maps.google.com/?q=Hardware+Societe+Melbourne" },
+            { name: "Lune Croissanterie", tags: ["snack", "brunch"], loc: "墨爾本 CBD", review: "號稱世界第一的可頌，永遠在排隊。", map: "https://maps.google.com/?q=Lune+Croissanterie+Melbourne+CBD" },
+            { name: "Pancakes On The Rocks", tags: ["snack", "brunch"], loc: "雪梨 The Rocks", review: "24小時營業，鬆餅跟肋排都很出名。", map: "https://maps.google.com/?q=Pancakes+On+The+Rocks" },
+            { name: "Mamak", tags: ["asian"], loc: "雪梨 Chinatown", review: "超道地馬來西亞印度煎餅與沙嗲。", map: "https://maps.google.com/?q=Mamak+Sydney" },
+            { name: "Queen Victoria Market", tags: ["snack", "all"], loc: "墨爾本 CBD", review: "熱果醬甜甜圈車 (American Doughnut Kitchen)。", map: "https://maps.google.com/?q=Queen+Victoria+Market" }
+        ];
+
+        const luggageCategories = [
+            { title: "🪪 證件與重要文件", items: ["護照 (效期需滿6個月以上)", "澳洲電子簽證 (ETA) 列印備用", "Day Tour 一日遊 / 郵輪跨年 電子憑證", "信用卡", "旅遊平安險/不便險英文證明"] },
+            { title: "👕 衣物 (洋蔥式穿法)", items: ["短袖/薄長袖 (白天防曬)", "防風防潑水外套 (大洋路/企鵝島風大)", "輕羽絨外套 (企鵝島/跨年夜溫差大)", "好走的運動鞋", "帽子/太陽眼鏡", "睡衣"] },
+            { title: "🔌 電子產品", items: ["澳洲轉接頭 (八字型)", "萬用延長線", "行動電源 (多顆，行程必備)", "手機充電線", "相機與記憶卡"] },
+            { title: "💊 藥品與日常用品", items: ["暈車藥 (大洋路山路極度需要)", "腸胃藥/感冒藥/止痛藥", "高防曬係數防曬乳", "牙刷牙膏 (環保考量飯店常不提供)", "保溫水壺", "個人保養品/化妝品"] }
+        ];
+
+        // ==========================================
+        // 2. DOM Elements & Initial Setup
+        // ==========================================
+        
+        let map;
+        let intensityChartInstance = null;
+        let isDetailMode = true;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNavigation();
+            generateItinerary();
+            generateFoodGrid();
+            generateLuggage();
+            initTools();
+            
+            // Map needs a slight delay to render correctly if hidden
+            setTimeout(initMap, 500);
+            initChart();
+            
+            // Back to top observer
+            window.addEventListener('scroll', handleScroll);
+            document.getElementById('back-to-top').addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Detail toggle
+            document.getElementById('toggle-detail-btn').addEventListener('click', toggleDetailMode);
+        });
+
+        // ==========================================
+        // 3. Navigation & View Switching
+        // ==========================================
+        function initNavigation() {
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Mock Weather
+            const weatherIcons = ['☀️', '🌤️', '⛅', '🌧️', '☀️', '🌤️', '☀️', '☀️', '⛅', '☀️', '☀️', '☀️'];
+            const temps = ['24°', '25°', '21°', '19°', '23°', '26°', '28°', '27°', '25°', '26°', '27°', '25°'];
+            const wc = document.getElementById('weather-container');
+            for(let i=0; i<12; i++) {
+                wc.innerHTML += `
+                    <div class="flex flex-col items-center justify-center p-2 rounded-lg bg-slate-50 border border-slate-100 min-w-[60px] shadow-sm">
+                        <span class="text-xs text-slate-500 font-bold mb-0.5">D${i+1}</span>
+                        <span class="text-xl my-1">${weatherIcons[i]}</span>
+                        <span class="text-sm font-bold text-slate-700">${temps[i]}</span>
+                    </div>`;
+            }
+        }
+
+        function switchView(viewId) {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(sec => {
+                sec.classList.add('hidden');
+            });
+            // Show target
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            
+            // Update Nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.dataset.target === viewId) {
+                    btn.classList.remove('text-slate-600', 'hover:bg-slate-100', 'hover:bg-slate-50');
+                    btn.classList.add('text-blue-600', 'bg-blue-50');
+                } else {
+                    btn.classList.add('text-slate-600');
+                    btn.classList.remove('text-blue-600', 'bg-blue-50');
+                    if(btn.parentElement.classList.contains('hidden')) {
+                        btn.classList.add('hover:bg-slate-50');
+                    } else {
+                        btn.classList.add('hover:bg-slate-100');
+                    }
+                }
+            });
+
+            // Close mobile menu
+            document.getElementById('mobile-menu').classList.add('hidden');
+            
+            // Control Bottom Panel Visibility (Only show on itinerary)
+            const bottomPanel = document.getElementById('bottom-panel');
+            if(viewId === 'itinerary') {
+                bottomPanel.classList.remove('translate-y-full', 'opacity-0');
+                bottomPanel.classList.add('translate-y-0', 'opacity-100');
+                document.body.classList.add('pb-16'); // Add padding to body so last item isn't covered
+            } else {
+                bottomPanel.classList.add('translate-y-full', 'opacity-0');
+                bottomPanel.classList.remove('translate-y-0', 'opacity-100');
+                document.body.classList.remove('pb-16');
+            }
+
+            // Scroll to top smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Fix map and chart dimensions when switching back to dashboard
+            if (viewId === 'dashboard') {
+                if (map) setTimeout(() => map.invalidateSize(), 100);
+            }
+        }
+
+        function handleScroll() {
+            const btn = document.getElementById('back-to-top');
+            if (window.scrollY > 300) {
+                btn.classList.remove('opacity-0', 'pointer-events-none');
+                btn.classList.add('opacity-100', 'pointer-events-auto');
+            } else {
+                btn.classList.add('opacity-0', 'pointer-events-none');
+                btn.classList.remove('opacity-100', 'pointer-events-auto');
+            }
+        }
+
+        // ==========================================
+        // 4. Map & Chart
+        // ==========================================
+        function initMap() {
+            map = L.map('map').setView([-35.3, 147.3], 5); // Center between Mel & Syd
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            const markers = [
+                { loc: [-37.8136, 144.9631], title: "Aspire Melbourne (住宿)", day: 1, type: "🏠" },
+                { loc: [-38.6654, 143.1044], title: "大洋路 十二門徒", day: 2, type: "🌊" },
+                { loc: [-38.5082, 145.1481], title: "企鵝島", day: 4, type: "🐧" },
+                { loc: [-33.8863, 151.1994], title: "Adina Chippendale (住宿)", day: 6, type: "🏠" },
+                { loc: [-33.8568, 151.2153], title: "雪梨歌劇院/跨年", day: 7, type: "🎆" },
+                { loc: [-33.7317, 150.3117], title: "藍山國家公園", day: 8, type: "⛰️" }
+            ];
+
+            markers.forEach(m => {
+                const marker = L.marker(m.loc).addTo(map);
+                marker.bindPopup(`
+                    <div class="text-center p-1">
+                        <div class="text-3xl mb-2">${m.type}</div>
+                        <div class="font-bold text-slate-800 mb-3">${m.title}</div>
+                        <button onclick="jumpToDay(${m.day})" class="px-3.5 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow-sm w-full">查看 Day ${m.day}</button>
+                    </div>
+                `);
+            });
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('intensityChart').getContext('2d');
+            
+            if (intensityChartInstance) {
+                intensityChartInstance.destroy();
+            }
+
+            intensityChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10', 'D11', 'D12'],
+                    datasets: [
+                        {
+                            label: '交通/休息 (時)',
+                            data: [8, 6, 4, 4, 3, 4, 2, 4, 2, 1, 1, 5],
+                            backgroundColor: '#94a3b8', // slate-400
+                            borderRadius: 4
+                        },
+                        {
+                            label: '遊玩/活動 (時)',
+                            data: [4, 4, 5, 6, 3, 5, 11, 6, 7, 4, 5, 0],
+                            backgroundColor: '#3b82f6', // blue-500
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // CRITICAL for preventing infinite vertical growth
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, beginAtZero: true, border: { display: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // 5. Itinerary Generation
+        // ==========================================
+        function generateItinerary() {
+            const container = document.getElementById('itinerary-container');
+            let html = '';
+
+            itineraryData.forEach(day => {
+                html += `
+                <div id="day-${day.day}" class="scroll-mt-24">
+                    <div class="sticky top-16 z-30 bg-slate-50/95 backdrop-blur-md py-3 border-b border-slate-200 mb-6 flex items-center gap-3 shadow-sm px-2 -mx-2 rounded-t-xl">
+                        <div class="bg-slate-800 text-white font-black px-3.5 py-1.5 rounded-lg shadow-sm">Day ${day.day}</div>
+                        <div>
+                            <div class="text-xs text-slate-500 font-bold mb-0.5">${day.date}</div>
+                            <h3 class="text-lg font-extrabold text-slate-800 tracking-tight">${day.title}</h3>
+                        </div>
+                    </div>
+                    <div class="timeline-container relative pl-12 space-y-7">
+                `;
+
+                day.events.forEach((ev, idx) => {
+                    const isLast = idx === day.events.length - 1;
+                    
+                    html += `
+                        <div class="relative group">
+                            <!-- Timeline Dot -->
+                            <div class="absolute -left-[3.25rem] top-1.5 w-[1.35rem] h-[1.35rem] rounded-full border-4 border-slate-50 ${isLast ? 'bg-slate-800' : 'bg-blue-500'} shadow-md z-10 transition-transform group-hover:scale-110"></div>
+                            
+                            <!-- Event Card -->
+                            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                                
+                                <!-- Title & Location -->
+                                <div class="mb-3">
+                                    <div class="flex items-center gap-2.5 mb-1.5">
+                                        <span class="text-2xl">${ev.emoji}</span>
+                                        <h4 class="text-lg font-bold text-slate-800">${ev.title}</h4>
+                                    </div>
+                                    <div class="text-sm text-slate-500 font-medium flex items-center gap-1.5 pl-1">
+                                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                        ${ev.loc}
+                                    </div>
+                                </div>
+                                
+                                <!-- Time / Stay / Depart (ALL IN ONE ROW) -->
+                                <div class="inline-flex flex-wrap items-center gap-x-4 gap-y-2 text-sm bg-blue-50/50 border border-blue-100 px-3 py-2 rounded-lg text-blue-900 w-full mb-1">
+                                    <div class="flex items-center gap-1.5 font-bold"><span class="text-base leading-none">⏰</span>${ev.time}</div>
+                                    ${ev.stay !== '-' ? `<div class="hidden sm:block w-1 h-1 rounded-full bg-blue-300"></div><div class="flex items-center gap-1.5 font-medium text-slate-600"><span class="text-base leading-none grayscale opacity-70">⏳</span>停留: ${ev.stay}</div>` : ''}
+                                    ${ev.depart !== '-' ? `<div class="hidden sm:block w-1 h-1 rounded-full bg-blue-300"></div><div class="flex items-center gap-1.5 font-medium text-slate-600"><span class="text-base leading-none grayscale opacity-70">🚀</span>出發: ${ev.depart}</div>` : ''}
+                                </div>
+                                
+                                <!-- Detailed Information -->
+                                ${ (ev.route || ev.tips || ev.map) ? `
+                                <div class="detail-block space-y-2.5 mt-3 text-sm animate-fade-in">
+                                    ${ ev.route ? `<div class="bg-slate-50 text-slate-700 p-3 rounded-xl border border-slate-200 leading-relaxed"><span class="font-bold text-slate-800">🛣️ 路線/指引：</span> ${ev.route}</div>` : '' }
+                                    ${ ev.tips ? `<div class="bg-amber-50 text-amber-800 p-3 rounded-xl border border-amber-200 leading-relaxed"><span class="font-bold text-amber-900">💡 提醒/筆記：</span> ${ev.tips}</div>` : '' }
+                                    ${ ev.map ? `<a href="${ev.map}" target="_blank" class="inline-flex items-center gap-1.5 mt-1 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 hover:border-blue-300 text-slate-700 rounded-lg transition font-bold shadow-sm"><span class="text-base">📍</span> Google Maps 導航</a>` : '' }
+                                </div>` : '' }
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function jumpToDay(dayNumber) {
+            switchView('itinerary');
+            setTimeout(() => {
+                const target = document.getElementById(`day-${dayNumber}`);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+
+        function toggleDetailMode() {
+            isDetailMode = !isDetailMode;
+            const body = document.body;
+            const btn = document.getElementById('toggle-detail-btn');
+            const iconOn = document.getElementById('detail-icon-on');
+            const iconOff = document.getElementById('detail-icon-off');
+            const text = document.getElementById('detail-text');
+
+            if (isDetailMode) {
+                body.classList.remove('compact-mode');
+                btn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
+                btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                iconOn.classList.remove('hidden');
+                iconOff.classList.add('hidden');
+                text.textContent = '詳細模式';
+            } else {
+                body.classList.add('compact-mode');
+                btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                btn.classList.add('bg-slate-600', 'hover:bg-slate-700');
+                iconOn.classList.add('hidden');
+                iconOff.classList.remove('hidden');
+                text.textContent = '簡潔模式';
+            }
+        }
+
+        // ==========================================
+        // 6. Food Map
+        // ==========================================
+        function generateFoodGrid() {
+            const grid = document.getElementById('food-grid');
+            const filters = document.querySelectorAll('.filter-btn');
+
+            const renderCards = (filterTag) => {
+                grid.innerHTML = '';
+                foodData.forEach(food => {
+                    if (filterTag === 'all' || food.tags.includes(filterTag)) {
+                        const tagsHtml = food.tags.map(t => {
+                            const names = { seafood: '海鮮', brunch: '早午餐', asian: '亞洲', snack: '小吃甜點' };
+                            return names[t] ? `<span class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-600 rounded text-xs font-bold">${names[t]}</span>` : '';
+                        }).join('');
+
+                        grid.innerHTML += `
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition">
+                                <div>
+                                    <div class="flex gap-1.5 mb-2.5">${tagsHtml}</div>
+                                    <h3 class="font-extrabold text-lg text-slate-800 mb-1.5">${food.name}</h3>
+                                    <div class="text-sm font-medium text-slate-500 mb-3.5 flex items-center gap-1.5">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                                        ${food.loc}
+                                    </div>
+                                    <p class="text-sm text-slate-700 mb-5 bg-slate-50 p-3 rounded-xl border border-slate-100">"${food.review}"</p>
+                                </div>
+                                <a href="${food.map}" target="_blank" class="w-full text-center py-2.5 bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-700 transition shadow-sm">📍 導航前往</a>
+                            </div>
+                        `;
+                    }
+                });
+            };
+
+            renderCards('all');
+
+            filters.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    filters.forEach(f => {
+                        f.classList.remove('bg-slate-800', 'text-white');
+                        f.classList.add('bg-white', 'text-slate-600');
+                    });
+                    e.target.classList.remove('bg-white', 'text-slate-600');
+                    e.target.classList.add('bg-slate-800', 'text-white');
+                    renderCards(e.target.dataset.filter);
+                });
+            });
+        }
+
+        // ==========================================
+        // 7. Tools (Currency & Expense)
+        // ==========================================
+        let expenses = [];
+        
+        function initTools() {
+            // Currency Converter
+            const audInput = document.getElementById('aud-input');
+            const twdInput = document.getElementById('twd-input');
+            const rateInput = document.getElementById('custom-rate');
+
+            const calculate = (source) => {
+                const rate = parseFloat(rateInput.value) || 21.5;
+                if (source === 'aud') {
+                    const aud = parseFloat(audInput.value);
+                    twdInput.value = isNaN(aud) ? '' : Math.round(aud * rate);
+                } else if (source === 'twd') {
+                    const twd = parseFloat(twdInput.value);
+                    audInput.value = isNaN(twd) ? '' : (twd / rate).toFixed(2);
+                }
+            };
+
+            audInput.addEventListener('input', () => calculate('aud'));
+            twdInput.addEventListener('input', () => calculate('twd'));
+            rateInput.addEventListener('input', () => {
+                if (audInput.value) calculate('aud');
+                updateExpenseTotal();
+            });
+
+            // Expense Tracker
+            const form = document.getElementById('expense-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('expense-name').value;
+                const amount = parseFloat(document.getElementById('expense-amount').value);
+                
+                if (name && !isNaN(amount)) {
+                    expenses.push({ id: Date.now(), name, amount });
+                    document.getElementById('expense-name').value = '';
+                    document.getElementById('expense-amount').value = '';
+                    renderExpenses();
+                }
+            });
+        }
+
+        function renderExpenses() {
+            const list = document.getElementById('expense-list');
+            if (expenses.length === 0) {
+                list.innerHTML = '<li class="text-center text-slate-400 py-6 text-sm font-medium">尚無紀錄，開始新增吧！</li>';
+                updateExpenseTotal();
+                return;
+            }
+
+            list.innerHTML = '';
+            expenses.forEach(exp => {
+                list.innerHTML += `
+                    <li class="flex justify-between items-center p-3 bg-white rounded-lg border border-slate-200 shadow-sm">
+                        <span class="font-bold text-slate-700">${exp.name}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="font-black text-slate-800">$${exp.amount.toFixed(2)}</span>
+                            <button onclick="deleteExpense(${exp.id})" class="text-red-400 hover:text-red-600 focus:outline-none transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </li>
+                `;
+            });
+            
+            const container = list.parentElement;
+            container.scrollTop = container.scrollHeight;
+            updateExpenseTotal();
+        }
+
+        function deleteExpense(id) {
+            expenses = expenses.filter(e => e.id !== id);
+            renderExpenses();
+        }
+
+        function updateExpenseTotal() {
+            const totalAud = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+            const rate = parseFloat(document.getElementById('custom-rate').value) || 21.5;
+            const totalTwd = Math.round(totalAud * rate);
+
+            document.getElementById('total-aud').textContent = `$${totalAud.toFixed(2)}`;
+            document.getElementById('total-twd').textContent = `NT$${totalTwd.toLocaleString()}`;
+        }
+
+        // ==========================================
+        // 8. Info & Prep (Luggage Accordion)
+        // ==========================================
+        function generateLuggage() {
+            const container = document.getElementById('luggage-accordion');
+            let html = '';
+
+            luggageCategories.forEach((cat, cIdx) => {
+                let itemsHtml = cat.items.map((item, iIdx) => `
+                    <label class="flex items-start gap-3 p-2 hover:bg-slate-100 rounded-lg cursor-pointer transition group">
+                        <div class="relative flex items-center pt-0.5">
+                            <input type="checkbox" class="custom-checkbox opacity-0 absolute h-5 w-5 cursor-pointer z-10">
+                            <div class="bg-white border-2 border-slate-300 rounded w-5 h-5 flex flex-shrink-0 justify-center items-center mr-2 focus-within:border-blue-500 transition-colors shadow-sm">
+                                <svg class="hidden w-3 h-3 text-white pointer-events-none" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 7 5 11 15 1"></polyline></svg>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900 select-none">${item}</span>
+                    </label>
+                `).join('');
+
+                html += `
+                    <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50 shadow-sm transition-colors">
+                        <button class="w-full px-4 py-3.5 text-left font-bold text-slate-800 flex justify-between items-center focus:outline-none hover:bg-slate-100 transition" onclick="toggleAccordion('acc-${cIdx}')">
+                            ${cat.title}
+                            <svg id="icon-${cIdx}" class="w-5 h-5 transform transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="acc-${cIdx}" class="px-4 pb-3 hidden">
+                            <div class="pt-2 border-t border-slate-200 space-y-1">
+                                ${itemsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const iconId = id.replace('acc-', 'icon-');
+            const icon = document.getElementById(iconId);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+    </script>
+</body>
+</html>
