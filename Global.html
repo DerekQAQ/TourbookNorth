@@ -237,12 +237,13 @@
     function getResponsiveZoom(type) {
       const isMobile = window.innerWidth < 768;
       if (type === 'world') {
-        return isMobile ? 1 : 2; // 手機版 minZoom 設為 1 才能看見全圖
+        // 啟用小數點縮放，讓畫面可以更完美的塞下全世界
+        return isMobile ? 0.8 : 1.5; 
       }
       if (type === 'focus') {
         return isMobile ? 4 : 5; // 手機版縮放稍微退後一點，避免文字/畫面太擁擠
       }
-      return 2;
+      return 1.5;
     }
 
     // 初始化地圖
@@ -251,10 +252,11 @@
       
       // 建立地圖實例
       map = L.map('map', {
-        center: [25, 10], 
+        center: [20, 15], // 將中心經度偏移至15，讓美西與澳洲完美對稱入鏡
         zoom: initialZoom,
         zoomControl: false, // 我們自訂了縮放按鈕
-        minZoom: 1, // 將最小縮放下調至 1，讓手機可以順利 Zoom-out
+        minZoom: 0, // 將最小縮放下調至 0，支援任意縮放
+        zoomSnap: 0.1, // 啟用小數點縮放，滑順且精準
         maxBounds: [[-90, -180], [90, 180]], // 限制拖曳範圍在世界地圖內
         maxBoundsViscosity: 1.0
       });
@@ -285,11 +287,11 @@
       document.getElementById('zoom-in').addEventListener('click', () => map.zoomIn());
       document.getElementById('zoom-out').addEventListener('click', () => map.zoomOut());
       document.getElementById('zoom-reset').addEventListener('click', () => {
-        map.flyTo([25, 10], getResponsiveZoom('world'), { duration: 1.5 });
+        map.flyTo([20, 15], getResponsiveZoom('world'), { duration: 1.5 });
       });
 
       // 初始將畫面設定為觀看全世界 (Zoom-out)
-      map.setView([25, 10], initialZoom);
+      map.setView([20, 15], initialZoom);
     }
 
     // 切換行程邏輯
