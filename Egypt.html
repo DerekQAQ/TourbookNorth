@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>埃及六人包車探索之旅</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tailwind Config for Custom Colors/Fonts -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        egypt: {
+                            gold: '#D4AF37',
+                            sand: '#F4A460',
+                            nile: '#0077BE',
+                            terracotta: '#E2725B'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Styles & Glassmorphism */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.05);
+        }
+        /* Hide scrollbar for horizontal scroll area */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Detail Toggle Classes */
+        .compact-mode .detail-block {
+            display: none !important;
+        }
+        
+        /* View Transition */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .view-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen relative pb-24">
+
+    <!-- Top Navigation -->
+    <nav class="glass-nav fixed top-0 w-full z-50 transition-all duration-300" id="topNav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Title -->
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🐪</span>
+                    <span class="font-bold text-lg tracking-wide text-slate-900 hidden sm:block">埃及秘境包車行</span>
+                    <span class="font-bold text-lg tracking-wide text-slate-900 sm:hidden">埃及之旅</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-1">
+                    <button onclick="switchView('dashboard')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-egypt-nile hover:bg-blue-50 transition-colors" data-target="dashboard">總覽儀表盤</button>
+                    <button onclick="switchView('itinerary')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-egypt-nile hover:bg-blue-50 transition-colors" data-target="itinerary">每日行程</button>
+                    <button onclick="switchView('food')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-egypt-nile hover:bg-blue-50 transition-colors" data-target="food">美食地圖</button>
+                    <button onclick="switchView('tools')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-egypt-nile hover:bg-blue-50 transition-colors" data-target="tools">實用工具</button>
+                    <button onclick="switchView('info')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-egypt-nile hover:bg-blue-50 transition-colors" data-target="info">準備與資訊</button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobileMenuBtn" class="text-slate-500 hover:text-slate-900 focus:outline-none p-2">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-slate-100 shadow-lg absolute w-full">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <button onclick="switchView('dashboard')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-egypt-nile">📊 總覽儀表盤</button>
+                <button onclick="switchView('itinerary')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-egypt-nile">📅 每日行程</button>
+                <button onclick="switchView('food')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-egypt-nile">🍽️ 美食地圖</button>
+                <button onclick="switchView('tools')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-egypt-nile">🧮 實用工具</button>
+                <button onclick="switchView('info')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-egypt-nile">ℹ️ 準備與資訊</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        
+        <!-- ================= VIEW 1: Dashboard ================= -->
+        <section id="view-dashboard" class="view-section active space-y-6">
+            <!-- Hero Banner -->
+            <div class="relative rounded-2xl overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 text-white shadow-xl">
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-yellow-100 via-transparent to-transparent"></div>
+                <div class="relative p-8 md:p-12 z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div>
+                        <h1 class="text-3xl md:text-5xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500">
+                            埃及六人專屬包車行
+                        </h1>
+                        <p class="text-slate-300 text-lg md:text-xl font-light mb-4">法老、神廟、撒哈拉與紅海的奇幻漂流</p>
+                        <div class="flex flex-wrap gap-3 text-sm">
+                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">🗓️ 2025/1/17 - 1/31 (15天)</span>
+                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">👥 6 人成行</span>
+                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">🚙 專屬嚮導包車</span>
+                        </div>
+                    </div>
+                    <div class="bg-white/10 p-4 rounded-xl backdrop-blur-md border border-white/20 text-center min-w-[150px]">
+                        <div class="text-sm text-slate-300 mb-1">距離出發還有</div>
+                        <div class="text-3xl font-bold text-yellow-400" id="countdown">-- 天</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">🌤️ 每日天氣預覽與行程跳轉</h2>
+                <div id="weatherScrollContainer" class="flex overflow-x-auto gap-4 pb-4 no-scrollbar snap-x">
+                    <!-- JS Generated Weather Cards -->
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Leaflet Map -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+                    <div class="p-4 border-b border-slate-50">
+                        <h2 class="text-xl font-bold flex items-center gap-2">🗺️ 行程總覽地圖</h2>
+                    </div>
+                    <div id="map" class="w-full min-h-[400px] flex-1 z-0 relative"></div>
+                </div>
+
+                <!-- Chart & Highlights -->
+                <div class="flex flex-col gap-6">
+                    <!-- Highlights -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex-1">
+                        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">✨ 旅程亮點</h2>
+                        <ul class="space-y-3">
+                            <li><button onclick="jumpToDay(3)" class="w-full text-left px-4 py-3 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-800 transition flex justify-between items-center"><span>🏜️ 夜宿黑白沙漠</span> <span class="text-xs font-bold px-2 py-1 bg-yellow-200 rounded">Day 3</span></button></li>
+                            <li><button onclick="jumpToDay(6)" class="w-full text-left px-4 py-3 rounded-lg bg-orange-50 hover:bg-orange-100 text-orange-800 transition flex justify-between items-center"><span>🐪 吉薩金字塔群</span> <span class="text-xs font-bold px-2 py-1 bg-orange-200 rounded">Day 6</span></button></li>
+                            <li><button onclick="jumpToDay(9)" class="w-full text-left px-4 py-3 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-800 transition flex justify-between items-center"><span>🏛️ 阿布辛貝神殿</span> <span class="text-xs font-bold px-2 py-1 bg-blue-200 rounded">Day 9</span></button></li>
+                            <li><button onclick="jumpToDay(11)" class="w-full text-left px-4 py-3 rounded-lg bg-red-50 hover:bg-red-100 text-red-800 transition flex justify-between items-center"><span>🎈 路克索熱氣球</span> <span class="text-xs font-bold px-2 py-1 bg-red-200 rounded">Day 11</span></button></li>
+                            <li><button onclick="jumpToDay(13)" class="w-full text-left px-4 py-3 rounded-lg bg-cyan-50 hover:bg-cyan-100 text-cyan-800 transition flex justify-between items-center"><span>🐠 紅海玻璃船</span> <span class="text-xs font-bold px-2 py-1 bg-cyan-200 rounded">Day 13</span></button></li>
+                        </ul>
+                    </div>
+                    <!-- Chart -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                        <h2 class="text-lg font-bold mb-2 flex items-center gap-2">⏱️ 強度分析 (車程 vs 遊玩)</h2>
+                        <div class="h-48 relative">
+                            <canvas id="intensityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 2: Daily Itinerary ================= -->
+        <section id="view-itinerary" class="view-section">
+            <div class="mb-6 flex justify-between items-end">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-slate-800">每日行程細節</h1>
+                    <p class="text-slate-500 mt-2">下拉瀏覽完整 15 天行程，使用底部控制列快速跳轉或切換檢視模式。</p>
+                </div>
+            </div>
+
+            <!-- Itinerary Container (Generated by JS) -->
+            <div id="itineraryContainer" class="relative pl-2 md:pl-0 pb-16">
+                <!-- Timeline will be generated here -->
+            </div>
+        </section>
+
+        <!-- ================= VIEW 3: Food Map ================= -->
+        <section id="view-food" class="view-section">
+            <h1 class="text-3xl font-extrabold text-slate-800 mb-2">🍽️ 埃及美食地圖</h1>
+            <p class="text-slate-500 mb-6">嚴選當地特色餐廳、海鮮與小吃，點擊圖示直接導航。</p>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-2 mb-8" id="foodFilters">
+                <!-- Generated by JS -->
+            </div>
+
+            <!-- Food Grid -->
+            <div id="foodGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards generated by JS -->
+            </div>
+        </section>
+
+        <!-- ================= VIEW 4: Tools ================= -->
+        <section id="view-tools" class="view-section space-y-8">
+            <h1 class="text-3xl font-extrabold text-slate-800 mb-2">🧮 實用小工具</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Exchange Rate -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <h2 class="text-xl font-bold mb-4 text-egypt-nile flex items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                        匯率換算器
+                    </h2>
+                    <p class="text-sm text-slate-500 mb-4">預設參考匯率：1 埃及鎊 (EGP) ≈ 0.65 台幣 (TWD)</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">埃及鎊 (EGP) / 外幣</label>
+                            <input type="number" id="calcEgp" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-egypt-nile focus:border-transparent outline-none" placeholder="輸入金額..." oninput="convertCurrency('egp')">
+                        </div>
+                        <div class="flex justify-center text-slate-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">新台幣 (TWD)</label>
+                            <input type="number" id="calcTwd" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-egypt-nile focus:border-transparent outline-none" placeholder="輸入金額..." oninput="convertCurrency('twd')">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expense Tracker -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col h-full">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-egypt-terracotta flex items-center gap-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            簡易公費記帳本
+                        </h2>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">幣值設定: 澳幣(AUD)/外幣</span>
+                    </div>
+                    
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="expenseName" placeholder="項目名稱 (例: 包車尾款)" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-egypt-terracotta outline-none text-sm">
+                        <input type="number" id="expenseAmount" placeholder="金額" class="w-24 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-egypt-terracotta outline-none text-sm">
+                        <button onclick="addExpense()" class="bg-egypt-terracotta hover:bg-orange-600 text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        </button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto min-h-[150px] mb-4 border border-slate-100 rounded-lg p-2 bg-slate-50">
+                        <ul id="expenseList" class="space-y-2">
+                            <!-- JS Items -->
+                            <li class="text-center text-slate-400 text-sm py-4" id="emptyExpenseMsg">尚無記帳紀錄</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-100 p-4 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-slate-600 font-medium">總澳幣/外幣金額:</span>
+                            <span class="text-xl font-bold text-slate-800" id="totalForeign">0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-500">預估台幣 (x21):</span>
+                            <span class="font-medium text-slate-600" id="totalTwd">NT$ 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 5: Info & Prep ================= -->
+        <section id="view-info" class="view-section space-y-8">
+            <h1 class="text-3xl font-extrabold text-slate-800">ℹ️ 準備與行前資訊</h1>
+            
+            <!-- Flights Table -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                    <h2 class="text-lg font-bold flex items-center gap-2">✈️ 關鍵航班資訊</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-white text-slate-500 text-sm border-b">
+                                <th class="px-6 py-3 font-medium">日期</th>
+                                <th class="px-6 py-3 font-medium">行程</th>
+                                <th class="px-6 py-3 font-medium">航班編號 (點擊追蹤)</th>
+                                <th class="px-6 py-3 font-medium">時間</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-100">
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-6 py-4">1/17 (五)</td>
+                                <td class="px-6 py-4">TPE 台北 ➔ DXB 杜拜</td>
+                                <td class="px-6 py-4"><a href="https://zh-tw.flightaware.com/live/flight/EK367" target="_blank" class="text-blue-600 hover:underline font-medium flex items-center gap-1">EK367 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></td>
+                                <td class="px-6 py-4">23:45 - 05:40(+1)</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-6 py-4">1/18 (六)</td>
+                                <td class="px-6 py-4">DXB 杜拜 ➔ CAI 開羅</td>
+                                <td class="px-6 py-4"><a href="https://zh-tw.flightaware.com/live/flight/EK927" target="_blank" class="text-blue-600 hover:underline font-medium flex items-center gap-1">EK927 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></td>
+                                <td class="px-6 py-4">08:10 - 10:25</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-6 py-4">1/23 (四)</td>
+                                <td class="px-6 py-4">CAI 開羅 ➔ ASW 亞斯文</td>
+                                <td class="px-6 py-4"><a href="https://zh-tw.flightaware.com/live/flight/MS282" target="_blank" class="text-blue-600 hover:underline font-medium flex items-center gap-1">MS282 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></td>
+                                <td class="px-6 py-4">國內線 (依導遊安排)</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-6 py-4">1/30 (四)</td>
+                                <td class="px-6 py-4">HRG 赫加達 ➔ CAI 開羅</td>
+                                <td class="px-6 py-4"><a href="https://zh-tw.flightaware.com/live/flight/MS43" target="_blank" class="text-blue-600 hover:underline font-medium flex items-center gap-1">MS43 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></td>
+                                <td class="px-6 py-4">轉機航班</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Accommodation -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">🏨 住宿安排摘要</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="border border-slate-200 rounded-xl p-4 flex gap-4 items-start">
+                        <div class="text-3xl">🏜️</div>
+                        <div>
+                            <div class="font-bold text-slate-800">黑白沙漠露營 (1晚)</div>
+                            <div class="text-sm text-slate-500 mt-1">Day 3。貝都因人帳篷，無現代衛浴，需備濕紙巾與禦寒衣物。</div>
+                        </div>
+                    </div>
+                    <div class="border border-slate-200 rounded-xl p-4 flex gap-4 items-start">
+                        <div class="text-3xl">⛴️</div>
+                        <div>
+                            <div class="font-bold text-slate-800">尼羅河五星級河輪 (3晚)</div>
+                            <div class="text-sm text-slate-500 mt-1">Day 8-10。雙人房含三餐，Aswan至Luxor。限制Check-in 14:00。</div>
+                        </div>
+                    </div>
+                    <div class="border border-slate-200 rounded-xl p-4 flex gap-4 items-start">
+                        <div class="text-3xl">🏖️</div>
+                        <div>
+                            <div class="font-bold text-slate-800">赫加達海濱渡假村 (2晚)</div>
+                            <div class="text-sm text-slate-500 mt-1">Day 12-13。雙人房含早晚餐。享受紅海設施。</div>
+                        </div>
+                    </div>
+                    <div class="border border-slate-200 rounded-xl p-4 flex gap-4 items-start">
+                        <div class="text-3xl">🏙️</div>
+                        <div>
+                            <div class="font-bold text-slate-800">開羅市區飯店 (數晚)</div>
+                            <div class="text-sm text-slate-500 mt-1">Day 2, 4-6。鄰近金字塔或博物館，標準雙人房含早餐。</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Packing List Accordion -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">🧳 智慧行李清單</h2>
+                <div class="space-y-3" id="packingList">
+                    <!-- JS Generated Accordion -->
+                </div>
+            </div>
+
+            <!-- Emergency Card (Must be at bottom of info) -->
+            <div class="mt-12 bg-red-50 border-l-4 border-red-500 rounded-r-2xl shadow-sm p-6 relative overflow-hidden">
+                <div class="absolute right-0 top-0 opacity-10 text-9xl -mt-6 -mr-6">🆘</div>
+                <h2 class="text-2xl font-black text-red-700 mb-4 flex items-center gap-2 relative z-10">緊急救援卡</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                    <div>
+                        <div class="text-sm text-red-600 font-bold mb-1">當地報警 (報案/急救)</div>
+                        <div class="text-2xl font-mono text-slate-800">122 / 123</div>
+                        <div class="text-xs text-slate-500 mt-1">122 警察 / 123 救護車</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-red-600 font-bold mb-1">旅遊警察 (會英文)</div>
+                        <div class="text-2xl font-mono text-slate-800">126</div>
+                        <div class="text-xs text-slate-500 mt-1">處理旅客糾紛與安全</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-red-600 font-bold mb-1">駐外代表處 (急難救助)</div>
+                        <div class="text-xl font-mono text-slate-800">+20-100-718-XXXX</div>
+                        <div class="text-xs text-slate-500 mt-1">駐約旦代表處 (兼轄埃及)</div>
+                    </div>
+                </div>
+                <div class="mt-6 relative z-10">
+                    <a href="https://www.google.com/maps/search/hospital" target="_blank" class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-transform hover:scale-105">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        一鍵搜尋附近醫院 (Google Maps)
+                    </a>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Bottom Panel (Glassmorphism) - Only visible on Itinerary View -->
+    <div id="bottomPanel" class="glass-panel fixed bottom-0 w-full z-40 transition-transform duration-300 transform translate-y-full">
+        <div class="max-w-7xl mx-auto px-2 sm:px-4 flex items-center justify-between h-16 gap-2 sm:gap-4 relative">
+            
+            <!-- Left: Toggle Mode -->
+            <button id="toggleDetailBtn" class="flex-shrink-0 flex items-center justify-center gap-1 sm:gap-2 px-3 py-2 rounded-xl bg-blue-100 text-blue-700 font-bold text-sm shadow-sm transition-all border border-blue-200 whitespace-nowrap" onclick="toggleDetailMode()">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                <span class="hidden sm:inline" id="toggleDetailText">詳細模式</span>
+                <span class="sm:hidden" id="toggleDetailTextMobile">詳細</span>
+            </button>
+
+            <!-- Right: Horizontal Scroll Days -->
+            <div class="flex-1 overflow-x-auto no-scrollbar flex items-center gap-2 py-2 md:justify-center min-w-0 snap-x" id="dayButtonsContainer">
+                <!-- JS Generated Day Buttons -->
+            </div>
+            
+            <!-- Gradient mask for scroll indication -->
+            <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/90 to-transparent pointer-events-none md:hidden z-10"></div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="fixed bottom-20 right-4 z-50 glass-panel p-3 rounded-full text-slate-600 hover:text-egypt-nile hover:scale-110 transition-all opacity-0 translate-y-10 shadow-lg" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"></path>
+        </svg>
+    </button>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // ================= DATA =================
+        const itineraryData = [
+            { day: 1, date: "1/17 (五)", title: "啟程：飛往神秘國度", desc: "台灣轉機兩次到埃及", weather: "⛅", temp: "15-20°C", loc: "TPE 台北",
+              events: [
+                  { time: "21:00", title: "抵達桃園機場 (TPE)", icon: "🛫", location: "Taiwan", stayTime: "2.5h", leaveTime: "23:45", detail: "至阿聯酋航空櫃檯報到，準備好護照(效期需六個月以上)與電子簽證紙本。確認行李直掛開羅。", tips: "長途飛行建議穿著寬鬆衣物，攜帶空水壺過安檢後裝水。飛機上空氣乾燥，準備護唇膏與小罐保濕乳液。", gmaps: "https://goo.gl/maps/tpe" },
+                  { time: "23:45", title: "搭乘 EK367 航班起飛", icon: "✈️", location: "Flight", stayTime: "9.5h", leaveTime: "-", detail: "前往杜拜轉機。準備在飛機上好好休息，調整時差。", tips: "可向空服員索取眼罩與耳塞幫助睡眠。", gmaps: "" }
+              ]
+            },
+            { day: 2, date: "1/18 (六)", title: "抵達開羅：初見金字塔之城", desc: "換錢/eSIM/聯繫導遊", weather: "☀️", temp: "12-21°C", loc: "CAI 開羅",
+              events: [
+                  { time: "10:25", title: "抵達開羅機場 (CAI)", icon: "🛬", location: "Cairo", stayTime: "2h", leaveTime: "12:30", detail: "辦理入境手續、購買落地簽(25美元)或查驗電子簽。提領行李並通過海關。", tips: "機場內先提領小額埃鎊供小費使用，在機場電信櫃台安裝eSIM或購買實體SIM卡確保網路暢通。", gmaps: "https://goo.gl/maps/cairoairport" },
+                  { time: "13:00", title: "與專屬嚮導會合", icon: "🤝", location: "Cairo Airport", stayTime: "1h", leaveTime: "14:00", detail: "包車司機與導遊於接機大廳舉牌等候，協助搬運行李上專車。", tips: "確認行程尾款支付方式(美金/歐元現鈔)，並將護照影本交給導遊備查。", gmaps: "" },
+                  { time: "14:30", title: "市區午餐：初嚐國民美食", icon: "🥙", location: "Abou Tarek", stayTime: "1.5h", leaveTime: "16:00", detail: "前往開羅市區，品嚐第一餐埃及料理 Koshary (庫沙麗)，這是一種混合通心粉、米飯、扁豆與炸洋蔥的特色素食。", tips: "推薦餐廳：Abou Tarek。吃飽後由導遊帶領至市區匯率較佳的換錢所換大額埃鎊。", gmaps: "https://goo.gl/maps/aboutarek" },
+                  { time: "17:00", title: "🏠 抵達住宿 (開羅吉薩區)", icon: "🏨", location: "Giza Hotel", stayTime: "-", leaveTime: "-", detail: "辦理入住，稍作休息調整時差。若住吉薩區，晚上可能有機會從飯店屋頂遠眺金字塔聲光秀。", tips: "注意財物安全，晚上可自由在飯店附近走走，買些瓶裝水備用。", gmaps: "" }
+              ]
+            },
+            { day: 3, date: "1/19 (日)", title: "踏入奇幻：黑白沙漠探險", desc: "前往黑白沙漠/星空露營", weather: "🌬️", temp: "5-18°C", loc: "Bahariya 綠洲",
+              events: [
+                  { time: "07:30", title: "早晨出發前往巴哈利亞綠洲", icon: "🚙", location: "Bahariya Oasis", stayTime: "4.5h", leaveTime: "12:00", detail: "將大行李寄放飯店，只帶輕便過夜包。沿著沙漠公路長途驅車，中途會停靠休息站上廁所。", tips: "備妥零食與水，車上可補眠。休息站廁所通常需支付 5-10 埃鎊小費。", gmaps: "" },
+                  { time: "12:30", title: "綠洲午餐 & 換乘吉普車", icon: "🚙", location: "Bahariya", stayTime: "1.5h", leaveTime: "14:00", detail: "抵達綠洲享用當地風味午餐(通常是烤雞與燉菜)，隨後換乘四輪傳動吉普車正式進入沙漠腹地。", tips: "吉普車顛簸，容易暈車者請提前吃藥。", gmaps: "" },
+                  { time: "15:00", title: "黑沙漠 (Black Desert)", icon: "🌋", location: "Black Desert", stayTime: "1h", leaveTime: "16:00", detail: "由火山岩風化覆蓋的奇特地貌，嚮導會停靠小沙丘讓大家攀登俯瞰壯闊景色。", tips: "風沙大，相機與手機請注意防沙，可佩戴頭巾。", gmaps: "https://goo.gl/maps/blackdesert" },
+                  { time: "16:30", title: "水晶山與滑沙體驗", icon: "💎", location: "Crystal Mountain", stayTime: "1h", leaveTime: "17:30", detail: "尋找天然石英水晶礦石形成的拱門，並在陡峭沙丘體驗刺激的滑沙板。", tips: "水晶不可帶走，留給下一位旅客。滑沙請聽從嚮導指示避免受傷。", gmaps: "" },
+                  { time: "18:00", title: "白沙漠夕陽與紮營", icon: "🏕️", location: "White Desert", stayTime: "-", leaveTime: "-", detail: "抵達蘑菇石與小雞石區域，欣賞純白石灰岩在夕陽下的夢幻色彩變化。嚮導開始生火準備晚餐。", tips: "太陽下山後氣溫驟降，請立刻穿上羽絨外套與保暖衣物。", gmaps: "https://goo.gl/maps/whitedesert" },
+                  { time: "20:00", title: "🏠 星空露營與貝都因晚餐", icon: "🌌", location: "Desert Camp", stayTime: "-", leaveTime: "-", detail: "享用嚮導現烤的營火晚餐，伴隨傳統打擊樂器與歌聲，夜宿星空下的帳篷或露宿睡袋中。", tips: "營地無現代衛浴，使用濕紙巾清潔。盡情享受無光害的銀河星空。", gmaps: "" }
+              ]
+            },
+            { day: 4, date: "1/20 (一)", title: "文明溯源：返回開羅", desc: "回開羅/文明博物館/哈利利市集", weather: "⛅", temp: "11-20°C", loc: "CAI 開羅",
+              events: [
+                  { time: "07:00", title: "沙漠日出與早餐", icon: "🌅", location: "White Desert", stayTime: "1.5h", leaveTime: "08:30", detail: "在奇岩怪石中迎接絕美日出，享用嚮導準備的簡單早餐（麵包、起司、熱紅茶）。", tips: "早晨非常冷，需穿著保暖衣物。", gmaps: "" },
+                  { time: "09:00", title: "返回綠洲 & 驅車回開羅", icon: "🚙", location: "Route", stayTime: "5h", leaveTime: "14:00", detail: "收拾營地，搭吉普車回綠洲後，轉乘原包車返回開羅文明世界。", tips: "車程較長，可準備車上聽的音樂或Podcast。", gmaps: "" },
+                  { time: "15:00", title: "埃及文明國家博物館 (NMEC)", icon: "🏛️", location: "NMEC", stayTime: "2.5h", leaveTime: "17:30", detail: "參觀全新的博物館，重點是地下室的『皇家木乃伊展廳』，一睹拉美西斯二世等22位法老真容。", tips: "木乃伊展廳內嚴格禁止拍照。門票預估 500 EGP。", gmaps: "https://goo.gl/maps/nmec" },
+                  { time: "18:00", title: "哈利利市集 (Khan el-Khalili)", icon: "🛍️", location: "Old Cairo", stayTime: "2h", leaveTime: "20:00", detail: "開羅最古老的中東大市集，穿梭在迷宮般的巷弄中尋找神燈與紀念品。可在百年咖啡館 El Fishawy 喝杯薄荷茶。", tips: "買紀念品必須殺價 (從3折開始喊)。注意隨身包包防扒手。", gmaps: "https://goo.gl/maps/khalili" },
+                  { time: "20:30", title: "🏠 抵達住宿 (開羅)", icon: "🏨", location: "Cairo Hotel", stayTime: "-", leaveTime: "-", detail: "晚餐後回飯店休息，洗去一身沙漠塵土。", tips: "", gmaps: "" }
+              ]
+            },
+            { day: 5, date: "1/21 (二)", title: "地中海風情：亞歷山大港", desc: "亞歷山大港一日遊", weather: "☁️", temp: "14-19°C", loc: "Alexandria",
+              events: [
+                  { time: "08:00", title: "出發前往亞歷山大港", icon: "🚙", location: "Route", stayTime: "3h", leaveTime: "11:00", detail: "沿著沙漠公路前往埃及地中海畔的第二大城，感受與開羅截然不同的歐洲風情。", tips: "準備一件防風外套，海邊風大。", gmaps: "" },
+                  { time: "11:30", title: "亞歷山大地下墓穴", icon: "💀", location: "Catacombs of Kom el Shoqafa", stayTime: "1h", leaveTime: "12:30", detail: "深入地下三層，參觀羅馬、希臘與古埃及風格完美混合的奇特地下墓葬群。", tips: "門票約 150 EGP。內部空間狹窄且需走旋轉樓梯，注意腳下。", gmaps: "https://goo.gl/maps/catacombs" },
+                  { time: "13:00", title: "龐貝柱 (Pompey's Pillar)", icon: "🏛️", location: "Pompey's Pillar", stayTime: "0.5h", leaveTime: "13:30", detail: "矗立在廢墟中的巨大羅馬花崗岩石柱，兩旁有古埃及斯芬克斯像守護。", tips: "門票約 150 EGP。拍照停留時間較短。", gmaps: "https://goo.gl/maps/pompey" },
+                  { time: "14:00", title: "海鮮午餐：魚市場", icon: "🐟", location: "Fish Market", stayTime: "1.5h", leaveTime: "15:30", detail: "在地中海畔享用新鮮現烤的海鮮大餐，欣賞無敵海景。", tips: "推薦餐廳：Fish Market 或 Kadoura，可自行挑選漁獲秤重計價。", gmaps: "https://goo.gl/maps/fishmarket" },
+                  { time: "16:00", title: "奎特貝堡 (Qaitbay Citadel)", icon: "🏰", location: "Qaitbay", stayTime: "1.5h", leaveTime: "17:30", detail: "建於古代世界七大奇蹟之一『亞歷山大燈塔』遺址上的宏偉堡壘。", tips: "門票約 150 EGP。傍晚拍照光線極佳，可拍出絕美剪影。", gmaps: "https://goo.gl/maps/qaitbay" },
+                  { time: "18:00", title: "🏠 抵達住宿 (亞歷山大或回開羅)", icon: "🏨", location: "Hotel", stayTime: "-", leaveTime: "-", detail: "依嚮導安排入住亞歷山大海濱飯店，或驅車返回開羅。", tips: "", gmaps: "" }
+              ]
+            },
+            { day: 6, date: "1/22 (三)", title: "法老榮耀：博物館與金字塔", desc: "大埃及博物館/金字塔區", weather: "☀️", temp: "12-22°C", loc: "Giza 吉薩",
+              events: [
+                  { time: "09:00", title: "大埃及博物館 (GEM)", icon: "🏛️", location: "GEM", stayTime: "3.5h", leaveTime: "12:30", detail: "參觀世界最大的單一文明博物館。重點參觀拉美西斯巨大雕像與圖坦卡門完整黃金寶藏展廳。", tips: "門票約 1000 EGP。館內極大，請穿著舒適好走的鞋子。", gmaps: "https://goo.gl/maps/gem" },
+                  { time: "13:30", title: "吉薩金字塔群與獅身人面像", icon: "🐪", location: "Giza Pyramids", stayTime: "3.5h", leaveTime: "17:00", detail: "參觀古夫、卡夫拉、孟卡拉三大金字塔。包含進入古夫大金字塔內部的門票。隨後前往全景點(Panorama)拍照，並近距離欣賞獅身人面像(Sphinx)。", tips: "金字塔內部悶熱狹窄且須彎腰，幽閉恐懼者斟酌。騎駱駝交涉請務必讓導遊出面。", gmaps: "https://goo.gl/maps/giza" },
+                  { time: "18:00", title: "金字塔景觀晚餐", icon: "🍽️", location: "9 Pyramids Lounge", stayTime: "2h", leaveTime: "20:00", detail: "在能毫無遮蔽看見金字塔夕陽與夜景的餐廳享用晚餐，慶祝解鎖人生清單。", tips: "需提前數月預訂。防風保暖衣物不可少。", gmaps: "" },
+                  { time: "20:30", title: "🏠 抵達住宿 (開羅)", icon: "🏨", location: "Cairo Hotel", stayTime: "-", leaveTime: "-", detail: "回飯店打包行李，準備明日搭國內線。", tips: "", gmaps: "" }
+              ]
+            },
+            { day: 7, date: "1/23 (四)", title: "南下努比亞：飛往亞斯文", desc: "飛往亞斯文/努比亞村", weather: "☀️", temp: "15-26°C", loc: "ASW 亞斯文",
+              events: [
+                  { time: "08:00", title: "搭機前往亞斯文", icon: "✈️", location: "Cairo to Aswan", stayTime: "1.5h", leaveTime: "-", detail: "前往開羅機場搭乘國內線班機(如 MS282)飛往南部的亞斯文，氣溫會明顯變暖。", tips: "國內線提早1.5-2小時到機場即可。機上通常只提供水或果汁。", gmaps: "" },
+                  { time: "11:30", title: "亞斯文大壩與未完成的方尖碑", icon: "🏗️", location: "Aswan", stayTime: "2h", leaveTime: "13:30", detail: "參觀壯觀的亞斯文水壩，以及採石場中因裂縫而遺留的巨大方尖碑，了解古埃及切割巨石的工藝。", tips: "採石場完全無遮蔽，非常曬，務必撐傘或戴帽。", gmaps: "" },
+                  { time: "15:00", title: "風帆船前往努比亞村", icon: "⛵", location: "Nubian Village", stayTime: "2.5h", leaveTime: "17:30", detail: "搭乘傳統風帆船(Felucca)或汽船在清澈的尼羅河上航行，前往色彩繽紛的努比亞村落，體驗騎駱駝與參觀當地人家(看寵物鱷魚)。", tips: "村內可購買特色香料與洛神花茶，記得殺價。", gmaps: "" },
+                  { time: "18:00", title: "🏠 抵達住宿 (亞斯文飯店)", icon: "🏨", location: "Aswan Hotel", stayTime: "-", leaveTime: "-", detail: "入住休息，今晚需早睡，準備明日凌晨的阿布辛貝行程。", tips: "請飯店準備明日凌晨出發的早餐盒(Breakfast Box)。", gmaps: "" }
+              ]
+            },
+            { day: 8, date: "1/24 (五)", title: "雙神震撼：阿布辛貝神殿", desc: "凌晨前往阿布辛貝/登遊輪", weather: "☀️", temp: "16-27°C", loc: "Abu Simbel",
+              events: [
+                  { time: "04:00", title: "凌晨車隊前往阿布辛貝", icon: "🚙", location: "Desert Route", stayTime: "3.5h", leaveTime: "07:30", detail: "極早起，領取飯店準備的餐盒。穿越沙漠前往靠近蘇丹邊境的阿布辛貝。", tips: "車上補眠必備頸枕。沙漠清晨極冷，請穿厚外套。", gmaps: "" },
+                  { time: "07:30", title: "阿布辛貝雙神殿", icon: "🏛️", location: "Abu Simbel", stayTime: "2.5h", leaveTime: "10:00", detail: "拉美西斯二世的偉大傑作。參觀宏偉的大神殿與為愛妻妮菲塔莉建的小神殿。這兩座神殿曾因建水壩而整座切割搬遷。", tips: "清晨陽光直射神殿正面，是最佳拍照時機。內部禁止解說，導遊會在外面先講解。", gmaps: "https://goo.gl/maps/abusimbel" },
+                  { time: "13:30", title: "登五星級尼羅河遊輪", icon: "🛳️", location: "Aswan Port", stayTime: "1.5h", leaveTime: "-", detail: "返回亞斯文，辦理遊輪 Check-in，於船上享用豐盛的自助午餐。", tips: "確認房間設施，熟悉船上餐廳、酒吧與頂樓甲板泳池位置。", gmaps: "" },
+                  { time: "15:30", title: "菲萊神殿 (Temple of Philae)", icon: "🏛️", location: "Philae Island", stayTime: "2h", leaveTime: "17:30", detail: "搭乘汽船前往位於小島上的伊西斯(Isis)女神神殿，被譽為埃及最浪漫的神殿。", tips: "島上貓咪很多。船夫可能會在回程時索要小費。", gmaps: "https://goo.gl/maps/philae" },
+                  { time: "18:30", title: "🏠 抵達住宿 (尼羅河河輪)", icon: "🛌", location: "Cruise", stayTime: "-", leaveTime: "-", detail: "船上享用晚餐。遊輪於夜間啟航，開始尼羅河巡航之旅。", tips: "", gmaps: "" }
+              ]
+            },
+            { day: 9, date: "1/25 (六)", title: "雙神信仰：康翁波與航行", desc: "鱷魚神殿/船上放鬆", weather: "☀️", temp: "15-26°C", loc: "Kom Ombo",
+              events: [
+                  { time: "早上", title: "尼羅河巡航與放鬆", icon: "🛳️", location: "Nile River", stayTime: "-", leaveTime: "-", detail: "睡到自然醒，在船上享用早餐。上午在頂樓甲板躺椅上享受微風，欣賞兩岸的綠洲與沙漠交替的景色。", tips: "可點杯飲料，享受無所事事的渡假時光。", gmaps: "" },
+                  { time: "15:00", title: "康翁波雙神殿 (Kom Ombo)", icon: "🐊", location: "Kom Ombo", stayTime: "1.5h", leaveTime: "16:30", detail: "全埃及唯一同時供奉老鷹神(Horus)與鱷魚神(Sobek)的對稱神殿。旁有鱷魚木乃伊博物館可以參觀。", tips: "神殿就在碼頭邊，下船步行即達。留意壁畫上的古代醫療器具與日曆。", gmaps: "https://goo.gl/maps/komombo" },
+                  { time: "19:00", title: "🏠 抵達住宿 (尼羅河河輪)", icon: "🛌", location: "Cruise", stayTime: "-", leaveTime: "-", detail: "船隻繼續航向艾得芙。今晚船上可能舉辦 Galabeya Party (阿拉伯傳統服飾之夜)。", tips: "可提前在市集購買傳統服飾參與派對同樂。", gmaps: "" }
+              ]
+            },
+            { day: 10, date: "1/26 (日)", title: "荷魯斯之眼：艾得芙至路克索", desc: "搭馬車/過水閘門/路克索神殿", weather: "☀️", temp: "14-25°C", loc: "Luxor 路克索",
+              events: [
+                  { time: "08:00", title: "搭乘馬車前往艾得芙神殿", icon: "🐎", location: "Edfu", stayTime: "0.5h", leaveTime: "08:30", detail: "下船後，兩人一輛搭乘當地特色馬車，穿梭在市區街道前往神殿。", tips: "導遊會統一處理馬車費用與小費，避免與馬車伕發生糾紛。", gmaps: "" },
+                  { time: "08:30", title: "艾得芙神殿 (Temple of Horus)", icon: "🦅", location: "Edfu Temple", stayTime: "1.5h", leaveTime: "10:00", detail: "全埃及保存最完整的神殿，供奉老鷹神荷魯斯。擁有壯觀的塔門與巨型老鷹花崗岩雕像。", tips: "大門口的老鷹雕像是必拍打卡點。", gmaps: "https://goo.gl/maps/edfu" },
+                  { time: "14:00", title: "通過伊斯納水閘門", icon: "🚢", location: "Esna Lock", stayTime: "1h", leaveTime: "-", detail: "遊輪排隊通過伊斯納水閘，體驗水位高低落差升降。當地小販會划著小船，從岸上將浴巾與桌布精準丟上甲板叫賣。", tips: "若想購買，可在甲板上討價還價，並將錢包在商品裡丟回去；不買則直接丟還即可。", gmaps: "" },
+                  { time: "18:00", title: "夜訪路克索神殿", icon: "🏛️", location: "Luxor Temple", stayTime: "1.5h", leaveTime: "19:30", detail: "遊輪抵達路克索。傍晚前往參觀打上唯美燈光的路克索神殿，欣賞拉美西斯二世巨大雕像與獅身羊面大道。", tips: "夜晚的神殿氣氛神秘且涼爽，非常適合拍照。", gmaps: "" },
+                  { time: "20:00", title: "🏠 抵達住宿 (尼羅河河輪)", icon: "🛌", location: "Cruise", stayTime: "-", leaveTime: "-", detail: "最後一晚在船上享用晚餐與休息。準備隔天凌晨的熱氣球行程。", tips: "", gmaps: "" }
+              ]
+            },
+            { day: 11, date: "1/27 (一)", title: "底比斯遺跡：熱氣球與帝王谷", desc: "熱氣球/帝王谷/卡納克", weather: "☀️", temp: "12-25°C", loc: "Luxor 路克索",
+              events: [
+                  { time: "04:30", title: "熱氣球升空迎日出", icon: "🎈", location: "West Bank", stayTime: "2.5h", leaveTime: "07:00", detail: "摸黑搭乘小船渡過尼羅河到西岸，搭乘熱氣球緩緩升空，在空中俯瞰帝王谷、哈特薛普蘇特神殿與壯麗的尼羅河日出。", tips: "清晨高空非常冷，務必穿著防風保暖衣物。降落時需配合駕駛員指示採取防護姿勢。", gmaps: "" },
+                  { time: "07:30", title: "帝王谷 (Valley of the Kings)", icon: "🪦", location: "Valley of Kings", stayTime: "2.5h", leaveTime: "10:00", detail: "隱密在山谷中的法老地下陵墓群。門票含三個基本墓穴，欣賞色彩依舊鮮豔的地下壁畫。可自費參觀圖坦卡門墓。", tips: "墓穴內不可使用相機閃光燈。推薦加購拉美西斯五/六世的墓穴門票。", gmaps: "https://goo.gl/maps/valleyofkings" },
+                  { time: "10:30", title: "哈特薛普蘇特神殿", icon: "🏛️", location: "Hatshepsut Temple", stayTime: "1h", leaveTime: "11:30", detail: "埃及唯一女法老的陵寢神殿，獨特的三層梯形現代感建築，依傍著陡峭的石灰岩壁。", tips: "", gmaps: "" },
+                  { time: "11:45", title: "曼儂巨像 (Colossi of Memnon)", icon: "🗿", location: "Colossi of Memnon", stayTime: "0.5h", leaveTime: "12:15", detail: "兩座巨大的阿蒙霍特普三世雕像，孤立在平原上，是過去宏偉神殿僅存的遺跡。", tips: "不需門票，路邊短暫停留拍照即可。", gmaps: "https://goo.gl/maps/memnon" },
+                  { time: "14:00", title: "卡納克神殿 (Karnak Temple)", icon: "🏛️", location: "Karnak", stayTime: "2h", leaveTime: "16:00", detail: "世界最大的宗教建築群。漫步在震撼的『多柱廳』(134根巨大石柱)中，並觀賞埃及最高的方尖碑。", tips: "尋找聖甲蟲雕像，逆時針繞著走七圈許下願望。", gmaps: "https://goo.gl/maps/karnak" },
+                  { time: "17:00", title: "🏠 抵達住宿 (路克索飯店)", icon: "🏨", location: "Luxor Hotel", stayTime: "-", leaveTime: "-", detail: "結束極度精采也耗體力的一天，入住路克索市區飯店休息。", tips: "", gmaps: "" }
+              ]
+            },
+            { day: 12, date: "1/28 (二)", title: "向東奔赴紅海：赫加達度假", desc: "驅車穿越東部沙漠", weather: "☀️", temp: "15-24°C", loc: "Hurghada",
+              events: [
+                  { time: "09:00", title: "離開路克索，穿越東部沙漠", icon: "🚙", location: "Eastern Desert Route", stayTime: "4h", leaveTime: "13:00", detail: "驅車前往紅海度假勝地赫加達。沿途欣賞壯麗且荒涼的東部山區與沙漠風光。", tips: "車程較長，中途會停靠休息站。", gmaps: "" },
+                  { time: "13:30", title: "抵達赫加達 & 告別導遊", icon: "👋", location: "Hurghada Resort", stayTime: "1h", leaveTime: "-", detail: "抵達紅海度假村。陪伴大家多日的專業導遊將在此與大家告別，接下來是屬於你們的自由度假時間。", tips: "請準備好導遊與司機的感謝小費 (建議以美金給付)。", gmaps: "" },
+                  { time: "15:00", title: "🏠 抵達住宿 (海濱渡假村)", icon: "🏖️", location: "Resort", stayTime: "-", leaveTime: "-", detail: "Check-in 享受全包式 (All-Inclusive) 或半包式渡假村設施。下午在私人沙灘躺椅上放空，或在無邊際泳池游泳。", tips: "全包式渡假村內的餐飲通常免費無限供應，盡情享受！", gmaps: "https://goo.gl/maps/hurghada" }
+              ]
+            },
+            { day: 13, date: "1/29 (三)", title: "紅海探索：與熱帶魚共舞", desc: "玻璃船/浮潛/沙灘放空", weather: "☀️", temp: "16-24°C", loc: "Red Sea",
+              events: [
+                  { time: "10:00", title: "紅海玻璃船與浮潛體驗", icon: "🚤", location: "Red Sea", stayTime: "3h", leaveTime: "13:00", detail: "搭乘底部透明的玻璃船駛入紅海，不下水也能欣賞清澈見底的珊瑚礁。也可選擇換上裝備直接跳入海中浮潛，與色彩斑斕的熱帶魚共游。", tips: "容易暈船者建議出發前一小時先吃暈船藥。記得帶飯店毛巾與防曬。", gmaps: "" },
+                  { time: "下午", title: "渡假村自由活動或沙漠 ATV", icon: "🍹", location: "Resort", stayTime: "-", leaveTime: "-", detail: "享受慵懶的午後。若覺得還不夠刺激，可向飯店報名自費的『沙漠四輪驅動車 (ATV) 飆沙行程』。", tips: "ATV行程風沙極大，務必配戴墨鏡與將頭包緊。", gmaps: "" },
+                  { time: "18:00", title: "🏠 抵達住宿 (海濱渡假村)", icon: "🛌", location: "Resort", stayTime: "-", leaveTime: "-", detail: "享用飯店豐盛的自助晚餐，晚上可在渡假村內的酒吧看表演。", tips: "", gmaps: "" }
+              ]
+            },
+            { day: 14, date: "1/30 (四)", title: "踏上歸途：揮別古文明", desc: "赫加達飛開羅/準備轉機", weather: "⛅", temp: "14-23°C", loc: "Transit",
+              events: [
+                  { time: "早上", title: "最後的紅海晨光", icon: "🌅", location: "Resort", stayTime: "-", leaveTime: "11:00", detail: "悠閒吃完早餐，做最後的行李打包，並辦理退房。", tips: "確認護照、貴重物品皆已收好。將多餘的埃鎊在機場買紀念品花掉。", gmaps: "" },
+                  { time: "11:30", title: "前往赫加達機場 (HRG)", icon: "🚐", location: "HRG Airport", stayTime: "-", leaveTime: "-", detail: "包車司機接送至赫加達機場。", tips: "", gmaps: "" },
+                  { time: "下午", title: "搭機返回開羅", icon: "✈️", location: "Flight", stayTime: "1h", leaveTime: "-", detail: "搭乘國內線班機(如 MS43)飛回開羅。抵達後提領行李，轉往國際線航廈準備報到。", tips: "", gmaps: "" },
+                  { time: "晚上", title: "🏠 機上過夜", icon: "💺", location: "Airplane", stayTime: "-", leaveTime: "-", detail: "搭乘國際線航班，帶著滿滿的回憶入睡。", tips: "", gmaps: "" }
+              ]
+            },
+            { day: 15, date: "1/31 (五)", title: "平安抵達：甜蜜的家", desc: "杜拜轉機/抵達台灣", weather: "⛅", temp: "台灣天氣", loc: "Taiwan",
+              events: [
+                  { time: "全天", title: "國際線轉機中", icon: "🔄", location: "Transit", stayTime: "-", leaveTime: "-", detail: "經杜拜等機場轉機回台。可在免稅店做最後的採買。", tips: "", gmaps: "" },
+                  { time: "預計下午/晚上", title: "🏠 抵達台灣桃園機場", icon: "🛬", location: "Taiwan", stayTime: "-", leaveTime: "-", detail: "順利通關，旅程圓滿結束。", tips: "別忘了把滿滿的照片整理好，跟旅伴們分享！", gmaps: "" }
+              ]
+            }
+        ];
+
+        const foodData = [
+            { name: "Abou Tarek", type: "小吃甜點", loc: "開羅", desc: "最著名的 Koshary 專賣店，國民美食必吃", map: "https://goo.gl/maps/aboutarek" },
+            { name: "Felfela", type: "中東/亞洲", loc: "開羅市區", desc: "傳統埃及料理，裝潢極具特色，推薦烤肉與豆泥", map: "#" },
+            { name: "9 Pyramids Lounge", type: "早午餐", loc: "吉薩金字塔區", desc: "坐在金字塔腳下喝咖啡吃早午餐，需預約", map: "#" },
+            { name: "Fish Market", type: "海鮮", loc: "亞歷山大", desc: "地中海畔新鮮現烤海鮮，風景絕佳", map: "#" },
+            { name: "Kadoura", type: "海鮮", loc: "亞歷山大", desc: "當地人愛去的平價海鮮餐廳", map: "#" },
+            { name: "Sofra Restaurant", type: "中東/亞洲", loc: "路克索", desc: "復古老屋內的道地埃及燉菜與烤餅", map: "#" },
+            { name: "Aswan Moon", type: "早午餐", loc: "亞斯文", desc: "尼羅河畔的悠閒餐廳，看夕陽的好去處", map: "#" },
+            { name: "Starfish Restaurant", type: "海鮮", loc: "赫加達", desc: "紅海新鮮漁獲，當地口碑極佳的海鮮餐廳", map: "#" }
+        ];
+
+        const packingCategories = [
+            { id: "docs", title: "📄 重要證件與文件", items: ["護照 (效期6個月以上)", "電子簽證紙本/截圖", "機票行程單", "美金/歐元現鈔", "信用卡 (開通海外刷卡)", "海外旅平險/不便險英文證明"] },
+            { id: "clothes", title: "👕 衣物與穿搭 (洋蔥式)", items: ["短袖/薄長袖T恤 (白天防曬)", "防風保暖外套/輕羽絨 (早晚溫差大)", "好走的運動鞋", "拖鞋/涼鞋 (沙漠與紅海用)", "遮陽帽 & 太陽眼鏡", "薄圍巾/頭巾 (防風沙/進清真寺)"] },
+            { id: "meds", title: "💊 藥品與個人保養", items: ["腸胃藥/止瀉藥 (極重要)", "感冒藥/退燒藥", "暈車/暈船藥", "高係數防曬乳", "護唇膏 & 保濕乳液 (氣候極乾)", "個人慣用藥物", "濕紙巾/乾洗手 (沙漠必備)"] },
+            { id: "tech", title: "🔌 電子產品與其他", items: ["萬用轉接頭 (雙圓孔 220V)", "行動電源", "相機/手機 & 充電線", "頸枕 & 眼罩 (長途車/機)", "旅行充氣頸枕", "隨身小包 (防扒手)"] }
+        ];
+
+        // ================= STATE & INIT =================
+        let currentView = 'dashboard';
+        let isDetailMode = true;
+        let map;
+        let chartInstance;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
+
+        function initApp() {
+            renderWeather();
+            renderItinerary();
+            renderDayButtons();
+            renderFoodGrid();
+            renderPackingList();
+            setupMobileMenu();
+            setupScrollSpy();
+            calculateDaysLeft();
+            
+            // Default to dashboard map & chart
+            setTimeout(() => {
+                initMap();
+                initChart();
+            }, 100);
+        }
+
+        function renderWeather() {
+            const container = document.getElementById('weatherScrollContainer');
+            container.innerHTML = itineraryData.map(day => `
+                <div onclick="jumpToDay(${day.day})" class="snap-start shrink-0 w-32 cursor-pointer bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl p-3 flex flex-col items-center justify-center transition-colors group shadow-sm">
+                    <span class="text-xs font-bold text-slate-500 group-hover:text-blue-600 mb-1">Day ${day.day}</span>
+                    <span class="text-3xl mb-1 filter drop-shadow-sm">${day.weather}</span>
+                    <span class="text-sm font-bold text-slate-700 truncate w-full text-center">${day.loc}</span>
+                    <span class="text-xs text-slate-500 font-mono mt-1">${day.temp}</span>
+                </div>
+            `).join('');
+        }
+
+        // ================= VIEW SWITCHING =================
+        function switchView(viewId) {
+            // Update Navigation active state
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === viewId) {
+                    btn.classList.add('text-egypt-nile', 'bg-blue-50', 'font-bold');
+                    btn.classList.remove('text-slate-600');
+                } else {
+                    btn.classList.remove('text-egypt-nile', 'bg-blue-50', 'font-bold');
+                    btn.classList.add('text-slate-600');
+                }
+            });
+
+            // Hide all sections, show target
+            document.querySelectorAll('.view-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            document.getElementById(`view-${viewId}`).classList.add('active');
+
+            // Handle Bottom Panel Visibility
+            const bottomPanel = document.getElementById('bottomPanel');
+            if (viewId === 'itinerary') {
+                bottomPanel.classList.remove('translate-y-full');
+            } else {
+                bottomPanel.classList.add('translate-y-full');
+            }
+
+            // Map and Chart resize fix when switching back to dashboard
+            if (viewId === 'dashboard') {
+                setTimeout(() => {
+                    if (map) map.invalidateSize();
+                    if (chartInstance) chartInstance.update();
+                }, 350);
+            }
+
+            currentView = viewId;
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            
+            // Close mobile menu if open
+            document.getElementById('mobileMenu').classList.add('hidden');
+        }
+
+        // ================= DASHBOARD LOGIC =================
+        function calculateDaysLeft() {
+            const targetDate = new Date('2025-01-17T00:00:00');
+            const today = new Date();
+            const diffTime = targetDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const el = document.getElementById('countdown');
+            if(diffDays > 0) {
+                el.innerText = `${diffDays} 天`;
+            } else if (diffDays === 0) {
+                el.innerText = "出發！";
+            } else {
+                el.innerText = "旅途愉快";
+            }
+        }
+
+        function initMap() {
+            if (map) return;
+            // Center roughly on Egypt
+            map = L.map('map').setView([26.8206, 30.8025], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 18
+            }).addTo(map);
+
+            const pins = [
+                { loc: [30.0444, 31.2357], name: "開羅 (金字塔/博物館)", day: 6 },
+                { loc: [31.2001, 29.9187], name: "亞歷山大 (地中海/遺跡)", day: 5 },
+                { loc: [28.3496, 28.8665], name: "黑白沙漠 (露營)", day: 3 },
+                { loc: [25.6872, 32.6396], name: "路克索 (帝王谷/熱氣球)", day: 11 },
+                { loc: [24.0889, 32.8998], name: "亞斯文 (菲萊神殿)", day: 7 },
+                { loc: [22.3372, 31.6258], name: "阿布辛貝 (雙神殿)", day: 9 },
+                { loc: [27.2579, 33.8116], name: "赫加達 (紅海度假)", day: 12 }
+            ];
+
+            // Custom Icon using inline SVG string via DivIcon
+            const pinIconHtml = `<div class="text-3xl filter drop-shadow-md transform -translate-x-1/2 -translate-y-full hover:scale-110 transition-transform">📍</div>`;
+            const customIcon = L.divIcon({ html: pinIconHtml, className: 'custom-pin', iconSize: [30, 30] });
+
+            pins.forEach(p => {
+                const marker = L.marker(p.loc, {icon: customIcon}).addTo(map);
+                marker.bindPopup(`
+                    <div class="text-center p-1">
+                        <div class="font-bold mb-2">${p.name}</div>
+                        <button onclick="jumpToDay(${p.day})" class="bg-egypt-nile text-white px-3 py-1 rounded text-sm w-full hover:bg-blue-700">查看行程細節 (Day ${p.day})</button>
+                    </div>
+                `);
+            });
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('intensityChart').getContext('2d');
+            
+            // Mock data for 15 days: Drive Time vs Play Time
+            const labels = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10', 'D11', 'D12', 'D13', 'D14', 'D15'];
+            const driveData = [12, 1, 6, 5, 4, 1, 3, 1, 7, 2, 1, 4, 0, 3, 14];
+            const playData =  [0,  4, 5, 4, 5, 6, 4, 6, 5, 4, 7, 2, 6, 1, 0];
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '車程/飛行 (時)', data: driveData, backgroundColor: '#cbd5e1', borderRadius: 4 },
+                        { label: '遊玩活動 (時)', data: playData, backgroundColor: '#f59e0b', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, beginAtZero: true, border: {display: false} }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } }
+                    }
+                }
+            });
+        }
+
+        // ================= ITINERARY LOGIC =================
+        function renderItinerary() {
+            const container = document.getElementById('itineraryContainer');
+            let html = ''; 
+
+            itineraryData.forEach(dayData => {
+                html += `
+                    <div id="day-${dayData.day}" class="pt-6 scroll-mt-24 mb-12">
+                        <!-- Day Header -->
+                        <div class="flex items-center gap-4 mb-6 sticky top-16 bg-slate-50/95 backdrop-blur z-30 py-3 border-b border-slate-200/50">
+                            <div class="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-egypt-nile to-blue-800 text-white rounded-2xl flex items-center justify-center font-black shadow-lg z-10 text-lg md:text-xl shrink-0">
+                                D${dayData.day}
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl md:text-2xl font-extrabold text-slate-800">${dayData.title}</h3>
+                                <p class="text-sm font-medium text-egypt-nile">${dayData.date} • ${dayData.desc}</p>
+                            </div>
+                        </div>
+
+                        <!-- Events List -->
+                        <div class="space-y-6 md:space-y-8 pr-2">
+                `;
+
+                dayData.events.forEach((event, idx) => {
+                    const isLast = idx === dayData.events.length - 1;
+                    const isHome = event.title.includes('🏠');
+                    const isFlight = event.icon.includes('✈️') || event.icon.includes('🛫');
+                    const cardBorder = isHome ? 'border-l-[6px] border-l-indigo-400' : (isFlight ? 'border-l-[6px] border-l-sky-400' : 'border-l-[6px] border-l-egypt-gold');
+
+                    html += `
+                        <div class="relative flex gap-3 md:gap-6 group">
+                            <!-- Time Column -->
+                            <div class="w-14 md:w-20 shrink-0 flex flex-col items-end pt-1">
+                                <span class="text-sm md:text-base font-bold text-slate-700">${event.time}</span>
+                                ${event.stayTime !== '-' ? `<span class="text-[10px] md:text-xs text-slate-500 font-mono mt-1 bg-slate-200/70 px-1.5 py-0.5 rounded border border-slate-300">⏳ ${event.stayTime}</span>` : ''}
+                            </div>
+
+                            <!-- Node & Line -->
+                            <div class="relative flex flex-col items-center shrink-0 w-4">
+                                <div class="w-4 h-4 rounded-full bg-white border-[3px] border-egypt-nile z-10 mt-1.5 shadow-sm group-hover:scale-125 transition-transform"></div>
+                                ${!isLast ? `<div class="absolute top-6 bottom-[-2rem] w-0.5 bg-slate-200 group-hover:bg-blue-300 transition-colors"></div>` : ''}
+                            </div>
+
+                            <!-- Content Card -->
+                            <div class="flex-1 bg-white rounded-xl shadow-sm border border-slate-100 ${cardBorder} p-4 md:p-5 hover:shadow-md transition-shadow">
+                                <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
+                                    <h4 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <span class="text-xl filter drop-shadow-sm">${event.icon}</span> ${event.title}
+                                    </h4>
+                                    <span class="text-[10px] md:text-xs font-medium bg-slate-100 text-slate-600 px-2 py-1 rounded-md flex items-center gap-1 border border-slate-200">📍 ${event.location}</span>
+                                </div>
+                                
+                                ${event.leaveTime !== '-' ? `<div class="text-[10px] md:text-xs text-rose-600 font-bold mb-3 font-mono bg-rose-50 inline-flex items-center px-2 py-1 rounded border border-rose-100">🚀 建議出發/離開: ${event.leaveTime}</div>` : ''}
+
+                                <!-- Detail Block (Togglable) -->
+                                <div class="detail-block space-y-3 mt-3">
+                                    ${event.detail ? `
+                                        <div class="text-sm text-slate-700 leading-relaxed bg-blue-50/50 p-3.5 rounded-lg border border-blue-100/60 shadow-sm">
+                                            <div class="font-bold text-blue-800 mb-1.5 flex items-center gap-1.5 text-xs">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 路線與細節
+                                            </div>
+                                            ${event.detail}
+                                        </div>
+                                    ` : ''}
+                                    ${event.tips ? `
+                                        <div class="text-sm text-amber-800 leading-relaxed bg-amber-50/70 p-3.5 rounded-lg border border-amber-200/60 flex gap-2.5 shadow-sm">
+                                            <div class="shrink-0 mt-0.5 text-base">💡</div>
+                                            <div>
+                                                <div class="font-bold text-amber-900 mb-0.5 text-xs">Tips & Food</div>
+                                                ${event.tips}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    ${event.gmaps ? `
+                                        <div class="mt-3">
+                                            <a href="${event.gmaps}" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-blue-500 hover:bg-blue-600 px-3.5 py-2 rounded-lg shadow-sm transition-transform hover:-translate-y-0.5">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                Google Maps 導航
+                                            </a>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`; // Close space-y-6 and day-div
+            });
+
+            container.innerHTML = html;
+        }
+
+        function toggleDetailMode() {
+            isDetailMode = !isDetailMode;
+            const container = document.getElementById('itineraryContainer');
+            const btn = document.getElementById('toggleDetailBtn');
+            const textL = document.getElementById('toggleDetailText');
+            const textS = document.getElementById('toggleDetailTextMobile');
+
+            if (isDetailMode) {
+                container.classList.remove('compact-mode');
+                btn.classList.remove('bg-slate-200', 'text-slate-600', 'border-slate-300');
+                btn.classList.add('bg-blue-100', 'text-blue-700', 'border-blue-200');
+                textL.innerText = '詳細模式';
+                textS.innerText = '詳細';
+            } else {
+                container.classList.add('compact-mode');
+                btn.classList.remove('bg-blue-100', 'text-blue-700', 'border-blue-200');
+                btn.classList.add('bg-slate-200', 'text-slate-600', 'border-slate-300');
+                textL.innerText = '簡潔模式';
+                textS.innerText = '簡潔';
+            }
+        }
+
+        function renderDayButtons() {
+            const container = document.getElementById('dayButtonsContainer');
+            let html = '';
+            for(let i = 1; i <= 15; i++) {
+                html += `<button onclick="scrollToDay(${i})" class="px-3 py-1.5 md:py-2 min-w-[3.5rem] text-center rounded-lg bg-white/60 hover:bg-white text-slate-700 font-medium text-sm border border-slate-200 shadow-sm transition-colors whitespace-nowrap">D${i}</button>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function scrollToDay(dayNum) {
+            const el = document.getElementById(`day-${dayNum}`);
+            if (el) {
+                // Adjust scroll position to account for sticky header
+                const y = el.getBoundingClientRect().top + window.scrollY - 100;
+                window.scrollTo({top: y, behavior: 'smooth'});
+            }
+        }
+
+        function jumpToDay(dayNum) {
+            switchView('itinerary');
+            setTimeout(() => {
+                scrollToDay(dayNum);
+            }, 350); // wait for view transition
+        }
+
+        // ================= FOOD MAP LOGIC =================
+        function renderFoodGrid(filter = '全部') {
+            const grid = document.getElementById('foodGrid');
+            const filterContainer = document.getElementById('foodFilters');
+            
+            // Render Filters
+            const types = ['全部', ...new Set(foodData.map(f => f.type))];
+            filterContainer.innerHTML = types.map(t => 
+                `<button onclick="renderFoodGrid('${t}')" class="px-4 py-2 rounded-full text-sm font-medium transition-colors border ${t === filter ? 'bg-egypt-nile text-white border-egypt-nile shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}">${t}</button>`
+            ).join('');
+
+            // Render Cards
+            const filteredData = filter === '全部' ? foodData : foodData.filter(f => f.type === filter);
+            grid.innerHTML = filteredData.map(f => `
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition-shadow flex flex-col h-full">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold px-2 py-1 bg-slate-100 text-slate-600 rounded">${f.type}</span>
+                        <span class="text-xs text-slate-400">📍 ${f.loc}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">${f.name}</h3>
+                    <p class="text-sm text-slate-500 mb-4 flex-1">${f.desc}</p>
+                    <a href="${f.map}" target="_blank" class="w-full block text-center bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 py-2 rounded-lg text-sm font-medium transition-colors">導航至餐廳</a>
+                </div>
+            `).join('');
+        }
+
+        // ================= TOOLS LOGIC =================
+        const RATE = 0.65; // 1 EGP = 0.65 TWD (Mock)
+        const RATE_AUD_TO_TWD = 21.0; // Mock rate for expense tracker if needed
+
+        function convertCurrency(source) {
+            const egpIn = document.getElementById('calcEgp');
+            const twdIn = document.getElementById('calcTwd');
+            if (source === 'egp') {
+                const val = parseFloat(egpIn.value);
+                twdIn.value = isNaN(val) ? '' : (val * RATE).toFixed(1);
+            } else {
+                const val = parseFloat(twdIn.value);
+                egpIn.value = isNaN(val) ? '' : (val / RATE).toFixed(1);
+            }
+        }
+
+        let expenses = [];
+        function addExpense() {
+            const nameIn = document.getElementById('expenseName');
+            const amtIn = document.getElementById('expenseAmount');
+            const name = nameIn.value.trim();
+            const amt = parseFloat(amtIn.value);
+
+            if (name && !isNaN(amt) && amt > 0) {
+                expenses.push({ id: Date.now(), name, amt });
+                nameIn.value = '';
+                amtIn.value = '';
+                updateExpenseUI();
+            }
+        }
+
+        function deleteExpense(id) {
+            expenses = expenses.filter(e => e.id !== id);
+            updateExpenseUI();
+        }
+
+        function updateExpenseUI() {
+            const list = document.getElementById('expenseList');
+            const totalF = document.getElementById('totalForeign');
+            const totalT = document.getElementById('totalTwd');
+
+            if (expenses.length === 0) {
+                list.innerHTML = '<li class="text-center text-slate-400 text-sm py-4">尚無記帳紀錄</li>';
+                totalF.innerText = '0.00';
+                totalT.innerText = 'NT$ 0';
+                return;
+            }
+
+            list.innerHTML = expenses.map(e => `
+                <li class="flex justify-between items-center bg-white p-2 rounded border border-slate-100 shadow-sm">
+                    <span class="text-sm text-slate-700 truncate flex-1">${e.name}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-mono text-slate-800">${e.amt.toFixed(2)}</span>
+                        <button onclick="deleteExpense(${e.id})" class="text-red-400 hover:text-red-600 p-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                </li>
+            `).join('');
+
+            const sum = expenses.reduce((acc, curr) => acc + curr.amt, 0);
+            totalF.innerText = sum.toFixed(2);
+            // Assuming the prompt requested AUD calculation to TWD (approx * 21)
+            totalT.innerText = `NT$ ${(sum * RATE_AUD_TO_TWD).toLocaleString('zh-TW', {maximumFractionDigits:0})}`; 
+        }
+
+        // ================= INFO LOGIC =================
+        function renderPackingList() {
+            const container = document.getElementById('packingList');
+            container.innerHTML = packingCategories.map((cat, i) => `
+                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    <button class="w-full px-4 py-3 bg-slate-50 flex justify-between items-center text-left hover:bg-slate-100 transition-colors" onclick="toggleAccordion('acc-${i}')">
+                        <span class="font-bold text-slate-700">${cat.title}</span>
+                        <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="icon-acc-${i}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="hidden px-4 py-3 bg-white border-t border-slate-100" id="acc-${i}">
+                        <div class="space-y-2">
+                            ${cat.items.map((item, j) => `
+                                <label class="flex items-center gap-2 cursor-pointer group">
+                                    <input type="checkbox" class="w-4 h-4 text-egypt-nile rounded border-slate-300 focus:ring-egypt-nile cursor-pointer">
+                                    <span class="text-sm text-slate-600 group-hover:text-slate-900">${item}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Open first one by default
+            toggleAccordion('acc-0');
+        }
+
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        // ================= UI HELPERS =================
+        function setupMobileMenu() {
+            const btn = document.getElementById('mobileMenuBtn');
+            const menu = document.getElementById('mobileMenu');
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+        }
+
+        function setupScrollSpy() {
+            const topNav = document.getElementById('topNav');
+            const backToTop = document.getElementById('backToTop');
+            
+            window.addEventListener('scroll', () => {
+                // Top Nav blur effect increase
+                if (window.scrollY > 20) {
+                    topNav.classList.add('shadow-md');
+                } else {
+                    topNav.classList.remove('shadow-md');
+                }
+
+                // Back to Top button
+                if (window.scrollY > 300) {
+                    backToTop.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
+                    backToTop.classList.add('opacity-100', 'translate-y-0');
+                } else {
+                    backToTop.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+                    backToTop.classList.remove('opacity-100', 'translate-y-0');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
