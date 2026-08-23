@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 釜山尊榮雙人 4日秋日漫遊 (無自駕)</title>
+    
+    <!-- External CSS Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- External JS Libraries -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Base Custom Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.25s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-300">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+                        <i class="fa-solid fa-plane-departure text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight text-slate-900 dark:text-white">釜山奢華雙人 4D3N</h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">2026.09.25 - 09.28 | CHECHI & HSIAOFAN</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Tabs -->
+                <nav class="hidden lg:flex space-x-1">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-slate-800 border border-sky-200 dark:border-sky-500/30">
+                        <i class="fa-solid fa-chart-pie mr-1.5"></i>儀表盤
+                    </button>
+                    <button onclick="switchTab('itinerary')" id="nav-itinerary" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent">
+                        <i class="fa-solid fa-calendar-days mr-1.5"></i>每日行程
+                    </button>
+                    <button onclick="switchTab('budget')" id="nav-budget" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent">
+                        <i class="fa-solid fa-wallet mr-1.5"></i>財務預算
+                    </button>
+                    <button onclick="switchTab('food')" id="nav-food" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent">
+                        <i class="fa-solid fa-utensils mr-1.5"></i>美食地圖
+                    </button>
+                    <button onclick="switchTab('logistics')" id="nav-logistics" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent">
+                        <i class="fa-solid fa-clipboard-list mr-1.5"></i>後勤與提醒
+                    </button>
+                </nav>
+
+                <!-- Actions & Mobile Menu Toggle -->
+                <div class="flex items-center space-x-2">
+                    <!-- Light / Dark Mode Toggle Button -->
+                    <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 text-slate-500 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="切換深色模式">
+                        <i class="fa-solid fa-moon text-lg"></i>
+                    </button>
+                    <!-- Mobile Hamburger Button -->
+                    <div class="lg:hidden">
+                        <button onclick="toggleMobileMenu()" class="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none transition-colors">
+                            <i class="fa-solid fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobileMenu" class="hidden lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center transition-colors">
+                <i class="fa-solid fa-chart-pie w-6 text-sky-500"></i> 儀表盤 Dashboard
+            </button>
+            <button onclick="switchTab('itinerary'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center transition-colors">
+                <i class="fa-solid fa-calendar-days w-6 text-sky-500"></i> 每日行程 Itinerary
+            </button>
+            <button onclick="switchTab('budget'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center transition-colors">
+                <i class="fa-solid fa-wallet w-6 text-sky-500"></i> 財務預算 Budget
+            </button>
+            <button onclick="switchTab('food'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center transition-colors">
+                <i class="fa-solid fa-utensils w-6 text-sky-500"></i> 美食地圖 Food Map
+            </button>
+            <button onclick="switchTab('logistics'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center transition-colors">
+                <i class="fa-solid fa-clipboard-list w-6 text-sky-500"></i> 後勤與提醒 Logistics & Tips
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- ==================== MODULE 1: DASHBOARD ==================== -->
+        <section id="dashboard" class="tab-content active space-y-6">
+            <!-- Key Metric Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:border-sky-300 dark:hover:border-sky-600 transition-all">
+                    <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">總天數 / 旅程類型</div>
+                    <div class="text-2xl font-bold text-slate-900 dark:text-white mt-1">4 天 3 夜</div>
+                    <div class="text-xs text-sky-600 dark:text-sky-400 mt-1"><i class="fa-solid fa-bus mr-1"></i>雙人大眾運輸/無自駕</div>
+                    <div class="absolute right-3 bottom-3 text-slate-100 dark:text-slate-700/30 text-4xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:border-emerald-300 dark:hover:border-emerald-600 transition-all">
+                    <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">預定總支出 (台幣)</div>
+                    <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">NT$ 54,963</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">機票 $32,239 + 住宿 $8,146 + 其他 $14,578</div>
+                    <div class="absolute right-3 bottom-3 text-slate-100 dark:text-slate-700/30 text-4xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-receipt"></i></div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:border-sky-300 dark:hover:border-sky-600 transition-all">
+                    <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">預估公共交通總里程</div>
+                    <div class="text-2xl font-bold text-sky-600 dark:text-sky-400 mt-1">~140 km</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">地下鐵 + 膠囊列車 + 計程車</div>
+                    <div class="absolute right-3 bottom-3 text-slate-100 dark:text-slate-700/30 text-4xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-route"></i></div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:border-indigo-300 dark:hover:border-indigo-600 transition-all">
+                    <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">住宿據點</div>
+                    <div class="text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-1 truncate">Gemstay 西面</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">752 Jungang-daero</div>
+                    <div class="absolute right-3 bottom-3 text-slate-100 dark:text-slate-700/30 text-4xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-hotel"></i></div>
+                </div>
+            </div>
+
+            <!-- Charts & Interactive Map Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Chart.js Bar Chart -->
+                <div class="lg:col-span-5 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-base font-semibold text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-chart-simple text-sky-500 dark:text-sky-400 mr-2"></i>每日活動強度 vs 交通時間
+                        </h2>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">單位：小時 / 步數預估</span>
+                    </div>
+                    <div class="relative h-64 w-full">
+                        <canvas id="intensityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Leaflet.js Interactive Map -->
+                <div class="lg:col-span-7 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm flex flex-col">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h2 class="text-base font-semibold text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-map-location-dot text-indigo-500 dark:text-indigo-400 mr-2"></i>釜山景點動態軌跡導覽
+                        </h2>
+                        <!-- Day Filter Buttons -->
+                        <div class="flex space-x-1 text-xs">
+                            <button onclick="filterMapDay(0)" class="map-day-btn px-3 py-1 rounded-full bg-sky-600 text-white font-medium shadow-sm transition-colors">全覽</button>
+                            <button onclick="filterMapDay(1)" class="map-day-btn px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Day 1</button>
+                            <button onclick="filterMapDay(2)" class="map-day-btn px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Day 2</button>
+                            <button onclick="filterMapDay(3)" class="map-day-btn px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Day 3</button>
+                            <button onclick="filterMapDay(4)" class="map-day-btn px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Day 4</button>
+                        </div>
+                    </div>
+                    <div id="busanMap" class="w-full h-72 rounded-lg border border-slate-200 dark:border-slate-700 z-10"></div>
+                </div>
+            </div>
+
+            <!-- Weather Card & Risk Matrix -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 9 Month Weather Card -->
+                <div class="lg:col-span-4 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-semibold text-slate-900 dark:text-white flex items-center">
+                                <i class="fa-solid fa-cloud-sun-rain text-amber-500 mr-2"></i>9 月下旬釜山氣候預報
+                            </h3>
+                            <span class="text-xs px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">秋初涼爽</span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">平均氣溫 18°C - 25°C，日夜溫差較大，海邊風大需備薄外衣。</p>
+                        
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700/50">
+                                <div class="text-[10px] text-slate-400">09/25 (五)</div>
+                                <i class="fa-solid fa-sun text-amber-500 my-1 text-sm"></i>
+                                <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">24°C</div>
+                            </div>
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700/50">
+                                <div class="text-[10px] text-slate-400">09/26 (六)</div>
+                                <i class="fa-solid fa-cloud-sun text-slate-400 my-1 text-sm"></i>
+                                <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">23°C</div>
+                            </div>
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700/50">
+                                <div class="text-[10px] text-slate-400">09/27 (日)</div>
+                                <i class="fa-solid fa-sun text-amber-500 my-1 text-sm"></i>
+                                <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">22°C</div>
+                            </div>
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700/50">
+                                <div class="text-[10px] text-slate-400">09/28 (一)</div>
+                                <i class="fa-solid fa-cloud text-slate-400 my-1 text-sm"></i>
+                                <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">21°C</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Management Matrix -->
+                <div class="lg:col-span-8 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm">
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center">
+                        <i class="fa-solid fa-shield-halved text-rose-500 mr-2"></i>行前風險管理與應變處置矩陣
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        <div class="p-3 bg-rose-50 dark:bg-slate-900/60 rounded-lg border-l-4 border-rose-400 dark:border-rose-500">
+                            <div class="font-semibold text-rose-700 dark:text-rose-300 mb-1"><i class="fa-solid fa-plane-circle-exclamation mr-1"></i>紅眼航班體力消耗 (02:50 出發)</div>
+                            <p class="text-slate-600 dark:text-slate-400">桃園飛金海僅 2.5 小時，睡眠極不足。抵達後先至西面飯店寄放行李，午後至 SPA Land 汗蒸幕放鬆休養。</p>
+                        </div>
+                        <div class="p-3 bg-amber-50 dark:bg-slate-900/60 rounded-lg border-l-4 border-amber-400 dark:border-amber-500">
+                            <div class="font-semibold text-amber-700 dark:text-amber-300 mb-1"><i class="fa-solid fa-train-subway mr-1"></i>膠囊列車/景點預約逾時</div>
+                            <p class="text-slate-600 dark:text-slate-400">海雲臺藍線公園熱門，務必提前 2 週間於官網預訂尾浦至青沙浦段，若逾時需現場排隊或搭乘海岸列車備案。</p>
+                        </div>
+                        <div class="p-3 bg-indigo-50 dark:bg-slate-900/60 rounded-lg border-l-4 border-indigo-400 dark:border-indigo-500">
+                            <div class="font-semibold text-indigo-700 dark:text-indigo-300 mb-1"><i class="fa-solid fa-key mr-1"></i>無人櫃檯飯店入住問題</div>
+                            <p class="text-slate-600 dark:text-slate-400">Gemstay 西面採用非面對面入住(簡訊/Email取密碼)，客服時間 09:00-23:00。抵達前需確定已取得門鎖密碼。</p>
+                        </div>
+                        <div class="p-3 bg-emerald-50 dark:bg-slate-900/60 rounded-lg border-l-4 border-emerald-400 dark:border-emerald-500">
+                            <div class="font-semibold text-emerald-700 dark:text-emerald-300 mb-1"><i class="fa-solid fa-credit-card mr-1"></i>無自駕交通與支付工具</div>
+                            <p class="text-slate-600 dark:text-slate-400">全行程強烈建議購買 Visit Busan Pass BIG3 並搭配 T-Money / Kakao T 叫車 (綁定信用卡) 以節省開支。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== MODULE 2: ITINERARY ==================== -->
+        <section id="itinerary" class="tab-content space-y-6">
+            <!-- Sticky Date Navigation & View Mode Switch -->
+            <div class="sticky top-16 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur py-3 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+                <!-- Day Filter Buttons -->
+                <div class="flex items-center space-x-2 overflow-x-auto pb-1 max-w-full hide-scroll">
+                    <button onclick="scrollToDay('day1')" class="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-sky-600 text-white shadow hover:bg-sky-500 whitespace-nowrap transition-colors">
+                        Day 1 (09/25 五)
+                    </button>
+                    <button onclick="scrollToDay('day2')" class="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 whitespace-nowrap transition-colors">
+                        Day 2 (09/26 六)
+                    </button>
+                    <button onclick="scrollToDay('day3')" class="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 whitespace-nowrap transition-colors">
+                        Day 3 (09/27 日)
+                    </button>
+                    <button onclick="scrollToDay('day4')" class="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 whitespace-nowrap transition-colors">
+                        Day 4 (09/28 一)
+                    </button>
+                </div>
+
+                <!-- Detailed vs Simplified Toggle -->
+                <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <button id="viewDetailBtn" onclick="setItineraryView('detail')" class="px-3 py-1 text-xs font-medium rounded-md bg-sky-600 text-white shadow-sm transition-colors">
+                        詳細 SOP 模式
+                    </button>
+                    <button id="viewSimpleBtn" onclick="setItineraryView('simple')" class="px-3 py-1 text-xs font-medium rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                        精簡模式
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vertical Timeline Container -->
+            <div id="timelineContainer" class="space-y-8">
+                <!-- Timeline items rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- ==================== MODULE 3: BUDGET ==================== -->
+        <section id="budget" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Currency Converter Card -->
+                <div class="lg:col-span-4 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm">
+                    <h2 class="text-base font-semibold text-slate-900 dark:text-white mb-3 flex items-center">
+                        <i class="fa-solid fa-calculator text-emerald-500 mr-2"></i>即時匯率換算器
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">預設參考匯率：1 TWD ≈ 41.5 KRW (0.0241)</p>
+                    
+                    <div class="space-y-4 text-xs">
+                        <div>
+                            <label class="block text-slate-600 dark:text-slate-400 font-medium mb-1">韓國韓元 (KRW ₩)</label>
+                            <input type="number" id="krwInput" oninput="convertCurrency('krw')" value="50000" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 font-mono text-sm">
+                        </div>
+                        <div class="flex justify-center my-1 text-slate-400">
+                            <i class="fa-solid fa-arrows-up-down"></i>
+                        </div>
+                        <div>
+                            <label class="block text-slate-600 dark:text-slate-400 font-medium mb-1">新台幣 (TWD $)</label>
+                            <input type="number" id="twdInput" oninput="convertCurrency('twd')" value="1205" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 font-mono text-sm">
+                        </div>
+                        <div class="p-3 bg-amber-50 dark:bg-slate-900/60 rounded-lg text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed border border-amber-100 dark:border-slate-700">
+                            <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i><strong>消費建議：</strong>建議使用 WOWPASS 儲值卡刷卡消費，並搭配 Visit Busan Pass 節省高額門票。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budget Donut Chart -->
+                <div class="lg:col-span-8 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-base font-semibold text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-chart-pie text-sky-600 dark:text-sky-400 mr-2"></i>預算結構分佈圖
+                        </h2>
+                        <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">總計約 NT$ 54,963 (雙人)</span>
+                    </div>
+                    <div class="relative h-60 w-full flex justify-center items-center">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visit Busan Pass Recommendation Card -->
+            <div class="bg-gradient-to-r from-sky-50 to-white dark:from-slate-800 dark:to-slate-900 border border-sky-200 dark:border-sky-500/40 rounded-xl p-5 shadow-lg relative overflow-hidden">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                    <h2 class="text-base font-semibold text-slate-900 dark:text-white flex items-center">
+                        <i class="fa-solid fa-ticket text-sky-600 dark:text-sky-400 mr-2"></i>Visit Busan Pass (VBP) 購買評估與建議
+                    </h2>
+                    <span class="text-xs px-2.5 py-1 rounded bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 font-bold border border-sky-200 dark:border-sky-500/30">
+                        ★ 強烈建議購買 BIG3 通票
+                    </span>
+                </div>
+                <div class="text-sm text-slate-600 dark:text-slate-300 space-y-3">
+                    <p>根據您目前的專屬行程（涵蓋松島纜車、Skyline Luge、Spa Land 汗蒸幕），<strong>強烈建議您購買 Visit Busan Pass BIG3 (任選3項)</strong>，每人售價 <span class="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">45,000 KRW</span>（約 NT$ 1,084）。開通後 180 天內有效，行程調度超級彈性！</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+                        <div class="bg-white/90 dark:bg-slate-950/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                            <div class="text-sky-600 dark:text-sky-400 font-semibold mb-1"><i class="fa-solid fa-cable-car mr-1"></i>設施一：松島海上纜車</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">原價 22,000 KRW (一般廂來回)。VBP 可免費兌換，若想升級水晶車廂可於現場補差額。</div>
+                        </div>
+                        <div class="bg-white/90 dark:bg-slate-950/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                            <div class="text-sky-600 dark:text-sky-400 font-semibold mb-1"><i class="fa-solid fa-cart-arrow-down mr-1"></i>設施二：Skyline Luge</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">原價 34,000 KRW。VBP 包含免費 2 趟滑車體驗 (含 Skyride 上山吊椅)。</div>
+                        </div>
+                        <div class="bg-white/90 dark:bg-slate-950/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                            <div class="text-sky-600 dark:text-sky-400 font-semibold mb-1"><i class="fa-solid fa-hot-tub-person mr-1"></i>設施三：Spa Land 汗蒸幕</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">原價 23,000 KRW。五星級放鬆聖地，VBP 享免費入場 4 小時。</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300">
+                        <div class="mr-3 text-2xl"><i class="fa-solid fa-piggy-bank"></i></div>
+                        <div class="text-xs leading-relaxed">
+                            <strong>省錢試算：</strong> 單獨購票總價約 <span class="line-through text-slate-400">79,000 KRW</span> ➔ 使用 BIG3 Pass 只要 <strong>45,000 KRW</strong>！<br>
+                            每人激省 34,000 KRW，雙人總計為您省下約 <span class="font-bold text-emerald-600 dark:text-emerald-400">NT$ 1,600</span> 旅遊預算。
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-amber-600 dark:text-amber-400 flex items-start">
+                        <i class="fa-solid fa-circle-exclamation mt-0.5 mr-1.5"></i>
+                        <span><strong>注意：</strong>海雲臺 Sky Capsule (膠囊列車) <span class="underline underline-offset-2">不包含</span>在 VBP 的免費範圍內，VBP 僅涵蓋底層的「海岸列車」。本行程維持搭乘膠囊列車，需另行於官網購票。</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Detailed Expense Table -->
+            <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm overflow-hidden">
+                <h2 class="text-base font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+                    <i class="fa-solid fa-list-check text-indigo-500 mr-2"></i>預算費用細項明細 (2位大人)
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left">
+                        <thead class="text-xs uppercase bg-slate-100 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+                            <tr>
+                                <th class="px-4 py-3">類別</th>
+                                <th class="px-4 py-3">項目說明</th>
+                                <th class="px-4 py-3">付款狀態</th>
+                                <th class="px-4 py-3 text-right">金額 (KRW)</th>
+                                <th class="px-4 py-3 text-right">金額 (TWD)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="budgetTableBody" class="divide-y divide-slate-200 dark:divide-slate-700">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== MODULE 4: FOOD MAP ==================== -->
+        <section id="food" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-700 pb-3">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-utensils text-sky-500 mr-2"></i>釜山美饌私房地圖
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">點擊卡片可直接導航 Google 地圖，亦可依區域快速篩選</p>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="flex flex-wrap gap-2 items-center text-xs">
+                        <button onclick="filterFood('all')" class="food-filter-btn px-3 py-1 rounded-full bg-sky-600 text-white font-medium shadow-sm transition-colors">全部地區</button>
+                        <button onclick="filterFood('西面')" class="food-filter-btn px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">西面 (Seomyeon)</button>
+                        <button onclick="filterFood('海雲臺')" class="food-filter-btn px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">海雲臺 (Haeundae)</button>
+                        <button onclick="filterFood('南浦洞')" class="food-filter-btn px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">南浦洞 (Nampo)</button>
+                    </div>
+                </div>
+
+                <!-- Food Cards Grid -->
+                <div id="foodGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== MODULE 5: LOGISTICS & TIPS ==================== -->
+        <section id="logistics" class="tab-content space-y-6">
+            <!-- First-time Korea Travel Warm Tips Card -->
+            <div class="bg-gradient-to-r from-amber-50/90 to-orange-50/90 dark:from-slate-800 dark:to-slate-900 border border-amber-200 dark:border-amber-500/30 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex items-center space-x-2 border-b border-amber-200/80 dark:border-amber-500/20 pb-3">
+                    <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-sm shadow">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900 dark:text-white">韓國初訪小白必看！新手溫馨指南與應變貼士</h2>
+                        <p class="text-xs text-amber-700 dark:text-amber-400">專為首次前往韓國自由行準備的實用懶人包</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-white/80 dark:bg-slate-900/60 p-3.5 rounded-lg border border-amber-100 dark:border-slate-800 space-y-1.5">
+                        <div class="font-bold text-slate-900 dark:text-white text-sm flex items-center text-amber-700 dark:text-amber-400">
+                            <i class="fa-solid fa-map-location-dot mr-1.5"></i>1. 導航請用 Naver / Kakao
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                            韓國因法規限制，<strong>Google Maps 在韓國無法進行步行或開車導航</strong>。請提前下載 <strong>Naver Map</strong> (支援中文) 或 KakaoMap，並搭配 <strong>Papago</strong> 翻譯 App 對照韓文地址。
+                        </p>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-slate-900/60 p-3.5 rounded-lg border border-amber-100 dark:border-slate-800 space-y-1.5">
+                        <div class="font-bold text-slate-900 dark:text-white text-sm flex items-center text-amber-700 dark:text-amber-400">
+                            <i class="fa-solid fa-credit-card mr-1.5"></i>2. 支付與 WOWPASS / T-Money
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                            韓國刷卡極為普及！推薦使用 <strong>WOWPASS 儲值卡</strong>（直接用台幣機台儲值，兼具信用卡與 T-Money 功能）。公車與地鐵搭乘均需預備 T-Money，並準備少量韓元現金用於傳統市場與小吃攤。
+                        </p>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-slate-900/60 p-3.5 rounded-lg border border-amber-100 dark:border-slate-800 space-y-1.5">
+                        <div class="font-bold text-slate-900 dark:text-white text-sm flex items-center text-amber-700 dark:text-amber-400">
+                            <i class="fa-solid fa-hand-holding-dollar mr-1.5"></i>3. 零小費與退稅 Tax Free
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                            韓國<strong>完全不需要給小費</strong>（餐廳與計程車按表付費即可）。購物標有 Tax Free 滿 15,000 韓元即可退稅，結帳出示護照可現場扣抵或至金海機場退稅機辦理。
+                        </p>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-slate-900/60 p-3.5 rounded-lg border border-amber-100 dark:border-slate-800 space-y-1.5">
+                        <div class="font-bold text-slate-900 dark:text-white text-sm flex items-center text-amber-700 dark:text-amber-400">
+                            <i class="fa-solid fa-plug mr-1.5"></i>4. 220V 插座與行動電源
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                            韓國插座為 <strong>220V 雙圓孔 (4.8mm 圓柱)</strong>，需攜帶轉接頭。行動電源<strong>嚴禁託運，必須放在隨身手提行李登機</strong>，容量不可超過航空公司規範。
+                        </p>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-slate-900/60 p-3.5 rounded-lg border border-amber-100 dark:border-slate-800 space-y-1.5">
+                        <div class="font-bold text-slate-900 dark:text-white text-sm flex items-center text-amber-700 dark:text-amber-400">
+                            <i class="fa-solid fa-train-subway mr-1.5"></i>5. 地鐵進出站方向確認
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                            釜山部分地鐵站月台未聯通（進錯閘門無法直接走對面），刷卡進站前<strong>請務必先確認標示方向</strong>。若刷錯可尋找「Help」按鈕聯繫站務員解鎖。
+                        </p>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-slate-900/60 p-3.5 rounded-lg border border-amber-100 dark:border-slate-800 space-y-1.5">
+                        <div class="font-bold text-slate-900 dark:text-white text-sm flex items-center text-amber-700 dark:text-amber-400">
+                            <i class="fa-solid fa-taxi mr-1.5"></i>6. Kakao T 叫車免語言障礙
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                            路邊攔計程車可能遇到語言不通，建議下載 <strong>Kakao T App</strong> 綁定信用卡直接輸入目的地叫車，車資透明且不需與司機溝通地址。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flight & Hotel Voucher Summary -->
+            <div class="space-y-4">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
+                    <i class="fa-solid fa-plane text-sky-500 mr-2"></i>航班與飯店憑證明細 (Agoda 已確認)
+                </h3>
+                
+                <!-- Flight Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Outbound -->
+                    <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm relative">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs px-2.5 py-1 rounded bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 font-semibold border border-sky-200 dark:border-sky-500/20">去程航班 7C 6154</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">濟州航空 Jeju Air</span>
+                        </div>
+                        <div class="flex items-center justify-between my-4">
+                            <div>
+                                <div class="text-xl font-bold text-slate-900 dark:text-white">02:50</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400">台北桃園 (TPE)</div>
+                                <div class="text-[10px] text-slate-400">2026/09/25 (五)</div>
+                            </div>
+                            <div class="text-center px-4">
+                                <div class="text-xs text-sky-600 dark:text-sky-400 font-medium">2 小時 20 分</div>
+                                <div class="w-24 h-0.5 bg-slate-300 dark:bg-slate-700 my-1 relative">
+                                    <i class="fa-solid fa-plane text-sky-500 text-xs absolute -top-1.5 left-1/2 -translate-x-1/2"></i>
+                                </div>
+                                <div class="text-[10px] text-slate-400">直飛 Economy</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xl font-bold text-slate-900 dark:text-white">06:10</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400">釜山金海 (PUS)</div>
+                                <div class="text-[10px] text-slate-400">2026/09/25 (五)</div>
+                            </div>
+                        </div>
+                        <div class="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between text-xs text-slate-500 dark:text-slate-400">
+                            <div><i class="fa-solid fa-suitcase mr-1"></i>託運行李：15 kg / 人</div>
+                            <div><i class="fa-solid fa-bag-shopping mr-1"></i>手提行李：10 kg / 人</div>
+                        </div>
+                    </div>
+
+                    <!-- Inbound -->
+                    <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm relative">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs px-2.5 py-1 rounded bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold border border-indigo-200 dark:border-indigo-500/20">回程航班 7C 6151</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">濟州航空 Jeju Air</span>
+                        </div>
+                        <div class="flex items-center justify-between my-4">
+                            <div>
+                                <div class="text-xl font-bold text-slate-900 dark:text-white">09:30</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400">釜山金海 (PUS)</div>
+                                <div class="text-[10px] text-slate-400">2026/09/28 (一)</div>
+                            </div>
+                            <div class="text-center px-4">
+                                <div class="text-xs text-indigo-600 dark:text-indigo-400 font-medium">2 小時 30 分</div>
+                                <div class="w-24 h-0.5 bg-slate-300 dark:bg-slate-700 my-1 relative">
+                                    <i class="fa-solid fa-plane text-indigo-500 text-xs absolute -top-1.5 left-1/2 -translate-x-1/2 rotate-180"></i>
+                                </div>
+                                <div class="text-[10px] text-slate-400">直飛 Economy</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xl font-bold text-slate-900 dark:text-white">11:00</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400">台北桃園 (TPE)</div>
+                                <div class="text-[10px] text-slate-400">2026/09/28 (一)</div>
+                            </div>
+                        </div>
+                        <div class="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between text-xs text-slate-500 dark:text-slate-400">
+                            <div><i class="fa-solid fa-suitcase mr-1"></i>CHECHI 加購至 25 kg</div>
+                            <div><i class="fa-solid fa-suitcase mr-1"></i>HSIAOFAN 15 kg</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hotel Booking Voucher Summary -->
+                <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-hotel text-emerald-500 text-xl"></i>
+                            <div>
+                                <h3 class="font-bold text-slate-900 dark:text-white text-base">Gemstay Seomyeon (젬스테이 서면)</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">訂單編號：1763899645 | City View Studio (1 間 / 3 晚)</p>
+                            </div>
+                        </div>
+                        <span class="text-xs px-2.5 py-1 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium border border-emerald-200 dark:border-emerald-500/20">預訂已確認</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg mb-4 border border-slate-200 dark:border-slate-700/50">
+                        <div>
+                            <span class="text-slate-400">入住時間：</span>
+                            <div class="text-slate-900 dark:text-white font-semibold mt-0.5">2026/09/25 (五) 16:00 後</div>
+                        </div>
+                        <div>
+                            <span class="text-slate-400">退房時間：</span>
+                            <div class="text-slate-900 dark:text-white font-semibold mt-0.5">2026/09/28 (一) 11:00 前</div>
+                        </div>
+                        <div>
+                            <span class="text-slate-400">飯店地址：</span>
+                            <div class="text-slate-900 dark:text-white font-semibold mt-0.5">752, Jungang-daero, Busanjin-gu, Busan</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+                        <div class="flex items-center"><i class="fa-solid fa-circle-info text-sky-500 w-5"></i><strong>入住方式：</strong>採「非面對面入住/退房」，行動櫃檯營業時間 09:00 - 23:00。</div>
+                        <div class="flex items-center"><i class="fa-solid fa-phone text-emerald-500 w-5"></i><strong>聯絡電話：</strong>+82 10-7658-5224 / 信箱: help@gemstay.co.kr</div>
+                        <div class="flex items-center"><i class="fa-solid fa-ban text-rose-500 w-5"></i><strong>注意事項：</strong>全館禁菸（違者罰 150,000 韓元），住宿期間無每日清潔服務。</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Packing Checklist Section -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4 shadow-sm">
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-900 dark:text-white">出國行李整備進度</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">點擊核取方塊完成準備，數據將儲存於瀏覽器。</p>
+                    </div>
+                    <div class="text-right">
+                        <span id="checklistProgressText" class="text-lg font-bold text-sky-600 dark:text-sky-400">0%</span>
+                        <div class="w-28 h-2 bg-slate-200 dark:bg-slate-700 rounded-full mt-1 overflow-hidden">
+                            <div id="checklistProgressBar" class="h-full bg-sky-500 w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="checklistContainer">
+                    <!-- Dynamic Checklist Rendering -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-4 text-center text-xs text-slate-500 transition-colors duration-300">
+        <p>© 2026 釜山奢華 4D3N 特製行程 SPA | 專屬旅程規劃師為您服務</p>
+    </footer>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        const appData = {
+            exchangeRate: 41.5, // 1 TWD = 41.5 KRW
+            itinerary: [
+                {
+                    day: 1,
+                    date: "2026-09-25",
+                    week: "星期五",
+                    title: "紅眼啟航 ✕ 海景膠囊列車與自嘲熊尋寶",
+                    intensity: 4,
+                    transitHours: 2.5,
+                    items: [
+                        {
+                            time: "02:50 - 06:10",
+                            title: "桃園機場 (TPE) 飛往 釜山金海機場 (PUS)",
+                            icon: "fa-plane-departure",
+                            colorClass: "sky",
+                            location: "金海國際機場",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Gimhae+International+Airport",
+                            sop: "搭乘濟州航空 7C 6154。請於 23:50 (09/24) 前抵達 Terminal 1 辦理報到，出示護照與電子機票。",
+                            risk: "紅眼航班體力消耗大，飛機上請戴上眼罩與頸枕儘量休息。"
+                        },
+                        {
+                            time: "06:30 - 07:30",
+                            title: "機場通關 ➔ 輕軌/地鐵前往西面 Gemstay",
+                            icon: "fa-train-subway",
+                            colorClass: "indigo",
+                            location: "Gemstay Seomyeon",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Gemstay+Seomyeon",
+                            sop: "搭乘釜山金海輕軌至「沙上站」，轉乘地鐵 2 號線至「西面站」。利用 T-Money 或 WOWPASS 進站。",
+                            risk: "清晨拖行李時請注意地鐵站出口是否有電梯/手扶梯 (西面站出口較多)。"
+                        },
+                        {
+                            time: "08:00 - 09:30",
+                            title: "早餐：松亭3代豬肉湯飯 (Songjeong 3-dae)",
+                            icon: "fa-utensils",
+                            colorClass: "amber",
+                            location: "西面豬肉湯飯街",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Songjeong+3-dae+Gukbap+Busan",
+                            sop: "位於西面美食街，米其林推薦老店。推薦點「豬肉湯飯」與「白肉定食」，湯頭濃郁可自行加蝦醬調味。",
+                            risk: "早晨排隊時間約 10-15 分鐘，可先將大行李寄存於 Gemstay 行動櫃檯專區。"
+                        },
+                        {
+                            time: "10:30 - 13:00",
+                            title: "海雲臺 Sky Capsule 膠囊列車 (尾浦➔青沙浦)",
+                            icon: "fa-train-tram",
+                            colorClass: "emerald",
+                            location: "海雲臺藍線公園 尾浦站",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Haeundae+Blueline+Park+Mipo+Station",
+                            sop: "必須提前 2 週間於官網預訂尾浦(Mipo)開往青沙浦(Cheongsapo)的高架膠囊列車。沿海景緻絕佳。",
+                            risk: "務必提前 15 分鐘抵達車站，逾時票券失效。注意：此項不包含於 Visit Busan Pass 內！需提前買票。"
+                        },
+                        {
+                            time: "13:00 - 14:30",
+                            title: "午餐：青沙浦秀敏家烤貝 (Cheongsapo Suminine)",
+                            icon: "fa-utensils",
+                            colorClass: "amber",
+                            location: "青沙浦海岸",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Suminine+Cheongsapo",
+                            sop: "青沙浦超人氣海鮮烤貝店，推薦綜合烤貝類與海鮮拉麵，搭特製醬汁與起司極度美味。",
+                            risk: "海鮮烤盤溫度極高，夾取時請小心燙傷。"
+                        },
+                        {
+                            time: "16:00 - 17:30",
+                            title: "Gemstay 西面飯店 Self Check-in",
+                            icon: "fa-hotel",
+                            colorClass: "purple",
+                            location: "Gemstay Seomyeon Room",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Gemstay+Seomyeon",
+                            sop: "下午 16:00 後開放非面對面入住。開啟 Email 接收門鎖密碼輸入進房，稍作休息煥發精神。",
+                            risk: "若未收到密碼簡訊，可使用客服 +821076585224 聯繫。"
+                        },
+                        {
+                            time: "18:30 - 21:00",
+                            title: "晚餐：味贊王鹽烤肉 & 西面商圈漫步 (自嘲熊探店)",
+                            icon: "fa-fire-burner",
+                            colorClass: "rose",
+                            location: "味贊王鹽烤肉 西面店",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Matchandeul+Wangsoek-gumi+Seomyeon",
+                            sop: "3.5cm 厚切熟成豬五花，由專業店員專人代烤。飯後逛西面地下街、NC 百貨，並強烈建議至附近 Artbox 或 SPAO 尋找超萌「自嘲熊 (Joke Bear / 自分ツッコミくま)」周邊。",
+                            risk: "晚間用餐高峰期需於現場機器抽號碼牌等待。"
+                        }
+                    ]
+                },
+                {
+                    day: 2,
+                    date: "2026-09-26",
+                    week: "星期六",
+                    title: "人文色彩 ✕ ARTE MUSEUM 光影藝術與廣安里無人機秀",
+                    intensity: 3.5,
+                    transitHours: 2.2,
+                    items: [
+                        {
+                            time: "09:30 - 11:30",
+                            title: "甘川洞文化村 (Gamcheon Culture Village)",
+                            icon: "fa-camera-retro",
+                            colorClass: "emerald",
+                            location: "甘川洞文化村",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Gamcheon+Culture+Village",
+                            sop: "從西面搭地鐵至土城站，轉乘社區小巴士 (沙下1-1或西區2) 上山。必拍「小王子與沙漠狐狸」合照點。",
+                            risk: "地形多坡道階梯，請務必穿著舒適運動鞋。"
+                        },
+                        {
+                            time: "12:00 - 13:30",
+                            title: "午餐：札嘎其市場鮮魚 / 扎嘎其海鮮大排檔",
+                            icon: "fa-fish",
+                            colorClass: "amber",
+                            location: "札嘎其水產市場",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Jagalchi+Market",
+                            sop: "體驗韓國最大漁港風情，可於一樓挑選新鮮帝王蟹/刺身，二樓代客料理。",
+                            risk: "購買海鮮前請先確定料理費與人頭費細節。"
+                        },
+                        {
+                            time: "13:40 - 15:30",
+                            title: "釜山 ARTE MUSEUM (影島沉浸式光影美術館)",
+                            icon: "fa-palette",
+                            colorClass: "indigo",
+                            location: "Arte Museum Busan",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Arte+Museum+Busan",
+                            sop: "【全新頂級室內景點】位於影島區，全球最大沉浸式數位藝術展覽館。體驗極致震撼光影、瀑布與海浪藝術展示，完全不受戶外天氣與暑氣影響。",
+                            risk: "館內光線較暗，拍照時請留心腳步。展館內可持 Visit Busan Pass 享有購票優惠或特價體驗。"
+                        },
+                        {
+                            time: "16:00 - 17:30",
+                            title: "松島海上纜車 (Songdo Marine Cable Car)",
+                            icon: "fa-cable-car",
+                            colorClass: "sky",
+                            location: "松島灣站",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Songdo+Marine+Cable+Car",
+                            sop: "出示 Visit Busan Pass 免費兌換一般車廂來回票，跨越松島海峽，抵達對岸岩南公園漫步天空步道。",
+                            risk: "海邊強風可能導致纜車輕微搖晃。若想升級水晶車廂(透明底板)需於現場補差價。"
+                        },
+                        {
+                            time: "18:00 - 19:30",
+                            title: "BIFF 廣場黑糖餅 ➔ 龍頭山公園釜山塔夕陽",
+                            icon: "fa-monument",
+                            colorClass: "purple",
+                            location: "龍頭山公園",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Yongdusan+Park",
+                            sop: "品嚐 BIFF 廣場名物「堅果黑糖餅 (Hotteok)」，搭乘手扶梯登上龍頭山公園俯瞰釜山港夜景。",
+                            risk: "週末人潮較多，隨身貴重物品請妥善保管。"
+                        },
+                        {
+                            time: "20:00 - 21:30",
+                            title: "廣安里海灘 (Gwangalli) ✕ 星期六無人機燈光秀",
+                            icon: "fa-icons",
+                            colorClass: "indigo",
+                            location: "廣安里海水浴場",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Gwangalli+Beach",
+                            sop: "週六晚上 20:00/22:00 各有一場約 10 分鐘的無人機展演。於沙灘邊喝精釀啤酒邊欣賞廣安大橋夜景。",
+                            risk: "燈光秀時間可能因強風延後或取消，請留意現場廣播。"
+                        }
+                    ]
+                },
+                {
+                    day: 3,
+                    date: "2026-09-27",
+                    week: "星期日",
+                    title: "絕美海邊古剎 ✕ 刺激斜坡滑車與奢華放鬆",
+                    intensity: 3.8,
+                    transitHours: 2.2,
+                    items: [
+                        {
+                            time: "09:00 - 11:30",
+                            title: "海東龍宮寺 (Haedong Yonggungsa)",
+                            icon: "fa-gopuram",
+                            colorClass: "emerald",
+                            location: "海東龍宮寺",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Haedong+Yonggungsa+Temple",
+                            sop: "韓國唯一建於海邊岩石上的古剎。沿著 108 階梯向下，可欣賞太平洋絕壁壯麗景觀。",
+                            risk: "晨間參拜旅客較多，陽光較強請做好防曬。"
+                        },
+                        {
+                            time: "12:00 - 14:00",
+                            title: "Skyline Luge 釜山斜坡滑車",
+                            icon: "fa-cart-arrow-down",
+                            colorClass: "sky",
+                            location: "Skyline Luge Busan",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Skyline+Luge+Busan",
+                            sop: "離龍宮寺很近。出示 Visit Busan Pass 兌換 2 趟免費滑車。先搭乘 Skyride 吊椅上山，再享受刺激滑坡！",
+                            risk: "注意防曬，基於安全禁止穿著易勾到的長裙或無跟拖鞋，並務必戴好現場提供之安全帽。"
+                        },
+                        {
+                            time: "14:30 - 17:30",
+                            title: "新世界 Centum City ✕ Spa Land 汗蒸幕饗宴",
+                            icon: "fa-hot-tub-person",
+                            colorClass: "purple",
+                            location: "Spa Land Centum City",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Spa+Land+Centum+City",
+                            sop: "【五星級頂級室內放鬆體驗】擁有 22 個天然溫泉池與 13 種主題汗蒸房。出示 VBP 免費入場 4 小時。",
+                            risk: "入場需脫鞋並換上專用服裝，館內消費均用手環刷卡，出場時統一結帳。"
+                        },
+                        {
+                            time: "17:30 - 19:30",
+                            title: "Centum City 購物 & 自嘲熊 (Joke Bear) 尋寶",
+                            icon: "fa-bag-shopping",
+                            colorClass: "pink",
+                            location: "Shinsegae Centum City",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Shinsegae+Centum+City",
+                            sop: "逛金氏世界紀錄最大的新世界百貨公司（頂級室內商場）。務必前往 B2F Hyper Ground 或館內 SPAO 尋找超萌「自嘲熊 (Joke Bear / 自分ツッコミくま)」的周邊與聯名服飾，結束後可至 APEC 納魯公園散步。",
+                            risk: "退稅服務可在百貨內指定櫃檯直接辦理。"
+                        },
+                        {
+                            time: "19:30 - 21:00",
+                            title: "The Bay 101 摩天大樓夜景 ✕ 海鮮晚餐",
+                            icon: "fa-champagne-glasses",
+                            colorClass: "rose",
+                            location: "The Bay 101",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=The+Bay+101",
+                            sop: "欣賞 Marine City 高樓大廈反射於水面的倒影。推薦於 Fingers & Chat 享用炸魚薯條與啤酒。",
+                            risk: "夜間海風較大，記得穿著薄外衣。"
+                        }
+                    ]
+                },
+                {
+                    day: 4,
+                    date: "2026-09-28",
+                    week: "星期一",
+                    title: "溫馨滿載 ✕ 歸途返臺",
+                    intensity: 2,
+                    transitHours: 2.0,
+                    items: [
+                        {
+                            time: "06:30 - 07:00",
+                            title: "Gemstay 西面 Check-out 退房",
+                            icon: "fa-door-open",
+                            colorClass: "purple",
+                            location: "Gemstay Seomyeon",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Gemstay+Seomyeon",
+                            sop: "請於上午 11:00 前辦理退房，關閉房內所有電源並確認門鎖歸位。無需至櫃檯手續。",
+                            risk: "檢查房內勿遺留手機充電器、護照或買好的伴手禮。"
+                        },
+                        {
+                            time: "07:00 - 08:00",
+                            title: "地鐵/Kakao T 計程車前往金海國際機場",
+                            icon: "fa-taxi",
+                            colorClass: "indigo",
+                            location: "金海國際機場",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Gimhae+International+Airport",
+                            sop: "建議使用 Kakao T 叫計程車(約 25-30 分鐘，車資約 18,000 韓元)，或搭地鐵 2 號線至沙上轉乘輕軌。",
+                            risk: "早晨尖峰時段道路可能微塞，請提早出發。"
+                        },
+                        {
+                            time: "09:30 - 11:00",
+                            title: "釜山金海 (PUS) 飛往 台北桃園 (TPE)",
+                            icon: "fa-plane-arrival",
+                            colorClass: "sky",
+                            location: "桃園國際機場",
+                            gmap: "https://www.google.com/maps/search/?api=1&query=Taiwan+Taoyuan+International+Airport",
+                            sop: "搭乘濟州航空 7C 6151 返臺。滿載美麗回憶平安抵達桃園機場。",
+                            risk: "CHECHI 託運行李額度 25kg，HSIAOFAN 15kg，請注意勿超重。"
+                        }
+                    ]
+                }
+            ],
+            mapPoints: [
+                { id: "gemstay", day: 0, lat: 35.1580, lng: 129.0596, title: "Gemstay 西面飯店", desc: "住宿據點 (西面站 752 Jungang-daero)" },
+                { id: "mipo", day: 1, lat: 35.1598, lng: 129.1710, title: "海雲臺藍線公園 尾浦站", desc: "Day 1 膠囊列車起點" },
+                { id: "cheongsapo", day: 1, lat: 35.1615, lng: 129.1918, title: "青沙浦秀敏家烤貝", desc: "Day 1 午餐與海岸散步" },
+                { id: "gamcheon", day: 2, lat: 35.0975, lng: 129.0106, title: "甘川洞文化村", desc: "Day 2 小王子彩色小屋" },
+                { id: "artemuseum", day: 2, lat: 35.0786, lng: 129.0652, title: "釜山 ARTE MUSEUM", desc: "Day 2 全球最大沉浸式數位藝術館" },
+                { id: "songdo", day: 2, lat: 35.0762, lng: 129.0232, title: "松島海上纜車", desc: "Day 2 水晶車廂絕景" },
+                { id: "gwangalli", day: 2, lat: 35.1532, lng: 129.1189, title: "廣安里海水浴場", desc: "Day 2 週六無人機燈光秀" },
+                { id: "yonggungsa", day: 3, lat: 35.1884, lng: 129.2233, title: "海東龍宮寺", desc: "Day 3 海邊崖壁古剎" },
+                { id: "luge", day: 3, lat: 35.1963, lng: 129.2125, title: "Skyline Luge 釜山", desc: "Day 3 刺激斜坡滑車與吊椅體驗" },
+                { id: "spaland", day: 3, lat: 35.1690, lng: 129.1292, title: "新世界 Spa Land & 購物", desc: "Day 3 汗蒸幕放鬆與 B2F 尋找自嘲熊" }
+            ],
+            budgetItems: [
+                { category: "機票", item: "濟州航空 來回機票 (雙人含行李)", paid: true, krw: 1337930, twd: 32239 },
+                { category: "住宿", item: "Gemstay 西面 City View Studio (3晚)", paid: true, krw: 338076, twd: 8146 },
+                { category: "交通", item: "T-Money 加值 & 幾趟 Kakao T 計程車", paid: false, krw: 80000, twd: 1928 },
+                { category: "票券", item: "Visit Busan Pass BIG3 (雙人)", paid: false, krw: 90000, twd: 2169 },
+                { category: "票券", item: "海雲臺 Sky Capsule 膠囊列車 (雙人單程)", paid: false, krw: 35000, twd: 843 },
+                { category: "餐飲", item: "烤貝、烤肉、湯飯、海鮮與咖啡廳美食預算", paid: false, krw: 250000, twd: 6024 },
+                { category: "購物", item: "自嘲熊周邊、伴手禮、美妝準備金", paid: false, krw: 150000, twd: 3614 }
+            ],
+            restaurants: [
+                { name: "松亭3代豬肉湯飯", district: "西面", tag: "豬肉湯飯", desc: "濃郁白湯配上特製蝦醬與嫩豬肉片，西面 24hr 經典名店。", gmap: "https://www.google.com/maps/search/?api=1&query=Songjeong+3-dae+Gukbap" },
+                { name: "味贊王鹽烤肉", district: "西面", tag: "韓式烤肉", desc: "3.5cm 厚切熟成豬五花，全程專人桌邊服務烤至外酥內嫩。", gmap: "https://www.google.com/maps/search/?api=1&query=Matchandeul+Wangsoek-gumi+Seomyeon" },
+                { name: "秀敏家烤貝 (Suminine)", district: "海雲臺", tag: "海鮮烤物", desc: "青沙浦海岸線最狂烤貝，奶油起司特調醬汁堪稱一絕。", gmap: "https://www.google.com/maps/search/?api=1&query=Suminine+Cheongsapo" },
+                { name: "札嘎其海鮮市場大排檔", district: "南浦洞", tag: "海鮮刺身", desc: "現場現挑現做生魚片、烤鮑魚與帝王蟹，尚青的漁港風味。", gmap: "https://www.google.com/maps/search/?api=1&query=Jagalchi+Market" },
+                { name: "海雲臺元祖割肉小吃 (Hotteok)", district: "南浦洞", tag: "小吃甜點", desc: "BIFF 廣場排隊名物，黑糖煎餅包覆滿滿黑芝麻與堅果碎。", gmap: "https://www.google.com/maps/search/?api=1&query=BIFF+Square+Hotteok" },
+                { name: "The Bay 101 Fingers & Chat", district: "海雲臺", tag: "餐酒館", desc: "炸魚薯條搭精釀啤酒，伴隨 Marine City 豪宅璀璨夜景。", gmap: "https://www.google.com/maps/search/?api=1&query=The+Bay+101" }
+            ],
+            packingList: [
+                { category: "重要證件", items: ["護照 (有效期限6個月以上)", "電子機票 (Agoda憑證)", "飯店預訂確認單", "VBP BIG3 通票 QR Code 或實體卡"] },
+                { category: "電子產品", items: ["手機 & 韓國 4G/5G eSIM", "韓國轉接頭 (4.8mm圓孔)", "行動電源 (需隨身攜帶登機)", "充電線 & 萬用變壓器"] },
+                { category: "個人衣物", items: ["秋季保暖薄外衣/風衣", "舒適走路鞋/運動鞋", "SPA Land 盥洗用品備品", "個人保養品與防曬乳"] }
+            ]
+        };
+
+        let leafMap = null;
+        let mapMarkers = [];
+        let viewMode = 'detail';
+        let checkedItems = {};
+
+        try {
+            checkedItems = JSON.parse(localStorage.getItem('busan_checklist') || '{}');
+        } catch (e) {
+            console.warn("localStorage 不可用，跳過儲存。");
+        }
+
+        window.onload = function() {
+            try {
+                initIntensityChart();
+                initBudgetChart();
+                initLeafletMap();
+                renderItinerary();
+                renderBudgetTable();
+                renderFoodGrid();
+                renderChecklist();
+            } catch (err) {
+                console.error("Initialization error:", err);
+            }
+        };
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = document.querySelector('#themeToggleBtn i');
+            if (isDark) {
+                icon.className = 'fa-solid fa-sun text-lg text-amber-400';
+                document.getElementById('themeToggleBtn').title = '切換淺色模式';
+            } else {
+                icon.className = 'fa-solid fa-moon text-lg';
+                document.getElementById('themeToggleBtn').title = '切換深色模式';
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent";
+            });
+
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) targetTab.classList.add('active');
+
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold transition-all text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-slate-800 border border-sky-200 dark:border-sky-500/30";
+            }
+
+            if (tabId === 'dashboard' && leafMap) {
+                setTimeout(() => leafMap.invalidateSize(), 200);
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function initIntensityChart() {
+            const ctx = document.getElementById('intensityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Day 1 (09/25)', 'Day 2 (09/26)', 'Day 3 (09/27)', 'Day 4 (09/28)'],
+                    datasets: [
+                        {
+                            label: '活動強度 (分)',
+                            data: [85, 80, 80, 30],
+                            backgroundColor: 'rgba(14, 165, 233, 0.7)',
+                            borderColor: '#0ea5e9',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        },
+                        {
+                            label: '交通時間 (小時)',
+                            data: [2.5, 2.2, 2.2, 2.0],
+                            backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                            borderColor: '#6366f1',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { display: false } },
+                        y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(148, 163, 184, 0.15)' } },
+                        y1: { position: 'right', ticks: { color: '#818cf8' }, grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#64748b', font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        function initBudgetChart() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['機票 (Agoda)', '飯店 (Agoda)', '預估交通費', 'VBP BIG3 通票', '膠囊列車', '餐飲預算', '購物伴手禮'],
+                    datasets: [{
+                        data: [32239, 8146, 1928, 2169, 843, 6024, 3614],
+                        backgroundColor: ['#0ea5e9', '#10b981', '#6366f1', '#f59e0b', '#ec4899', '#f43f5e', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: '#64748b', font: { size: 11 }, boxWidth: 12 } }
+                    }
+                }
+            });
+        }
+
+        function initLeafletMap() {
+            leafMap = L.map('busanMap').setView([35.1580, 129.0800], 11);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(leafMap);
+
+            appData.mapPoints.forEach(pt => {
+                const marker = L.marker([pt.lat, pt.lng]).addTo(leafMap);
+                marker.bindPopup(`
+                    <div class="p-1">
+                        <strong class="text-sky-600 dark:text-sky-400 font-bold text-sm">${pt.title}</strong>
+                        <p class="text-xs text-slate-500 dark:text-slate-300 mt-1">${pt.desc}</p>
+                    </div>
+                `);
+                mapMarkers.push({ marker, day: pt.day, lat: pt.lat, lng: pt.lng });
+            });
+        }
+
+        function filterMapDay(day) {
+            const btns = document.querySelectorAll('.map-day-btn');
+            btns.forEach((btn, idx) => {
+                btn.className = (idx === day) 
+                    ? "map-day-btn px-3 py-1 rounded-full bg-sky-600 text-white font-medium shadow-sm transition-colors" 
+                    : "map-day-btn px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors";
+            });
+
+            if (day === 0) {
+                leafMap.setView([35.1580, 129.0800], 11);
+                mapMarkers.forEach(m => m.marker.addTo(leafMap));
+            } else {
+                const targetPoints = mapMarkers.filter(m => m.day === day || m.day === 0);
+                mapMarkers.forEach(m => {
+                    if (m.day === day || m.day === 0) m.marker.addTo(leafMap);
+                    else leafMap.removeLayer(m.marker);
+                });
+                if (targetPoints.length > 0) {
+                    leafMap.setView([targetPoints[0].lat, targetPoints[0].lng], 12);
+                }
+            }
+        }
+
+        function renderItinerary() {
+            const container = document.getElementById('timelineContainer');
+            container.innerHTML = '';
+
+            appData.itinerary.forEach(dayObj => {
+                const dayEl = document.createElement('div');
+                dayEl.id = `day${dayObj.day}`;
+                dayEl.className = "bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm space-y-4";
+
+                let itemsHTML = '';
+                dayObj.items.forEach(item => {
+                    itemsHTML += `
+                        <div class="relative group">
+                            <!-- Bullet Icon -->
+                            <div class="absolute -left-[31px] top-0.5 w-6 h-6 rounded-full bg-white dark:bg-slate-900 border-2 border-sky-500 flex items-center justify-center text-[10px] text-sky-600 dark:text-sky-400 shadow-sm">
+                                <i class="fa-solid ${item.icon}"></i>
+                            </div>
+
+                            <!-- Content Card -->
+                            <div class="bg-slate-50 dark:bg-slate-900/60 rounded-lg p-3.5 border border-slate-200 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600 transition-all shadow-sm">
+                                <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                                    <span class="text-xs font-semibold text-sky-600 dark:text-sky-400 font-mono"><i class="fa-regular fa-clock mr-1"></i>${item.time}</span>
+                                    <a href="${item.gmap}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 flex items-center">
+                                        <i class="fa-solid fa-location-dot mr-1"></i>${item.location} <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-1"></i>
+                                    </a>
+                                </div>
+                                <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-2">${item.title}</h3>
+
+                                <!-- Detail SOP & Risk -->
+                                <div class="sop-block ${viewMode === 'simple' ? 'hidden' : ''} space-y-1.5 text-xs border-t border-slate-200 dark:border-slate-700/50 pt-2 mt-2">
+                                    <div class="text-slate-600 dark:text-slate-400"><i class="fa-solid fa-play text-emerald-500 text-[10px] mr-1.5"></i><strong>操作 SOP：</strong>${item.sop}</div>
+                                    <div class="text-amber-700 dark:text-amber-400"><i class="fa-solid fa-triangle-exclamation text-[10px] mr-1.5"></i><strong>風險提示：</strong>${item.risk}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                dayEl.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3 gap-2">
+                        <div class="flex items-center space-x-3">
+                            <span class="px-3 py-1 bg-sky-600 text-white text-xs font-bold rounded-lg shadow-sm">Day ${dayObj.day}</span>
+                            <h2 class="text-base font-bold text-slate-900 dark:text-white">${dayObj.date} (${dayObj.week}) — ${dayObj.title}</h2>
+                        </div>
+                        <div class="flex items-center space-x-3 text-xs text-slate-500 dark:text-slate-400">
+                            <span><i class="fa-solid fa-gauge-high text-sky-500 mr-1"></i>強度：${'★'.repeat(Math.floor(dayObj.intensity))}</span>
+                            <span><i class="fa-solid fa-clock text-indigo-500 mr-1"></i>交通約 ${dayObj.transitHours} 小時</span>
+                        </div>
+                    </div>
+                    <div class="relative pl-6 border-l-2 border-slate-200 dark:border-slate-700 space-y-6 mt-4">
+                        ${itemsHTML}
+                    </div>
+                `;
+                container.appendChild(dayEl);
+            });
+        }
+
+        function setItineraryView(mode) {
+            viewMode = mode;
+            document.getElementById('viewDetailBtn').className = mode === 'detail' 
+                ? "px-3 py-1 text-xs font-medium rounded-md bg-sky-600 text-white shadow-sm transition-colors"
+                : "px-3 py-1 text-xs font-medium rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors";
+            document.getElementById('viewSimpleBtn').className = mode === 'simple' 
+                ? "px-3 py-1 text-xs font-medium rounded-md bg-sky-600 text-white shadow-sm transition-colors"
+                : "px-3 py-1 text-xs font-medium rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors";
+
+            document.querySelectorAll('.sop-block').forEach(el => {
+                if (mode === 'simple') el.classList.add('hidden');
+                else el.classList.remove('hidden');
+            });
+        }
+
+        function scrollToDay(dayId) {
+            const el = document.getElementById(dayId);
+            if (el) {
+                const yOffset = -80;
+                const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+        }
+
+        function renderBudgetTable() {
+            const tbody = document.getElementById('budgetTableBody');
+            let htmlStr = '';
+            appData.budgetItems.forEach(b => {
+                htmlStr += `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 border-b border-slate-200 dark:border-slate-700/50 last:border-0 transition-colors">
+                        <td class="px-4 py-3 font-semibold text-slate-900 dark:text-white">${b.category}</td>
+                        <td class="px-4 py-3 text-slate-600 dark:text-slate-300">${b.item}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${b.paid ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20' : 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20'}">
+                                ${b.paid ? 'Agoda 已線上卡付' : '現場/預估準備'}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-right font-mono text-slate-600 dark:text-slate-400">₩ ${b.krw.toLocaleString()}</td>
+                        <td class="px-4 py-3 text-right font-mono text-emerald-600 dark:text-emerald-400 font-semibold">$ ${b.twd.toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = htmlStr;
+        }
+
+        function convertCurrency(source) {
+            const krwInput = document.getElementById('krwInput');
+            const twdInput = document.getElementById('twdInput');
+            const rate = appData.exchangeRate;
+
+            if (source === 'krw') {
+                const val = parseFloat(krwInput.value) || 0;
+                twdInput.value = Math.round(val / rate);
+            } else {
+                const val = parseFloat(twdInput.value) || 0;
+                krwInput.value = Math.round(val * rate);
+            }
+        }
+
+        function renderFoodGrid(filterDistrict = 'all') {
+            const grid = document.getElementById('foodGrid');
+            const items = filterDistrict === 'all' 
+                ? appData.restaurants 
+                : appData.restaurants.filter(r => r.district === filterDistrict);
+
+            let gridHTML = '';
+            items.forEach(r => {
+                gridHTML += `
+                    <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-600">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[10px] px-2 py-0.5 rounded bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-500/20 font-semibold">${r.district}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 font-medium">${r.tag}</span>
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1.5">${r.name}</h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-3">${r.desc}</p>
+                        </div>
+                        <a href="${r.gmap}" target="_blank" rel="noopener noreferrer" class="w-full text-center py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 text-xs rounded-lg transition-colors flex items-center justify-center">
+                            <i class="fa-solid fa-map-location-dot mr-1.5"></i>Google 地圖開啓
+                        </a>
+                    </div>
+                `;
+            });
+            grid.innerHTML = gridHTML;
+        }
+
+        function filterFood(district) {
+            const btns = document.querySelectorAll('.food-filter-btn');
+            btns.forEach(btn => {
+                if (btn.innerText.includes(district) || (district === 'all' && btn.innerText.includes('全部'))) {
+                    btn.className = "food-filter-btn px-3 py-1 rounded-full bg-sky-600 text-white font-medium shadow-sm transition-colors";
+                } else {
+                    btn.className = "food-filter-btn px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors";
+                }
+            });
+            renderFoodGrid(district);
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklistContainer');
+            let listHTML = '';
+            appData.packingList.forEach((cat, cIdx) => {
+                let itemsHTML = '';
+                cat.items.forEach((item, iIdx) => {
+                    const key = `c_${cIdx}_${iIdx}`;
+                    const isChecked = !!checkedItems[key];
+                    itemsHTML += `
+                        <label class="flex items-center space-x-2.5 text-xs text-slate-600 dark:text-slate-300 cursor-pointer hover:text-slate-900 dark:hover:text-white transition-colors">
+                            <input type="checkbox" onchange="toggleCheckItem('${key}')" ${isChecked ? 'checked' : ''} class="w-4 h-4 text-sky-600 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded focus:ring-sky-500">
+                            <span class="${isChecked ? 'line-through text-slate-400 dark:text-slate-500' : ''}">${item}</span>
+                        </label>
+                    `;
+                });
+
+                listHTML += `
+                    <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 shadow-sm">
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white mb-3 border-b border-slate-200 dark:border-slate-700 pb-2 flex items-center">
+                            <i class="fa-solid fa-list-check text-sky-500 mr-2"></i>${cat.category}
+                        </h4>
+                        <div class="space-y-2">
+                            ${itemsHTML}
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = listHTML;
+            updateChecklistProgress();
+        }
+
+        function toggleCheckItem(key) {
+            checkedItems[key] = !checkedItems[key];
+            try {
+                localStorage.setItem('busan_checklist', JSON.stringify(checkedItems));
+            } catch (e) {}
+            renderChecklist();
+        }
+
+        function updateChecklistProgress() {
+            let total = 0;
+            let checkedCount = 0;
+
+            appData.packingList.forEach((cat, cIdx) => {
+                cat.items.forEach((_, iIdx) => {
+                    total++;
+                    if (checkedItems[`c_${cIdx}_${iIdx}`]) checkedCount++;
+                });
+            });
+
+            const percent = total === 0 ? 0 : Math.round((checkedCount / total) * 100);
+            document.getElementById('checklistProgressText').innerText = `${percent}%`;
+            document.getElementById('checklistProgressBar').style.width = `${percent}%`;
+        }
+    </script>
+</body>
+</html>
