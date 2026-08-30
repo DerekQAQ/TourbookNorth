@@ -230,7 +230,6 @@
     let map; // 儲存 Leaflet 地圖實例
     let markers = []; // 儲存所有標記點
 
-    // 建立自訂的 HTML 圖標
     function createCustomIcon(j, isActive) {
       const htmlContent = `
         <div class="group relative flex items-center justify-center transition-all duration-500 ${isActive ? 'scale-[1.3] md:scale-[1.4] z-50' : 'hover:scale-125 z-40'}">
@@ -252,7 +251,6 @@
       });
     }
 
-    // 獲取響應式的縮放等級
     function getResponsiveZoom(type) {
       const isMobile = window.innerWidth < 768;
       if (type === 'world') {
@@ -265,7 +263,6 @@
       return 1.5;
     }
 
-    // 初始化地圖
     function initMap() {
       const initialZoom = getResponsiveZoom('world');
       
@@ -312,7 +309,6 @@
       map.setView([20, 15], initialZoom);
     }
 
-    // 切換行程邏輯
     function setActive(id, shouldFly = true) {
       activeJourney = JOURNEYS.find(j => j.id === id);
       
@@ -342,7 +338,6 @@
       renderUI();
     }
 
-    // 渲染 UI (不包含地圖)
     function renderUI() {
       // 繪製右側簡報面板
       const active = activeJourney;
@@ -373,7 +368,7 @@
         </a>
       `;
 
-      // 加入 GSAP 進入動畫 (右側簡報面板)
+      // 加入 GSAP 動畫 (右側簡報面板)，因為內容會被抽換，需要重新啟動淡入效果
       gsap.to(".gs-briefing-header, .gs-briefing-desc, .gs-briefing-stats, .gs-briefing-btn", {
         y: 0,
         opacity: 1,
@@ -383,9 +378,9 @@
         overwrite: "auto" // 避免頻繁切換造成動畫衝突
       });
 
-      // 繪製底部卡片列表
+      // 繪製底部卡片列表 (移除強制透明度類別，避免更新後卡片消失)
       const archivesHtml = JOURNEYS.map(j => `
-        <button onclick="setActive(${j.id}, true)" class="text-left p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] bg-white border-2 transition-all group gs-archive-card opacity-0 translate-y-8 ${activeJourney.id === j.id ? 'border-sky-300 shadow-md ring-[3px] ring-sky-50' : 'border-gray-100 hover:border-gray-200 hover:-translate-y-1 md:hover:-translate-y-2 hover:shadow-md'}">
+        <button onclick="setActive(${j.id}, true)" class="text-left p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] bg-white border-2 transition-all group gs-archive-card ${activeJourney.id === j.id ? 'border-sky-300 shadow-md ring-[3px] ring-sky-50' : 'border-gray-100 hover:border-gray-200 hover:-translate-y-1 md:hover:-translate-y-2 hover:shadow-md'}">
           <div class="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
              <div class="p-1.5 md:p-2 rounded-lg md:rounded-xl bg-gradient-to-br ${j.theme.gradient} text-white shadow-sm group-hover:scale-110 transition-transform">
                <i data-lucide="${j.icon}" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
@@ -412,10 +407,10 @@
         .from(".xl\\:w-2\\/3", { x: -50, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.4")
         // 右側簡報區塊動畫
         .from(".xl\\:w-1\\/3", { x: 50, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6")
-        // 底部卡片列表動畫
-        .to(".gs-archive-card", {
-          y: 0,
-          opacity: 1,
+        // 底部卡片列表動畫 (使用 .from 從透明狀態飛入，避免干擾後續重新渲染的樣式)
+        .from(".gs-archive-card", {
+          y: 30,
+          opacity: 0,
           duration: 0.6,
           stagger: 0.1,
           ease: "back.out(1.2)"
