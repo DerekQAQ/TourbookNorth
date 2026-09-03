@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>沖繩 10/23-10/26 4天3夜奢華漫旅 | Okinawa Luxe Voyage 2026</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              400: '#2dd4bf',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            },
+            coral: {
+              400: '#fb7185',
+              500: '#f43f5e',
+              600: '#e11d48',
+            },
+            ocean: {
+              500: '#0284c7',
+              600: '#0369a1',
+              800: '#075985',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.7); }
+    
+    /* Map Marker Styling */
+    .custom-map-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      color: white;
+      font-weight: bold;
+      font-size: 11px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      border: 2px solid #ffffff;
+      transition: transform 0.2s ease;
+    }
+    .custom-map-pin:hover {
+      transform: scale(1.18);
+    }
+    
+    /* Tab Transitions */
+    .tab-content {
+      animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hide scrollbar for compact day nav */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-300 pb-20">
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Brand Logo & Date Info -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-ocean-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+            <i class="fa-solid fa-umbrella-beach text-lg"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white">沖繩 4D3N 奢華漫旅</span>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950/80 text-brand-700 dark:text-brand-300 font-bold border border-brand-200 dark:border-brand-800">10/23 - 10/26</span>
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">IT232 ✈ IT233 (訂位: YE6VRX)</p>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation Tabs -->
+        <nav class="hidden md:flex items-center space-x-1 bg-slate-100 dark:bg-slate-800/60 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm">
+            <i class="fa-solid fa-gauge-high"></i>
+            <span>儀表盤</span>
+          </button>
+          <button onclick="switchTab('itinerary')" id="nav-itinerary" class="nav-tab px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+            <i class="fa-solid fa-calendar-day"></i>
+            <span>每日行程</span>
+          </button>
+          <button onclick="switchTab('budget')" id="nav-budget" class="nav-tab px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+            <i class="fa-solid fa-receipt"></i>
+            <span>預算分析</span>
+          </button>
+          <button onclick="switchTab('logistics')" id="nav-logistics" class="nav-tab px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+            <i class="fa-solid fa-utensils"></i>
+            <span>美食與後勤</span>
+          </button>
+        </nav>
+
+        <!-- Right Utilities (Dark Mode + Mobile Hamburger) -->
+        <div class="flex items-center space-x-2">
+          <!-- Dark Mode Toggle Button -->
+          <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition focus:outline-none" title="切換深淺模式" aria-label="切換主題">
+            <i id="theme-icon" class="fa-solid fa-moon text-base"></i>
+          </button>
+
+          <!-- Mobile Hamburger Toggle -->
+          <button onclick="toggleMobileMenu()" class="md:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" aria-label="切換導覽選單">
+            <i class="fa-solid fa-bars-staggered text-base"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 pt-3 pb-4 space-y-2">
+      <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="mobile-nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center space-x-3 bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300">
+        <i class="fa-solid fa-gauge-high w-5"></i>
+        <span>儀表盤 (Dashboard)</span>
+      </button>
+      <button onclick="switchTab('itinerary'); toggleMobileMenu();" class="mobile-nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center space-x-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i class="fa-solid fa-calendar-day w-5"></i>
+        <span>每日行程 (Itinerary)</span>
+      </button>
+      <button onclick="switchTab('budget'); toggleMobileMenu();" class="mobile-nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center space-x-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i class="fa-solid fa-receipt w-5"></i>
+        <span>預算分析 (Budget)</span>
+      </button>
+      <button onclick="switchTab('logistics'); toggleMobileMenu();" class="mobile-nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center space-x-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i class="fa-solid fa-utensils w-5"></i>
+        <span>美食與後勤 (Food & Logistics)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Dynamic View Container -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ========================================== -->
+    <!-- MODULE 1: DASHBOARD (儀表盤)               -->
+    <!-- ========================================== -->
+    <section id="tab-dashboard" class="tab-content space-y-6">
+      
+      <!-- Top Overview Metrics Bar -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Metric 1 -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+          <div class="absolute -right-3 -bottom-3 text-slate-100 dark:text-slate-800 text-6xl group-hover:scale-110 transition duration-300 pointer-events-none">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">行程天數與出遊日期</span>
+          <div class="flex items-baseline space-x-2 mt-2">
+            <span class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">4 天 3 夜</span>
+            <span class="text-xs font-medium text-brand-600 dark:text-brand-400">雙人自駕</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">2026/10/23(五) - 10/26(一)</p>
+        </div>
+
+        <!-- Metric 2 (Goshuin Focus) -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+          <div class="absolute -right-3 -bottom-3 text-slate-100 dark:text-slate-800 text-6xl group-hover:scale-110 transition duration-300 pointer-events-none">
+            <i class="fa-solid fa-book-journal-whills"></i>
+          </div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">特色神社與御朱印收集</span>
+          <div class="flex items-baseline space-x-2 mt-2">
+            <span class="text-2xl sm:text-3xl font-extrabold text-brand-600 dark:text-brand-400">3 座</span>
+            <span class="text-xs font-medium text-slate-500">琉球八社與護國</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">沖宮、護國神社、波上宮</p>
+        </div>
+
+        <!-- Metric 3 -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+          <div class="absolute -right-3 -bottom-3 text-slate-100 dark:text-slate-800 text-6xl group-hover:scale-110 transition duration-300 pointer-events-none">
+            <i class="fa-solid fa-car-side"></i>
+          </div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">自駕總巡航里程</span>
+          <div class="flex items-baseline space-x-2 mt-2">
+            <span class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">~280</span>
+            <span class="text-xs font-medium text-ocean-500">公里 (KM)</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">中北部跨海大橋與南部海崖</p>
+        </div>
+
+        <!-- Metric 4: Special Highlight -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+          <div class="absolute -right-3 -bottom-3 text-slate-100 dark:text-slate-800 text-6xl group-hover:scale-110 transition duration-300 pointer-events-none">
+            <i class="fa-solid fa-paw"></i>
+          </div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">旗艦亮點主題</span>
+          <div class="flex items-baseline space-x-2 mt-2">
+            <span class="text-xl sm:text-2xl font-extrabold text-coral-500">自嘲熊 100%</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">PARCO CITY Nagano Market</p>
+        </div>
+      </div>
+
+      <!-- Interactive Leaflet Map & Day Quick-Jumps -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+              <i class="fa-solid fa-map-location-dot text-brand-600 dark:text-brand-400"></i>
+              <span>沖繩全域景點互動導航地圖 (4D3N)</span>
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">點擊下方天數按鈕切換視角，點選地標可調用導航座標。</p>
+          </div>
+          <!-- Map Day Buttons -->
+          <div class="flex flex-wrap gap-1.5" id="map-day-buttons">
+            <button onclick="filterMapByDay('all')" class="map-btn active px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 text-white dark:bg-brand-500 dark:text-slate-950 transition">全部點位</button>
+            <button onclick="filterMapByDay(1)" class="map-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">D1 (10/23) 那霸</button>
+            <button onclick="filterMapByDay(2)" class="map-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">D2 (10/24) 神社/恩納</button>
+            <button onclick="filterMapByDay(3)" class="map-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">D3 (10/25) 古宇利/殘波</button>
+            <button onclick="filterMapByDay(4)" class="map-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">D4 (10/26) 波上宮/南部</button>
+          </div>
+        </div>
+
+        <!-- Leaflet Container -->
+        <div id="leaflet-map" class="w-full h-[380px] sm:h-[460px] rounded-xl border border-slate-200 dark:border-slate-800 z-10 shadow-inner"></div>
+      </div>
+
+      <!-- Activity Intensity Chart & Weather Forecast Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Activity & Driving Chart (2 Cols) -->
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+              <i class="fa-solid fa-chart-simple text-brand-600 dark:text-brand-400"></i>
+              <span>4日活動強度 (小時) 與 車程時間 (分鐘) 分析</span>
+            </h3>
+            <span class="text-xs text-slate-400">Chart.js 視覺化</span>
+          </div>
+          <div class="relative h-64 w-full">
+            <canvas id="intensityChart"></canvas>
+          </div>
+        </div>
+
+        <!-- October Okinawa Weather & Climate Card (1 Col) -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+                <i class="fa-solid fa-cloud-sun text-amber-500"></i>
+                <span>10月下旬 沖繩氣候與穿著指引</span>
+              </h3>
+              <span class="text-xs px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-medium">黃金乾爽季</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">10/23-10/26 氣候涼爽舒適，避開酷暑與颱風季，日照充足海景通透。</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+              <span class="text-[11px] text-slate-400 block">平均氣溫</span>
+              <span class="text-lg font-bold text-slate-800 dark:text-slate-200">22°C ~ 27°C</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+              <span class="text-[11px] text-slate-400 block">海水均溫</span>
+              <span class="text-lg font-bold text-ocean-500">約 25.5°C</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+              <span class="text-[11px] text-slate-400 block">日落時間</span>
+              <span class="text-lg font-bold text-coral-500">~ 17:48</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+              <span class="text-[11px] text-slate-400 block">紫外線指數</span>
+              <span class="text-lg font-bold text-amber-500">UV 5-6 (中量)</span>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-brand-50/70 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-900 text-xs text-brand-900 dark:text-brand-300 space-y-1">
+            <p class="font-semibold flex items-center space-x-1">
+              <i class="fa-solid fa-shirt"></i>
+              <span>穿搭推薦：</span>
+            </p>
+            <p>白天短袖、棉麻休閒服搭配遮陽帽；傍晚海邊微風涼爽，請備一件輕薄防風外套。</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Risk Management Matrix -->
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+          <i class="fa-solid fa-shield-halved text-emerald-600 dark:text-emerald-400"></i>
+          <span>高階自駕與採購應變矩陣 (Risk Management SOP)</span>
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Risk 1 -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div class="flex items-center space-x-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
+              <i class="fa-solid fa-car-burst"></i>
+              <span>自駕保險與右駕適應</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <strong>SOP:</strong> 10/24 取車務必加保全險 (CDW + NOC)。牢記「左轉小彎、右轉大彎」，隨時由副駕駛提醒靠左行駛。
+            </p>
+          </div>
+
+          <!-- Risk 2 -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div class="flex items-center space-x-2 text-coral-500 font-bold text-sm">
+              <i class="fa-solid fa-store"></i>
+              <span>自嘲熊限定款搶購對策</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <strong>SOP:</strong> D2 週六上午 11:00 前抵達 PARCO CITY 2F Nagano Market 櫃位，優先鎖定沖繩風獅爺限定周邊。
+            </p>
+          </div>
+
+          <!-- Risk 3 -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div class="flex items-center space-x-2 text-ocean-500 font-bold text-sm">
+              <i class="fa-solid fa-plane-circle-exclamation"></i>
+              <span>晚去晚回航班動線</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <strong>SOP:</strong> D1 20:50 抵達搭單軌入市區不自駕；D4 回程 21:30 起飛，18:30 完成滿油還車並搭接駁車於 19:30 前達機場。
+            </p>
+          </div>
+
+          <!-- Risk 4 -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div class="flex items-center space-x-2 text-brand-600 dark:text-brand-400 font-bold text-sm">
+              <i class="fa-solid fa-route"></i>
+              <span>無水族館/無溶洞漫遊路線</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <strong>SOP:</strong> 避開常規擁擠景點，以「古宇利跨海公路」、「殘波岬斷崖」與「星野 Banta Cafe 崖上海景」打造悠閒假期。
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MODULE 2: ITINERARY (每日行程)              -->
+    <!-- ========================================== -->
+    <section id="tab-itinerary" class="tab-content hidden space-y-6">
+
+      <!-- Timeline Container rendered by JS -->
+      <div id="timeline-container" class="space-y-8">
+        <!-- Injected via JavaScript -->
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MODULE 3: BUDGET (財務預算分析)             -->
+    <!-- ========================================== -->
+    <section id="tab-budget" class="tab-content hidden space-y-6">
+      
+      <!-- Budget Header Overview -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gradient-to-br from-brand-600 to-teal-700 text-white p-6 rounded-2xl shadow-md space-y-2">
+          <span class="text-xs uppercase tracking-wider text-brand-100 font-medium">4D3N 雙人預估總支出</span>
+          <div class="text-3xl sm:text-4xl font-extrabold tracking-tight" id="budget-sum-twd">NT$ 81,186</div>
+          <p class="text-xs text-brand-100">折合約 <span id="budget-sum-jpy">¥377,600</span> JPY (匯率約 0.215)</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+          <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">單人人均預估花費</span>
+          <div class="text-3xl font-extrabold text-slate-900 dark:text-white" id="budget-per-person">NT$ 40,593</div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">含實付機票 NT$13,743/人、海景飯店、和牛與自嘲熊購物</p>
+        </div>
+
+        <!-- Realtime Currency Converter Box -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center space-x-1.5">
+              <i class="fa-solid fa-calculator text-brand-600"></i>
+              <span>日幣/台幣匯率換算器</span>
+            </span>
+            <input type="number" id="custom-rate" value="0.215" step="0.001" oninput="updateCurrencyRate()" class="w-16 text-right text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200" title="匯率調整">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">日幣 (JPY ¥)</label>
+              <input type="number" id="calc-jpy" value="10000" oninput="calcFromJpy()" class="w-full px-3 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">新台幣 (TWD $)</label>
+              <input type="number" id="calc-twd" value="2150" oninput="calcFromTwd()" class="w-full px-3 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 text-right">常用面額：
+            <button onclick="quickCalc(3000)" class="underline hover:text-brand-600">3千</button>、
+            <button onclick="quickCalc(10000)" class="underline hover:text-brand-600">1萬</button>、
+            <button onclick="quickCalc(50000)" class="underline hover:text-brand-600">5萬</button>
+          </p>
+        </div>
+      </div>
+
+      <!-- Budget Visualization Chart & Details Table -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Doughnut Chart (1 Col) -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center">
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-2 self-start flex items-center space-x-2">
+            <i class="fa-solid fa-chart-pie text-brand-600"></i>
+            <span>4D3N 預算結構佔比 (雙人)</span>
+          </h3>
+          <div class="relative h-64 w-full flex items-center justify-center">
+            <canvas id="budgetChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Budget Table Breakdown (2 Cols) -->
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3 overflow-hidden">
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+            <i class="fa-solid fa-table-list text-brand-600"></i>
+            <span>費用分類清單明細 (雙人總計)</span>
+          </h3>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs sm:text-sm">
+              <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th class="p-3 font-semibold rounded-l-lg">類別</th>
+                  <th class="p-3 font-semibold">項目細節與規格</th>
+                  <th class="p-3 font-semibold text-right">日幣 (JPY)</th>
+                  <th class="p-3 font-semibold text-right rounded-r-lg">折合台幣 (TWD)</th>
+                </tr>
+              </thead>
+              <tbody id="budget-table-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MODULE 4: FOOD & LOGISTICS (美食與後勤)      -->
+    <!-- ========================================== -->
+    <section id="tab-logistics" class="tab-content hidden space-y-6">
+
+      <!-- Flight Details Section -->
+      <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white p-6 rounded-2xl shadow-md space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700 pb-3">
+          <div class="flex items-center space-x-2">
+            <span class="px-2.5 py-1 bg-amber-500 text-slate-950 text-xs font-black rounded-lg uppercase tracking-wider">台灣虎航 Tigerair</span>
+            <h3 class="text-base font-bold">雙人來回航班已確認 (PNR: YE6VRX)</h3>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-amber-300 font-mono font-bold">訂單實付: TWD 27,486</span>
+            <span class="text-xs text-slate-300 font-mono hidden sm:inline"><i class="fa-solid fa-shield-cat mr-1 text-amber-400"></i>tigersmart 方案</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Outbound Flight -->
+          <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 flex items-center justify-between">
+            <div class="space-y-1">
+              <span class="text-xs text-amber-400 font-semibold uppercase">去程 2026/10/23 (週五)</span>
+              <div class="text-2xl font-black">18:30 <span class="text-xs font-normal text-slate-300">TPE 桃園 T1</span></div>
+              <p class="text-xs text-slate-400">航班 IT 232 (1h 20m)</p>
+            </div>
+            <div class="text-center px-4">
+              <i class="fa-solid fa-plane text-2xl text-slate-400"></i>
+              <div class="text-[10px] text-slate-400 mt-1">直飛</div>
+            </div>
+            <div class="space-y-1 text-right">
+              <span class="text-xs text-emerald-400 font-semibold uppercase">抵達 OKA</span>
+              <div class="text-2xl font-black">20:50 <span class="text-xs font-normal text-slate-300">那霸機場</span></div>
+              <p class="text-xs text-slate-400">日本時間 (GMT+9)</p>
+            </div>
+          </div>
+
+          <!-- Inbound Flight -->
+          <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 flex items-center justify-between">
+            <div class="space-y-1">
+              <span class="text-xs text-amber-400 font-semibold uppercase">回程 2026/10/26 (週一)</span>
+              <div class="text-2xl font-black">21:30 <span class="text-xs font-normal text-slate-300">OKA 那霸</span></div>
+              <p class="text-xs text-slate-400">航班 IT 233 (1h 35m)</p>
+            </div>
+            <div class="text-center px-4">
+              <i class="fa-solid fa-plane-arrival text-2xl text-slate-400"></i>
+              <div class="text-[10px] text-slate-400 mt-1">滿玩最後一天</div>
+            </div>
+            <div class="space-y-1 text-right">
+              <span class="text-xs text-emerald-400 font-semibold uppercase">抵達 TPE</span>
+              <div class="text-2xl font-black">22:05 <span class="text-xs font-normal text-slate-300">桃園 T1</span></div>
+              <p class="text-xs text-slate-400">台灣時間 (GMT+8)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Packing & Logistics Checklist -->
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+              <i class="fa-solid fa-clipboard-check text-brand-600"></i>
+              <span>出國與自嘲熊採購裝備清單 (互動式 Checklist)</span>
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">勾選進度將即時計算完成度。</p>
+          </div>
+          <div class="flex items-center space-x-3">
+            <span class="text-xs font-bold text-brand-600 dark:text-brand-400" id="checklist-progress-text">完成度: 0%</span>
+            <div class="w-28 bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+              <div id="checklist-progress-bar" class="bg-brand-500 h-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checklist Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="checklist-container">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+      <!-- Food Guide & Interactive Filters -->
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+              <i class="fa-solid fa-bowl-food text-coral-500"></i>
+              <span>精選美食地圖與口袋名單</span>
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">涵蓋沖繩麵、頂級石垣/本部和牛燒肉、海景咖啡與深夜料理。</p>
+          </div>
+
+          <!-- Filter Badges -->
+          <div class="flex flex-wrap gap-2 text-xs">
+            <select id="food-region-filter" onchange="filterFoodList()" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 outline-none">
+              <option value="all">所有地區 (全部)</option>
+              <option value="那霸市區">那霸市區</option>
+              <option value="中谷美濱/浦添">中谷美濱/浦添</option>
+              <option value="恩納/名護北部">恩納/名護北部</option>
+              <option value="南部海景">南部海景</option>
+            </select>
+
+            <select id="food-type-filter" onchange="filterFoodList()" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 outline-none">
+              <option value="all">所有料理類型</option>
+              <option value="燒肉和牛">燒肉和牛</option>
+              <option value="沖繩麵/道地料理">沖繩麵/道地料理</option>
+              <option value="海景咖啡/甜點">海景咖啡/甜點</option>
+              <option value="居酒屋/特色料理">居酒屋/特色料理</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Food Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="food-cards-container">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- BOTTOM FLOATING CONTROLLER (單行置底導覽列)   -->
+  <!-- ========================================== -->
+  <div id="itinerary-bottom-nav" class="hidden fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[95%] sm:w-max bg-slate-900/95 dark:bg-slate-800/95 text-white backdrop-blur-xl px-2.5 py-2 rounded-full shadow-2xl border border-slate-700/80 flex items-center justify-between sm:justify-center gap-2 transition-all duration-300">
+    
+    <!-- Day Pill Buttons in Single Row -->
+    <div class="flex items-center space-x-1 overflow-x-auto no-scrollbar py-0.5 whitespace-nowrap">
+      <button onclick="scrollToDay('day-1')" class="px-3 py-1.5 rounded-full text-xs font-bold bg-brand-500 text-slate-950 hover:bg-brand-400 transition shrink-0">D1<span class="ml-1 text-[10px] opacity-80 hidden sm:inline">10/23</span></button>
+      <button onclick="scrollToDay('day-2')" class="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white transition shrink-0">D2<span class="ml-1 text-[10px] opacity-80 hidden sm:inline">10/24</span></button>
+      <button onclick="scrollToDay('day-3')" class="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white transition shrink-0">D3<span class="ml-1 text-[10px] opacity-80 hidden sm:inline">10/25</span></button>
+      <button onclick="scrollToDay('day-4')" class="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white transition shrink-0">D4<span class="ml-1 text-[10px] opacity-80 hidden sm:inline">10/26</span></button>
+    </div>
+
+    <!-- Divider Line -->
+    <div class="h-4 w-px bg-slate-700 shrink-0"></div>
+
+    <!-- Mode Toggle Switch (Single line) -->
+    <button onclick="toggleItineraryMode()" id="itinerary-mode-toggle" class="flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800 hover:bg-slate-700 text-brand-300 border border-brand-500/40 transition shrink-0 whitespace-nowrap" title="切換檢視">
+      <i class="fa-solid fa-list-check text-xs"></i>
+      <span id="itinerary-mode-text" class="text-[11px]">簡化</span>
+    </button>
+  </div>
+
+  <!-- Global Toast Notification Component -->
+  <div id="toast" class="fixed top-20 right-4 sm:right-6 z-50 transform -translate-y-10 opacity-0 transition-all duration-300 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm font-medium">
+    <i id="toast-icon" class="fa-solid fa-circle-check text-brand-400 dark:text-brand-600 text-lg"></i>
+    <span id="toast-msg">操作成功</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 text-center text-xs text-slate-400">
+    <p>Okinawa Luxe Voyage &copy; 2026. 專為 2026/10/23 - 10/26 (4D3N) 雙人自駕打造 (無水族館・無鐘乳石洞・自嘲熊純享版).</p>
+  </footer>
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT STATE STORE & CONTROLLERS       -->
+  <!-- ========================================== -->
+  <script>
+    const appData = {
+      // General Trip Metadata
+      tripMeta: {
+        title: "沖繩 10/23-10/26 4天3夜奢華漫旅 (4D3N)",
+        dates: "2026/10/23(五) ~ 2026/10/26(一)",
+        pnr: "YE6VRX",
+        travelers: 2,
+        currencyRate: 0.215, // 1 JPY = 0.215 TWD
+        flight: {
+          outbound: { date: "2026/10/23", no: "IT 232", dep: "18:30 (TPE)", arr: "20:50 (OKA)", type: "tigersmart" },
+          inbound: { date: "2026/10/26", no: "IT 233", dep: "21:30 (OKA)", arr: "22:05 (TPE)", type: "tigersmart" }
+        }
+      },
+
+      // Map Points Data with Exact Coordinates (4 Days)
+      mapPoints: [
+        { id: "p1", day: 1, title: "那霸機場 (OKA)", lat: 26.2064, lng: 127.6465, desc: "10/23 20:50 班機抵達，入境後搭乘單軌電車前往市中心。", category: "交通" },
+        { id: "p2", day: 1, title: "Hotel Strata Naha (美榮橋站)", lat: 26.2185, lng: 127.6865, desc: "D1 住宿：都會綠意精品旅店，緊鄰單軌站方便入住。", category: "住宿" },
+        { id: "p3", day: 2, title: "奧武山公園：沖宮 & 護國神社", lat: 26.2023, lng: 127.6775, desc: "收集琉球八社「沖宮」與「沖繩縣護國神社」特色御朱印。", category: "文化" },
+        { id: "p4", day: 2, title: "San-A PARCO CITY (自嘲熊官方店)", lat: 26.2625, lng: 127.6974, desc: "10/24 11:00 2F Nagano Market (自嘲熊專賣店) & Kiddy Land 旗艦採購。", category: "購物" },
+        { id: "p5", day: 2, title: "萬座毛 (Cape Manzamo)", lat: 26.5050, lng: 127.8502, desc: "象鼻天然海蝕崖與壯麗東海日落木棧道。", category: "景點" },
+        { id: "p6", day: 2, title: "御菓子御殿 恩納店", lat: 26.5033, lng: 127.8530, desc: "購買現做紅芋塔，緊湊行程中的最佳伴手禮補給站。", category: "購物" },
+        { id: "p7", day: 2, title: "Hotel Monterey Okinawa Spa & Resort", lat: 26.4385, lng: 127.8080, desc: "D2 住宿：恩納村面海渡假村，享用琉球之牛頂級和牛晚餐。", category: "住宿" },
+        { id: "p8", day: 3, title: "古宇利大橋 & 心形岩", lat: 26.6974, lng: 128.0205, desc: "古宇利藍跨海公路巡禮，緊接前往品嚐蝦蝦飯。", category: "景點" },
+        { id: "p9", day: 3, title: "殘波岬燈塔 (Cape Zanpa)", lat: 26.4398, lng: 127.7145, desc: "白亞色絕美燈塔，登頂俯瞰 30 公尺高的斷崖海景。", category: "景點" },
+        { id: "p10", day: 3, title: "星野集團 Banta Cafe", lat: 26.3888, lng: 127.7288, desc: "日本最大級海崖咖啡館，享受短暫的海邊下午茶。", category: "美食" },
+        { id: "p11", day: 3, title: "美國村 (American Village)", lat: 26.3164, lng: 127.7576, desc: "黃昏魔幻時刻抵達，密集好逛的異國風情購物區與夕陽。", category: "景點" },
+        { id: "p12", day: 3, title: "Hotel Collective Naha", lat: 26.2160, lng: 127.6870, desc: "D3 住宿：國際通核心五星級奢華飯店，逛街無敵方便。", category: "住宿" },
+        { id: "p13", day: 4, title: "波上宮 (Naminoue Shrine)", lat: 26.2205, lng: 127.6711, desc: "10/26 懸崖上的琉球總鎮守神社，祈求平安小書包御守與御朱印。", category: "文化" },
+        { id: "p14", day: 4, title: "知念岬公園 & 奧武島", lat: 26.1667, lng: 127.8306, desc: "南部太平洋無敵海景與貓星人聚集的奧武島天婦羅。", category: "景點" },
+        { id: "p15", day: 4, title: "瀨長島 Umikaji Terrace", lat: 26.1755, lng: 127.6433, desc: "純白希臘風階梯露台，近距離觀賞飛機起降與幸福厚鬆餅。", category: "景點" }
+      ],
+
+      // 4-Day Curated Itinerary (2026/10/23 - 10/26)
+      itinerary: [
+        {
+          day: 1,
+          dateTitle: "Day 1: 2026/10/23 (週五)・抵達琉球・市區迎賓之夜",
+          subtitle: "18:30 桃園起飛 ➔ 20:50 抵達那霸 ➔ 單軌進城 ➔ 美榮橋精品旅店 ➔ 深夜拉麵宵夜",
+          items: [
+            {
+              time: "18:30 - 20:50",
+              title: "台北桃園 (T1) ✈ 沖繩那霸 (OKA) 台灣虎航 IT 232",
+              category: "交通",
+              catColor: "bg-ocean-500",
+              icon: "fa-plane-departure",
+              mapQuery: "Naha Airport, Okinawa",
+              cost: "機票實付 NT$ 27,486 (雙人來回已含)",
+              sop: "【快速通關 SOP】下機後跟隨國際線到達指標快速通關。出發前 24 小時填妥 Visit Japan Web (VJW) 取得入境審查與海關申報 QR Code，省去紙本填寫時間，約 25-30 分鐘可順利提領行李出關。",
+              tips: "航班 20:50 抵達，今晚完全不建議排隊租車，直接搭乘單軌進市區，避免深夜右駕疲憊與租車門市打烊風險。"
+            },
+            {
+              time: "21:25 - 21:50",
+              title: "搭乘沖繩單軌電車 (Yui Rail) 前往美榮橋站",
+              category: "交通",
+              catColor: "bg-ocean-500",
+              icon: "fa-train-subway",
+              mapQuery: "Miebashi Station, Naha",
+              cost: "約 ¥300 / 人",
+              sop: "從機場 2F 國內線連通道步行直達「那霸空港站」。可直接刷 iPhone 綁定之 Suica / ICOCA 或於自動售票機購票，搭乘至「美榮橋站」，下車由 1 號出口搭電梯至地面層。",
+              tips: "單軌電車班次密集，車程約 14 分鐘，沿途可俯瞰那霸市區夜景。"
+            },
+            {
+              time: "22:00",
+              title: "入住 Hotel Strata Naha (那霸斯特拉塔酒店)",
+              category: "住宿",
+              catColor: "bg-indigo-600",
+              icon: "fa-hotel",
+              mapQuery: "HOTEL STRATA NAHA",
+              cost: "住宿費已計入總預算",
+              sop: "辦理快速 Check-in，領取房卡與迎賓天然果汁。將大型托運行李安置於房內，換上輕便休閒服準備外出覓食。",
+              tips: "飯店就在美榮橋站正對面（步行 30 秒），充滿琉球自然植栽綠意與現代設計感。"
+            },
+            {
+              time: "22:30 - 23:45",
+              title: "深夜宵夜：麵屋夕凪 炙燒沖繩麵 / 國際通居酒屋",
+              category: "餐飲",
+              catColor: "bg-coral-500",
+              icon: "fa-utensils",
+              mapQuery: "Kokusai Dori Yataimura",
+              cost: "約 ¥3,500 / 雙人",
+              sop: "步行至鄰近居酒屋或麵屋，點選第一杯 Orion 冰涼生啤酒、阿古豬煎餃與招牌炙燒軟骨沖繩麵，為 4 天 3 夜旅程拉開完美序幕！",
+              tips: "10 月下旬夜晚海風微涼乾爽，散步在美榮橋與國際通周邊極其舒適。"
+            }
+          ]
+        },
+        {
+          day: 2,
+          dateTitle: "Day 2: 2026/10/24 (週六)・神社巡禮・自嘲熊掃貨・恩納海景",
+          subtitle: "市區取車 ➔ 沖宮與護國神社(御朱印) ➔ PARCO CITY ➔ 萬座毛 ➔ 琉球之牛",
+          items: [
+            {
+              time: "08:30 - 09:15",
+              title: "那霸市區門市取車 (OTS / Times)",
+              category: "交通",
+              catColor: "bg-ocean-500",
+              icon: "fa-car",
+              mapQuery: "Times Car Rental Naha",
+              cost: "租車3天含全險約 ¥28,000",
+              sop: "出示「台灣駕照正本」+「日文譯本」。確認加保全險，現場用手機環車錄影，並設定導航前往奧武山公園。",
+              tips: "今日行程非常緊密，建議提早於 08:30 完成取車手續出發。"
+            },
+            {
+              time: "09:30 - 10:45",
+              title: "特色神社雙巡禮：沖宮 & 沖繩縣護國神社 (收集御朱印)",
+              category: "文化",
+              catColor: "bg-amber-600",
+              icon: "fa-torii-gate",
+              mapQuery: "Okinogu Shrine",
+              cost: "御朱印約 ¥300-500/枚",
+              sop: "將車停於奧武山公園停車場。先參拜琉球八社之一的「沖宮」，以黃紅對比色的拜殿聞名，御朱印極具藝術感；接著步行至旁邊的「護國神社」參拜，一次收集兩座重量級神社的御朱印。",
+              tips: "記得隨身攜帶御朱印帳，若無可於沖宮現場購買充滿琉球特色的精美朱印帳。"
+            },
+            {
+              time: "11:00 - 14:00",
+              title: "San-A PARCO CITY：自嘲熊專賣店掃貨 & 午餐",
+              category: "購物",
+              catColor: "bg-pink-500",
+              icon: "fa-bag-shopping",
+              mapQuery: "SAN-A URASOE WEST COAST PARCO CITY",
+              cost: "購物金預估 ¥25,000",
+              sop: "直奔 2F Nagano Market (自嘲熊官方店)。優先挑選沖繩限定「風獅爺自嘲熊娃娃」、盲盒與吊飾。採購後直接在 PARCO CITY 美食街面海座位快速享用午餐，並至 1F 辦理退稅。",
+              tips: "時間緊湊，建議午餐選擇拉麵或漢堡排等上餐快速的料理，吃飽直接北上。"
+            },
+            {
+              time: "15:00 - 16:00",
+              title: "萬座毛 (Cape Manzamo) 象鼻海蝕斷崖",
+              category: "景點",
+              catColor: "bg-emerald-600",
+              icon: "fa-mountain-sun",
+              mapQuery: "Cape Manzamo",
+              cost: "門票 ¥100 / 人",
+              sop: "抵達恩納村，漫步於環形木棧道，欣賞大自然鬼斧神工的象鼻海蝕斷崖與清澈見底的東海海域。",
+              tips: "下午時分陽光折射在海面上非常適合拍照，風大需注意帽子。"
+            },
+            {
+              time: "16:15 - 17:00",
+              title: "御菓子御殿 恩納店 (海景紅芋塔伴手禮)",
+              category: "購物",
+              catColor: "bg-pink-500",
+              icon: "fa-gift",
+              mapQuery: "Okashigoten Onna",
+              cost: "約 ¥3,000",
+              sop: "順路造訪外觀如首里城的御菓子御殿。試吃並快速採買新鮮的紅芋塔、雪鹽與各式土產，店內後方即可看見絕美沙灘。",
+              tips: "將伴手禮一次買齊丟車上，免去後續提著大包小包逛街的困擾。"
+            },
+            {
+              time: "17:15",
+              title: "入住 Hotel Monterey Okinawa Spa & Resort",
+              category: "住宿",
+              catColor: "bg-indigo-600",
+              icon: "fa-hotel",
+              mapQuery: "Hotel Monterey Okinawa Spa & Resort",
+              cost: "住宿費已計入總預算",
+              sop: "辦理 Check-in，將行李與戰利品放進全海景陽台客房，短暫休息洗漱。",
+              tips: "趁太陽完全下山前，在陽台喝罐 Orion 啤酒享受恩納海風。"
+            },
+            {
+              time: "18:30 - 20:30",
+              title: "極致晚餐：琉球之牛 (恩納本館) 黑毛和牛燒肉",
+              category: "餐飲",
+              catColor: "bg-coral-500",
+              icon: "fa-fire-burner",
+              mapQuery: "Yakiniku Ryukyu no Ushi Onna",
+              cost: "約 ¥16,000 / 雙人",
+              sop: "【需提前預約】品嚐沖繩特選頂級和牛牛小排與厚切牛舌，油花細膩入口即化，慰勞一整天緊湊豐富的行程。",
+              tips: "距離飯店極近，可散步前往，吃飽後也能在附近超商買些零食回房。"
+            }
+          ]
+        },
+        {
+          day: 3,
+          dateTitle: "Day 3: 2026/10/25 (週日)・蔚藍絕景・美國村魔幻夕陽",
+          subtitle: "古宇利大橋 ➔ 蝦蝦飯 ➔ 殘波岬燈塔 ➔ 星野海崖咖啡 ➔ 美國村 ➔ 國際通",
+          items: [
+            {
+              time: "09:30 - 11:00",
+              title: "古宇利大橋 (Kouri Ocean Drive) & 心形岩",
+              category: "景點",
+              catColor: "bg-emerald-600",
+              icon: "fa-bridge-water",
+              mapQuery: "Kouri Bridge, Okinawa",
+              cost: "大橋免費 / 心形岩停車 ¥300",
+              sop: "早晨驅車行駛於被「古宇利藍」包圍的跨海大橋。直奔島嶼北側的「心形岩 (Heart Rock)」沙灘，踩水拍照。",
+              tips: "早點去可避開車潮，心形岩沙灘步行需經過一段礁石，請穿著好走的鞋子。"
+            },
+            {
+              time: "11:15 - 12:30",
+              title: "午餐：Kouri Shrimp 蝦蝦飯",
+              category: "餐飲",
+              catColor: "bg-coral-500",
+              icon: "fa-shrimp",
+              mapQuery: "Kouri Shrimp",
+              cost: "約 ¥4,000 / 雙人",
+              sop: "點選招牌「蒜香奶油辣味檸檬蝦飯」，在觀景露台邊吹海風邊俯瞰跨海大橋，享受夏威夷般的度假氛圍。",
+              tips: "點餐採自助點餐機，取餐後記得拿取大量紙巾，剝蝦會沾滿醬汁。"
+            },
+            {
+              time: "13:45 - 14:45",
+              title: "殘波岬燈塔 (Cape Zanpa) 白亞斷崖絕景",
+              category: "景點",
+              catColor: "bg-emerald-600",
+              icon: "fa-tower-observation",
+              mapQuery: "Cape Zanpa Lighthouse",
+              cost: "登塔費 ¥300 / 人",
+              sop: "沿西海岸南下抵達殘波岬。這是一座高達 31 公尺的純白燈塔，體力允許務必爬 99 階樓梯登頂，俯瞰周圍 30 公尺高連綿的珊瑚礁斷崖拍打著巨浪。",
+              tips: "風非常大！但從高空俯瞰東海 360 度的視野絕對值回票價。"
+            },
+            {
+              time: "15:00 - 16:15",
+              title: "星野集團 Banta Cafe (海崖咖啡)",
+              category: "美食",
+              catColor: "bg-brand-600",
+              icon: "fa-mug-saucer",
+              mapQuery: "Hoshino Resorts BANTA CAFE",
+              cost: "約 ¥3,500 / 雙人",
+              sop: "點杯沖繩香檸氣泡飲，選擇「海邊露台榻榻米區」盤腿席地而坐，在此稍作放空，聆聽海浪聲恢復體力。",
+              tips: "這是一個過渡的休憩站，喝完飲料拍完照即可準備前往下一個高密度戰區。"
+            },
+            {
+              time: "16:45 - 18:45",
+              title: "美國村 (American Village) 異國街區與魔幻夕陽",
+              category: "景點",
+              catColor: "bg-amber-500",
+              icon: "fa-sun",
+              mapQuery: "Mihama American Village",
+              cost: "免費參觀",
+              sop: "將車停於北谷町大停車場。穿梭於色彩繽紛的美式異國建築群與 Depot Island，17:30 左右至海堤邊欣賞沖繩西海岸最著名的魔幻日落。",
+              tips: "美國村佔地廣大且路線複雜，建議鎖定海濱步道與聖誕村造景區域集中火力逛街。"
+            },
+            {
+              time: "19:30",
+              title: "入住 Hotel Collective Naha (國際通)",
+              category: "住宿",
+              catColor: "bg-indigo-600",
+              icon: "fa-hotel",
+              mapQuery: "Hotel Collective Naha",
+              cost: "住宿費已計入總預算",
+              sop: "車停飯店地下室，辦理入住。享受國際通最精華地段的五星級奢華客房。",
+              tips: "將這兩天購買的所有戰利品集中整理，準備今晚的市區宵夜戰。"
+            },
+            {
+              time: "20:30 - 22:30",
+              title: "國際通採購漫步 & 第一牧志公設市場周邊居酒屋",
+              category: "餐飲",
+              catColor: "bg-coral-500",
+              icon: "fa-utensils",
+              mapQuery: "Makishi Public Market",
+              cost: "晚餐約 ¥6,000 / 雙人",
+              sop: "下樓即是國際通。漫步至牧志市場周邊的「屋台村」或特色居酒屋，點滿沖繩炒苦瓜、生魚片與生啤酒，感受那霸熱鬧的夜生活。",
+              tips: "順便至唐吉訶德補齊免稅藥妝，買完直接提回對面飯店。"
+            }
+          ]
+        },
+        {
+          day: 4,
+          dateTitle: "Day 4: 2026/10/26 (週一)・總鎮守祈福・南部海景・滿載賦歸",
+          subtitle: "波上宮(御朱印) ➔ 知念岬 ➔ 奧武島天婦羅 ➔ 瀨長島看飛機 ➔ 滿油還車 ➔ 21:30 賦歸",
+          items: [
+            {
+              time: "09:30 - 10:30",
+              title: "琉球八社之首：波上宮 (Naminoue Shrine)",
+              category: "文化",
+              catColor: "bg-amber-600",
+              icon: "fa-torii-gate",
+              mapQuery: "Naminoue Shrine, Naha",
+              cost: "御守/御朱印約 ¥1,500",
+              sop: "登上矗立於珊瑚礁斷崖上的紅色神社。完成本次旅程第三座御朱印收集，並購買知名的「書包造型交通御守」，祈求滿載平安歸。",
+              tips: "參拜後可步行至旁邊的波之上海灘，由下往上拍攝懸崖上的波上宮全貌。"
+            },
+            {
+              time: "11:15 - 12:15",
+              title: "南部絕景：知念岬公園 & Nirai Kanai 跨海公路",
+              category: "景點",
+              catColor: "bg-emerald-600",
+              icon: "fa-road",
+              mapQuery: "Chinen Cape Park",
+              cost: "免費",
+              sop: "駛過高低落差極大、彷彿直衝太平洋的 Nirai Kanai 橋。在知念岬公園的 270 度觀景台，迎著海風遠眺神之島「久高島」。",
+              tips: "南部的海呈現漸層薄荷綠，與中北部的古宇利藍有著不同的開闊美感。"
+            },
+            {
+              time: "12:30 - 14:00",
+              title: "奧武島 (Oujima) 貓咪之島 & 中本鮮魚天婦羅",
+              category: "餐飲",
+              catColor: "bg-coral-500",
+              icon: "fa-cat",
+              mapQuery: "Nakamoto Sengyoten Tempura",
+              cost: "約 ¥1,500 / 雙人",
+              sop: "開車跨過極短的跨海橋登島。島上充滿慵懶的貓咪，排隊購買現炸的「中本鮮魚天婦羅」(推薦炸花枝與海蘊天婦羅)，坐在海堤邊吹風享用超高 CP 值午餐。",
+              tips: "小心老鷹與野貓搶食，天婦羅外皮微軟是沖繩獨特做法，非常順口。"
+            },
+            {
+              time: "14:45 - 16:45",
+              title: "瀨長島 Umikaji Terrace (沖繩小希臘) 飛機與幸福厚鬆餅",
+              category: "景點",
+              catColor: "bg-pink-500",
+              icon: "fa-plane",
+              mapQuery: "Umikaji Terrace Senagajima",
+              cost: "約 ¥3,400 (鬆餅)",
+              sop: "來到那霸機場旁的純白階梯式建築群。品嚐「幸福厚鬆餅 (A Happy Pancake)」，近距離感受大型客機從頭頂呼嘯降落的震撼，並欣賞旅程最後的海景夕陽。",
+              tips: "周一午後人潮稍減，但鬆餅仍需提早抽號碼牌等候。"
+            },
+            {
+              time: "17:15 - 18:30",
+              title: "租車門市加滿油還車 (那霸機場店)",
+              category: "交通",
+              catColor: "bg-ocean-500",
+              icon: "fa-gas-pump",
+              mapQuery: "Times Car Rental Naha Airport",
+              cost: "3天總油資約 ¥4,000",
+              sop: "前往指定加油站加滿油 (Regular)，務必保留收據。交還車輛完成驗車後，搭乘租車公司免費接駁巴士直達那霸國際航廈。",
+              tips: "嚴格檢查車內是否遺留物品，尤其是裝滿戰利品的大提袋與御朱印帳！"
+            },
+            {
+              time: "19:00 - 21:30",
+              title: "那霸機場報到 ✈ 台灣虎航 IT 233 滿載返台",
+              category: "交通",
+              catColor: "bg-ocean-500",
+              icon: "fa-plane-departure",
+              mapQuery: "Naha Airport International Terminal",
+              cost: "已含於機票",
+              sop: "19:00 抵達台灣虎航櫃台辦理托運。通關後於免稅店進行最後的「生巧克力、薯條三兄弟、泡盛酒」補貨。21:30 準時起飛，22:05 返抵台北。",
+              tips: "4 天 3 夜緊密無冷場的奢華御朱印與自嘲熊之旅完美落幕！"
+            }
+          ]
+        }
+      ],
+
+      // Updated Budget Data reflecting real ticket (TWD 27,486)
+      budgetData: {
+        categories: [
+          { name: "機票交通 (實付)", jpy: 127840, twd: 27486, icon: "fa-plane", desc: "台灣虎航雙人來回 (IT232/IT233) 實付金額 (PNR: YE6VRX)" },
+          { name: "精選住宿 (3晚)", jpy: 100000, twd: 21500, icon: "fa-hotel", desc: "3晚雙人住宿 (那霸Strata、恩納Monterey海景、那霸Collective五星)" },
+          { name: "租車與油資ETC", jpy: 35000, twd: 7525, icon: "fa-car", desc: "3天自駕 SUV + 全險安心方案(CDW/NOC) + 油資與過路費" },
+          { name: "美食饗宴", jpy: 68000, twd: 14620, icon: "fa-utensils", desc: "琉球之牛頂級和牛、海景咖啡館、居酒屋、牧志海鮮" },
+          { name: "活動與門票", jpy: 9000, twd: 1935, icon: "fa-ticket", desc: "萬座毛門票、福木林道單車租借、波上宮御守、停車費" },
+          { name: "自嘲熊與伴手禮", jpy: 37800, twd: 8120, icon: "fa-bag-shopping", desc: "PARCO CITY Nagano Market 專屬採購預備金與土產" }
+        ]
+      },
+
+      restaurants: [
+        {
+          name: "琉球之牛 (Ryukyu no Ushi 恩納本館)",
+          region: "恩納/名護北部",
+          type: "燒肉和牛",
+          rating: "4.8 ★★★★★",
+          price: "¥8,000 - ¥12,000 / 人",
+          desc: "沖繩極致和牛代表，精選縣產黑毛和牛與特選牛舌，油花細膩、入口即化。",
+          mustTry: "極上牛舌、特選和牛牛小排、和牛套餐",
+          mapQuery: "Yakiniku Ryukyu no Ushi Onna",
+          tag: "極力推薦・須預約"
+        },
+        {
+          name: "Kouri Shrimp (古宇利蝦蝦飯)",
+          region: "恩納/名護北部",
+          type: "道地料理",
+          rating: "4.5 ★★★★☆",
+          price: "¥1,500 - ¥2,200 / 人",
+          desc: "古宇利島山坡上的美式夏威夷風名店，俯瞰大橋碧藍海景吃蒜香蝦飯。",
+          mustTry: "蒜香奶油辣味蝦飯、鮮榨沖繩香檸氣泡水",
+          mapQuery: "Kouri Shrimp Okinawa",
+          tag: "打卡首選"
+        },
+        {
+          name: "星野集團 BANTA CAFE",
+          region: "中谷美濱/浦添",
+          type: "海景咖啡/甜點",
+          rating: "4.7 ★★★★★",
+          price: "¥1,200 - ¥2,000 / 人",
+          desc: "沿著海崖地貌建造的絕美咖啡館，榻榻米海景露台直接俯瞰東海夕照。",
+          mustTry: "沖繩泡泡氣泡特調、黑糖甘薯鬆餅、香檸冰棒",
+          mapQuery: "Hoshino Resorts BANTA CAFE",
+          tag: "海景天花板"
+        },
+        {
+          name: "幸福厚鬆餅 (A Happy Pancake 瀨長島店)",
+          region: "南部海景",
+          type: "海景咖啡/甜點",
+          rating: "4.6 ★★★★☆",
+          price: "¥1,400 - ¥2,000 / 人",
+          desc: "位於瀨長島小希臘露天階梯，現烤舒芙蕾厚鬆餅搭配飛機降落與夕陽。",
+          mustTry: "濃厚起司蜜桃鬆餅、現烤焦糖香蕉厚鬆餅",
+          mapQuery: "A Happy Pancake Okinawa Senagajima",
+          tag: "日落甜點名店"
+        },
+        {
+          name: "第一牧志公設市場海鮮",
+          region: "那霸市區",
+          type: "居酒屋/特色料理",
+          rating: "4.5 ★★★★☆",
+          price: "¥3,500 - ¥5,500 / 人",
+          desc: "那霸市區廚房，一樓親選生猛海鮮，二樓資深大廚現場烹調代客料理。",
+          mustTry: "夜光貝刺身+奶油炒、炭烤伊勢龍蝦",
+          mapQuery: "Makishi Public Market, Naha",
+          tag: "市區道地體驗"
+        }
+      ],
+
+      checklist: [
+        { id: "c1", category: "必要證件與金融", text: "中華民國護照正本 (效期6個月以上)", checked: true },
+        { id: "c2", category: "必要證件與金融", text: "台灣駕照正本 (自駕必備)", checked: true },
+        { id: "c3", category: "必要證件與金融", text: "日文譯本正本 (監理所申辦)", checked: true },
+        { id: "c4", category: "必要證件與金融", text: "海外高回饋信用卡 + 日幣雙幣卡", checked: true },
+        { id: "c5", category: "必要證件與金融", text: "Visit Japan Web (VJW) QR Code 截圖", checked: false },
+        { id: "c6", category: "自嘲熊採購專用裝備", text: "大容量摺疊托運袋 (裝滿周邊)", checked: false },
+        { id: "c7", category: "自嘲熊採購專用裝備", text: "透明娃包 / 娃夾 (自嘲熊拍照用)", checked: true },
+        { id: "c8", category: "自嘲熊採購專用裝備", text: "PARCO CITY 2F Nagano Market 位置截圖", checked: false },
+        { id: "c9", category: "衣物與防曬用品", text: "10月透氣短袖與棉麻襯衫 x 4套", checked: false },
+        { id: "c10", category: "衣物與防曬用品", text: "防風海邊薄外套 (早晚海風防涼)", checked: false },
+        { id: "c11", category: "衣物與防曬用品", text: "太陽眼鏡與友善海洋防曬乳", checked: false },
+        { id: "c12", category: "電子與自駕配件", text: "車用手機磁吸導航支架 (右駕必備)", checked: false },
+        { id: "c13", category: "電子與自駕配件", text: "日本 eSIM / 漫遊網卡", checked: true },
+        { id: "c14", category: "電子與自駕配件", text: "大容量行動電源 + Type-C 快充線", checked: false }
+      ]
+    };
+
+    let mapInstance = null;
+    let markersLayer = null;
+    let intensityChartInstance = null;
+    let budgetChartInstance = null;
+    let isDetailedMode = true;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initDarkMode();
+      initLeafletMap();
+      renderItinerary();
+      renderBudget();
+      renderFoodCards();
+      renderChecklist();
+      initCharts();
+      updateDashboardNumbers();
+    });
+
+    function initDarkMode() {
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        updateThemeIcon(true);
+      } else {
+        document.documentElement.classList.remove('dark');
+        updateThemeIcon(false);
+      }
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.theme = isDark ? 'dark' : 'light';
+      updateThemeIcon(isDark);
+      if (intensityChartInstance && budgetChartInstance) {
+        intensityChartInstance.destroy();
+        budgetChartInstance.destroy();
+        initCharts();
+      }
+      showToast(isDark ? "已切換為深色模式 🌙" : "已切換為淺色模式 ☀️");
+    }
+
+    function updateThemeIcon(isDark) {
+      const icon = document.getElementById("theme-icon");
+      if (icon) {
+        icon.className = isDark ? "fa-solid fa-sun text-amber-400" : "fa-solid fa-moon text-slate-600";
+      }
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(`tab-${tabId}`);
+      if (target) target.classList.remove('hidden');
+
+      // Update Nav Buttons
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        btn.classList.remove('bg-white', 'dark:bg-slate-700', 'text-brand-600', 'dark:text-brand-400', 'shadow-sm');
+        btn.classList.add('text-slate-600', 'dark:text-slate-400');
+      });
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if (activeNav) {
+        activeNav.classList.add('bg-white', 'dark:bg-slate-700', 'text-brand-600', 'dark:text-brand-400', 'shadow-sm');
+        activeNav.classList.remove('text-slate-600', 'dark:text-slate-400');
+      }
+
+      // Control visibility of floating bottom itinerary nav
+      const bottomNav = document.getElementById("itinerary-bottom-nav");
+      if (bottomNav) {
+        if (tabId === 'itinerary') {
+          bottomNav.classList.remove('hidden');
+        } else {
+          bottomNav.classList.add('hidden');
+        }
+      }
+
+      if (tabId === 'dashboard' && mapInstance) {
+        setTimeout(() => mapInstance.invalidateSize(), 200);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    function showToast(msg, iconClass = "fa-circle-check text-brand-400") {
+      const toast = document.getElementById("toast");
+      const toastMsg = document.getElementById("toast-msg");
+      const toastIcon = document.getElementById("toast-icon");
+      toastMsg.textContent = msg;
+      toastIcon.className = `fa-solid ${iconClass}`;
+      toast.classList.remove("-translate-y-10", "opacity-0");
+      setTimeout(() => {
+        toast.classList.add("-translate-y-10", "opacity-0");
+      }, 2400);
+    }
+
+    function initLeafletMap() {
+      if (document.getElementById('leaflet-map')) {
+        mapInstance = L.map('leaflet-map').setView([26.4200, 127.8500], 10);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(mapInstance);
+
+        markersLayer = L.layerGroup().addTo(mapInstance);
+        renderMapMarkers('all');
+      }
+    }
+
+    function renderMapMarkers(dayFilter = 'all') {
+      if (!markersLayer) return;
+      markersLayer.clearLayers();
+
+      const dayColors = {
+        1: '#0284c7', // Ocean
+        2: '#ec4899', // Pink (Nagano Market/Shrines)
+        3: '#10b981', // Emerald (Kouri Blue)
+        4: '#f59e0b'  // Amber (South & Sunset)
+      };
+
+      const points = dayFilter === 'all' 
+        ? appData.mapPoints 
+        : appData.mapPoints.filter(p => p.day === parseInt(dayFilter));
+
+      const latLngs = [];
+
+      points.forEach(point => {
+        const color = dayColors[point.day] || '#0d9488';
+        const customIcon = L.divIcon({
+          className: 'custom-leaflet-pin',
+          html: `<div class="custom-map-pin" style="background-color: ${color}; width: 28px; height: 28px;">D${point.day}</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
+        });
+
+        const marker = L.marker([point.lat, point.lng], { icon: customIcon });
+        const popupContent = `
+          <div class="p-1 space-y-1 text-slate-800 font-sans">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded text-white" style="background-color: ${color};">Day ${point.day}</span>
+              <span class="text-[10px] text-slate-500">${point.category}</span>
+            </div>
+            <h4 class="font-bold text-sm text-slate-900">${point.title}</h4>
+            <p class="text-xs text-slate-600 leading-tight">${point.desc}</p>
+            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(point.title + ' Okinawa')}" target="_blank" class="inline-flex items-center space-x-1 text-xs font-bold text-sky-600 hover:underline pt-1">
+              <i class="fa-solid fa-diamond-turn-right"></i>
+              <span>在 Google Maps 開啟導航</span>
+            </a>
+          </div>
+        `;
+        marker.bindPopup(popupContent);
+        markersLayer.addLayer(marker);
+        latLngs.push([point.lat, point.lng]);
+      });
+
+      if (latLngs.length > 0) {
+        const bounds = L.latLngBounds(latLngs);
+        mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 });
+      }
+    }
+
+    function filterMapByDay(day) {
+      document.querySelectorAll('.map-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-slate-900', 'text-white', 'dark:bg-brand-500', 'dark:text-slate-950');
+        btn.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+      });
+      event.target.classList.add('active', 'bg-slate-900', 'text-white', 'dark:bg-brand-500', 'dark:text-slate-950');
+      renderMapMarkers(day);
+      showToast(day === 'all' ? "已顯示全部 4 日精選座標" : `已聚焦至 第 ${day} 天 專屬動線`);
+    }
+
+    function renderItinerary() {
+      const container = document.getElementById("timeline-container");
+      if (!container) return;
+      container.innerHTML = "";
+
+      appData.itinerary.forEach(day => {
+        const dayCard = document.createElement("div");
+        dayCard.id = `day-${day.day}`;
+        dayCard.className = "bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-6 scroll-mt-20";
+
+        // Day Header
+        dayCard.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 gap-2">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/80 px-2.5 py-1 rounded-lg border border-brand-200 dark:border-brand-900">DAY 0${day.day}</span>
+              <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white mt-1.5">${day.dateTitle}</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">${day.subtitle}</p>
+            </div>
+            <button onclick="filterMapByDay(${day.day}); switchTab('dashboard');" class="self-start sm:self-center px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center space-x-1.5 transition">
+              <i class="fa-solid fa-map-pin text-brand-600"></i>
+              <span>地圖檢視此日</span>
+            </button>
+          </div>
+
+          <!-- Timeline Items -->
+          <div class="relative pl-6 sm:pl-8 space-y-7 before:content-[''] before:absolute before:left-3 sm:before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
+            ${day.items.map((item) => `
+              <div class="relative group">
+                <!-- Icon Circle on Vertical Line -->
+                <div class="absolute -left-6 sm:-left-8 top-0.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full ${item.catColor} text-white flex items-center justify-center text-xs shadow-md ring-4 ring-white dark:ring-slate-900 transition-transform group-hover:scale-110">
+                  <i class="fa-solid ${item.icon}"></i>
+                </div>
+
+                <!-- Content Card -->
+                <div class="bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors p-4 sm:p-5 rounded-2xl border border-slate-200/70 dark:border-slate-800 space-y-3">
+                  
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center space-x-2">
+                      <span class="text-xs font-bold text-slate-400 dark:text-slate-500 font-mono"><i class="fa-regular fa-clock mr-1"></i>${item.time}</span>
+                      <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md ${item.catColor} text-white">${item.category}</span>
+                    </div>
+                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400"><i class="fa-solid fa-coins mr-1 text-amber-500"></i>${item.cost}</span>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">${item.title}</h3>
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}" target="_blank" class="inline-flex items-center space-x-1 text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 shrink-0">
+                      <i class="fa-solid fa-diamond-turn-right"></i>
+                      <span>Google Maps 導航</span>
+                    </a>
+                  </div>
+
+                  <!-- Detailed SOP & Risk Section -->
+                  <div class="itinerary-detail-content ${isDetailedMode ? '' : 'hidden'} space-y-2 pt-2 border-t border-slate-200 dark:border-slate-700/60 text-xs">
+                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed"><span class="font-bold text-brand-700 dark:text-brand-300">執行操作指引 (SOP)：</span>${item.sop}</p>
+                    <p class="text-slate-500 dark:text-slate-400 italic"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i>${item.tips}</p>
+                  </div>
+
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(dayCard);
+      });
+    }
+
+    function toggleItineraryMode() {
+      isDetailedMode = !isDetailedMode;
+      const text = document.getElementById("itinerary-mode-text");
+      text.textContent = isDetailedMode ? "簡化" : "詳細SOP";
+      document.querySelectorAll(".itinerary-detail-content").forEach(el => {
+        if (isDetailedMode) el.classList.remove("hidden");
+        else el.classList.add("hidden");
+      });
+      showToast(isDetailedMode ? "已展開完整執行 SOP" : "已切換為簡化瀏覽模式");
+    }
+
+    function scrollToDay(dayElementId) {
+      const el = document.getElementById(dayElementId);
+      if (el) {
+        const offset = 80;
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementRect = el.getBoundingClientRect().top;
+        const elementPosition = elementRect - bodyRect;
+        const offsetPosition = elementPosition - offset;
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      }
+    }
+
+    function renderBudget() {
+      const tbody = document.getElementById("budget-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let totalJpy = 0;
+      let totalTwd = 0;
+
+      appData.budgetData.categories.forEach(item => {
+        totalJpy += item.jpy;
+        totalTwd += item.twd;
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/40 transition";
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-slate-800 dark:text-slate-200 flex items-center space-x-2">
+            <div class="w-7 h-7 rounded-lg bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 flex items-center justify-center text-xs">
+              <i class="fa-solid ${item.icon}"></i>
+            </div>
+            <span>${item.name}</span>
+          </td>
+          <td class="p-3 text-slate-600 dark:text-slate-400 text-xs">${item.desc}</td>
+          <td class="p-3 text-right font-mono font-bold text-slate-800 dark:text-slate-200">¥${item.jpy.toLocaleString()}</td>
+          <td class="p-3 text-right font-mono font-bold text-brand-600 dark:text-brand-400">NT$ ${item.twd.toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const sumTwdEl = document.getElementById("budget-sum-twd");
+      const sumJpyEl = document.getElementById("budget-sum-jpy");
+      const perPersonEl = document.getElementById("budget-per-person");
+      if (sumTwdEl) sumTwdEl.textContent = `NT$ ${totalTwd.toLocaleString()}`;
+      if (sumJpyEl) sumJpyEl.textContent = `¥${totalJpy.toLocaleString()}`;
+      if (perPersonEl) perPersonEl.textContent = `NT$ ${(Math.round(totalTwd / 2)).toLocaleString()}`;
+    }
+
+    function updateCurrencyRate() {
+      const rate = parseFloat(document.getElementById("custom-rate").value) || 0.215;
+      appData.tripMeta.currencyRate = rate;
+      calcFromJpy();
+      showToast(`匯率基準已更新為：1 JPY = ${rate} TWD`);
+    }
+
+    function calcFromJpy() {
+      const rate = appData.tripMeta.currencyRate || 0.215;
+      const jpy = parseFloat(document.getElementById("calc-jpy").value) || 0;
+      document.getElementById("calc-twd").value = Math.round(jpy * rate);
+    }
+
+    function calcFromTwd() {
+      const rate = appData.tripMeta.currencyRate || 0.215;
+      const twd = parseFloat(document.getElementById("calc-twd").value) || 0;
+      document.getElementById("calc-jpy").value = Math.round(twd / rate);
+    }
+
+    function quickCalc(jpyVal) {
+      document.getElementById("calc-jpy").value = jpyVal;
+      calcFromJpy();
+    }
+
+    function renderChecklist() {
+      const container = document.getElementById("checklist-container");
+      if (!container) return;
+      container.innerHTML = "";
+
+      const categories = [...new Set(appData.checklist.map(i => i.category))];
+
+      categories.forEach(cat => {
+        const catItems = appData.checklist.filter(i => i.category === cat);
+        const col = document.createElement("div");
+        col.className = "p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 space-y-2.5";
+        
+        col.innerHTML = `
+          <h4 class="text-xs font-bold text-slate-900 dark:text-white pb-1 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+            <span>${cat}</span>
+            <span class="text-[10px] text-slate-400 font-normal">${catItems.length} 項</span>
+          </h4>
+          <div class="space-y-1.5">
+            ${catItems.map(item => `
+              <label class="flex items-start space-x-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer hover:text-brand-600 select-none">
+                <input type="checkbox" onchange="toggleCheckItem('${item.id}')" ${item.checked ? 'checked' : ''} class="mt-0.5 rounded text-brand-600 focus:ring-brand-500 border-slate-300 dark:border-slate-600">
+                <span class="${item.checked ? 'line-through text-slate-400 dark:text-slate-500' : ''}">${item.text}</span>
+              </label>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(col);
+      });
+
+      updateChecklistProgress();
+    }
+
+    function toggleCheckItem(id) {
+      const target = appData.checklist.find(i => i.id === id);
+      if (target) {
+        target.checked = !target.checked;
+        renderChecklist();
+      }
+    }
+
+    function updateChecklistProgress() {
+      const total = appData.checklist.length;
+      const checkedCount = appData.checklist.filter(i => i.checked).length;
+      const pct = Math.round((checkedCount / total) * 100);
+
+      const bar = document.getElementById("checklist-progress-bar");
+      const text = document.getElementById("checklist-progress-text");
+      if (bar) bar.style.width = `${pct}%`;
+      if (text) text.textContent = `完成度: ${pct}% (${checkedCount}/${total})`;
+    }
+
+    function renderFoodCards() {
+      const container = document.getElementById("food-cards-container");
+      if (!container) return;
+      container.innerHTML = "";
+
+      const regionFilter = document.getElementById("food-region-filter")?.value || "all";
+      const typeFilter = document.getElementById("food-type-filter")?.value || "all";
+
+      const filtered = appData.restaurants.filter(r => {
+        const matchesRegion = regionFilter === 'all' || r.region.includes(regionFilter);
+        const matchesType = typeFilter === 'all' || r.type.includes(typeFilter);
+        return matchesRegion && matchesType;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-3 py-8 text-center text-xs text-slate-400">尚無符合條件的餐廳項目</div>`;
+        return;
+      }
+
+      filtered.forEach(rest => {
+        const card = document.createElement("div");
+        card.className = "p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 hover:shadow-md transition flex flex-col justify-between space-y-3";
+        card.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300">${rest.region}</span>
+              <span class="text-xs font-semibold text-amber-500">${rest.rating}</span>
+            </div>
+            <h4 class="text-base font-bold text-slate-900 dark:text-white">${rest.name}</h4>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${rest.desc}</p>
+          </div>
+
+          <div class="space-y-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+            <div class="text-[11px] text-slate-500 dark:text-slate-400">
+              <strong class="text-slate-700 dark:text-slate-300">必點推薦：</strong> ${rest.mustTry}
+            </div>
+            <div class="flex items-center justify-between text-xs pt-1">
+              <span class="font-medium text-coral-500">${rest.price}</span>
+              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rest.mapQuery)}" target="_blank" class="font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center space-x-1">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span>Google Map</span>
+              </a>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterFoodList() {
+      renderFoodCards();
+    }
+
+    function initCharts() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#94a3b8' : '#475569';
+      const gridColor = isDark ? 'rgba(51, 65, 85, 0.4)' : 'rgba(226, 232, 240, 0.8)';
+
+      // 1. Intensity Chart (4 Days)
+      const ctx1 = document.getElementById('intensityChart')?.getContext('2d');
+      if (ctx1) {
+        intensityChartInstance = new Chart(ctx1, {
+          data: {
+            labels: ['D1 10/23 (那霸)', 'D2 10/24 (自嘲熊/神社)', 'D3 10/25 (古宇利/殘波)', 'D4 10/26 (波上宮/南部)'],
+            datasets: [
+              {
+                type: 'bar',
+                label: '景點與活動時數 (小時)',
+                data: [3.0, 7.5, 8.5, 7.0],
+                backgroundColor: 'rgba(20, 184, 166, 0.75)',
+                borderColor: '#0d9488',
+                borderWidth: 1.5,
+                borderRadius: 8,
+                yAxisID: 'y'
+              },
+              {
+                type: 'line',
+                label: '預估車程耗時 (分鐘)',
+                data: [15, 90, 130, 95],
+                borderColor: '#fb7185',
+                backgroundColor: 'rgba(251, 113, 133, 0.2)',
+                tension: 0.3,
+                pointRadius: 5,
+                pointBackgroundColor: '#f43f5e',
+                yAxisID: 'y1'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              mode: 'index',
+              intersect: false,
+            },
+            scales: {
+              x: {
+                grid: { color: gridColor },
+                ticks: { color: textColor, font: { size: 10 } }
+              },
+              y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                grid: { color: gridColor },
+                ticks: { color: textColor, stepSize: 2 },
+                title: { display: true, text: '小時', color: textColor, font: { size: 10 } }
+              },
+              y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                grid: { drawOnChartArea: false },
+                ticks: { color: textColor, stepSize: 30 },
+                title: { display: true, text: '分鐘', color: textColor, font: { size: 10 } }
+              }
+            },
+            plugins: {
+              legend: {
+                labels: { color: textColor, font: { size: 11 } }
+              },
+              tooltip: {
+                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                titleColor: isDark ? '#f8fafc' : '#0f172a',
+                bodyColor: isDark ? '#cbd5e1' : '#334155',
+                borderColor: gridColor,
+                borderWidth: 1
+              }
+            }
+          }
+        });
+      }
+
+      // 2. Budget Doughnut Chart
+      const ctx2 = document.getElementById('budgetChart')?.getContext('2d');
+      if (ctx2) {
+        const labels = appData.budgetData.categories.map(c => c.name);
+        const data = appData.budgetData.categories.map(c => c.twd);
+        
+        budgetChartInstance = new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              backgroundColor: [
+                '#0ea5e9', // Ocean Blue
+                '#6366f1', // Indigo
+                '#14b8a6', // Teal
+                '#f59e0b', // Amber
+                '#ec4899', // Pink
+                '#8b5cf6'  // Purple
+              ],
+              borderWidth: 0,
+              hoverOffset: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const value = context.raw;
+                    const total = context.chart._metasets[context.datasetIndex].total;
+                    const pct = Math.round((value / total) * 100);
+                    return ` NT$ ${value.toLocaleString()} (${pct}%)`;
+                  }
+                },
+                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                titleColor: isDark ? '#f8fafc' : '#0f172a',
+                bodyColor: isDark ? '#cbd5e1' : '#334155',
+                borderColor: gridColor,
+                borderWidth: 1
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function updateDashboardNumbers() {}
+
+  </script>
+</body>
+</html>
