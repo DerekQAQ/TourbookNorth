@@ -105,15 +105,15 @@
         
         <!-- Brand Logo & Date Info -->
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-ocean-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
-            <i class="fa-solid fa-umbrella-beach text-lg"></i>
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-ocean-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20 shrink-0">
+            <i class="fa-solid fa-umbrella-beach text-base sm:text-lg"></i>
           </div>
-          <div>
+          <div class="min-w-0">
             <div class="flex items-center space-x-2">
-              <span class="font-bold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white">沖繩 4D3N 奢華漫旅</span>
-              <span class="text-xs px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950/80 text-brand-700 dark:text-brand-300 font-bold border border-brand-200 dark:border-brand-800">10/23 - 10/26</span>
+              <span class="font-bold text-sm sm:text-lg tracking-tight text-slate-900 dark:text-white truncate">沖繩 4D3N 奢華漫旅</span>
+              <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950/80 text-brand-700 dark:text-brand-300 font-bold border border-brand-200 dark:border-brand-800 shrink-0">10/23-10/26</span>
             </div>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400">IT232 ✈ IT233 (訂位: YE6VRX)</p>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 truncate">IT232 ✈ IT233 (訂位: YE6VRX)</p>
           </div>
         </div>
 
@@ -602,7 +602,7 @@
   <!-- ========================================== -->
   <!-- BOTTOM FLOATING CONTROLLER (單行置底導覽列)   -->
   <!-- ========================================== -->
-  <div id="itinerary-bottom-nav" class="hidden fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[95%] sm:w-max bg-slate-900/95 dark:bg-slate-800/95 text-white backdrop-blur-xl px-2.5 py-2 rounded-full shadow-2xl border border-slate-700/80 flex items-center justify-between sm:justify-center gap-2 transition-all duration-300">
+  <div id="itinerary-bottom-nav" class="hidden fixed bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[98%] sm:w-max bg-slate-900/95 dark:bg-slate-800/95 text-white backdrop-blur-xl px-1.5 py-1.5 sm:px-2.5 sm:py-2 rounded-full shadow-2xl border border-slate-700/80 flex items-center justify-between sm:justify-center gap-1.5 sm:gap-2 transition-all duration-300">
     
     <!-- Day Pill Buttons in Single Row -->
     <div class="flex items-center space-x-1 overflow-x-auto no-scrollbar py-0.5 whitespace-nowrap">
@@ -655,19 +655,19 @@
       mapPoints: [
         { id: "p1", day: 1, title: "那霸機場 (OKA)", lat: 26.2064, lng: 127.6465, desc: "10/23 20:50 班機抵達，入境後搭乘單軌電車前往市中心。", category: "交通" },
         { id: "p2", day: 1, title: "Hotel Strata Naha (美榮橋站)", lat: 26.2185, lng: 127.6865, desc: "D1 住宿：都會綠意精品旅店，緊鄰單軌站方便入住。", category: "住宿" },
-        { id: "p3", day: 2, title: "奧武山公園：沖宮 & 護國神社", lat: 26.2023, lng: 127.6775, desc: "收集琉球八社「沖宮」與「沖繩縣護國神社」特色御朱印。", category: "文化" },
-        { id: "p4", day: 2, title: "San-A PARCO CITY (自嘲熊官方店)", lat: 26.2625, lng: 127.6974, desc: "10/24 11:00 2F Nagano Market (自嘲熊專賣店) & Kiddy Land 旗艦採購。", category: "購物" },
-        { id: "p5", day: 2, title: "萬座毛 (Cape Manzamo)", lat: 26.5050, lng: 127.8502, desc: "象鼻天然海蝕崖與壯麗東海日落木棧道。", category: "景點" },
-        { id: "p6", day: 2, title: "御菓子御殿 恩納店", lat: 26.5033, lng: 127.8530, desc: "購買現做紅芋塔，緊湊行程中的最佳伴手禮補給站。", category: "購物" },
+        { id: "p3", day: 2, title: "奧武山公園：沖宮 & 護國神社", lat: 26.2023, lng: 127.6775, desc: "早晨氣溫涼爽時，收集特色御朱印。", category: "文化" },
+        { id: "p4", day: 2, title: "San-A PARCO CITY (自嘲熊官方店)", lat: 26.2625, lng: 127.6974, desc: "10/24 11:00 2F Nagano Market，全室內冷氣爽逛掃貨。", category: "購物" },
+        { id: "p5", day: 2, title: "御菓子御殿 恩納店", lat: 26.5033, lng: 127.8530, desc: "室內冷氣吹到飽，試吃現做紅芋塔與採購伴手禮。", category: "購物" },
+        { id: "p6", day: 2, title: "萬座毛 (Cape Manzamo)", lat: 26.5050, lng: 127.8502, desc: "避開烈日，傍晚時分欣賞象鼻天然海蝕崖夕陽。", category: "景點" },
         { id: "p7", day: 2, title: "Hotel Monterey Okinawa Spa & Resort", lat: 26.4385, lng: 127.8080, desc: "D2 住宿：恩納村面海渡假村，享用琉球之牛頂級和牛晚餐。", category: "住宿" },
-        { id: "p8", day: 3, title: "古宇利大橋 & 心形岩", lat: 26.6974, lng: 128.0205, desc: "古宇利藍跨海公路巡禮，緊接前往品嚐蝦蝦飯。", category: "景點" },
-        { id: "p9", day: 3, title: "殘波岬燈塔 (Cape Zanpa)", lat: 26.4398, lng: 127.7145, desc: "白亞色絕美燈塔，登頂俯瞰 30 公尺高的斷崖海景。", category: "景點" },
-        { id: "p10", day: 3, title: "星野集團 Banta Cafe", lat: 26.3888, lng: 127.7288, desc: "日本最大級海崖咖啡館，享受短暫的海邊下午茶。", category: "美食" },
-        { id: "p11", day: 3, title: "美國村 (American Village)", lat: 26.3164, lng: 127.7576, desc: "黃昏魔幻時刻抵達，密集好逛的異國風情購物區與夕陽。", category: "景點" },
+        { id: "p8", day: 3, title: "古宇利大橋", lat: 26.6974, lng: 128.0205, desc: "不下車曬太陽，享受冷氣與無敵的古宇利藍跨海公路巡禮。", category: "景點" },
+        { id: "p9", day: 3, title: "AEON MALL Okinawa Rycom", lat: 26.3142, lng: 127.7961, desc: "躲避正中午烈日的最佳去處，沖繩最大室內購物中心。", category: "購物" },
+        { id: "p10", day: 3, title: "星野集團 Banta Cafe", lat: 26.3888, lng: 127.7288, desc: "選擇岩穴遮陽區，享受微風與海崖下午茶。", category: "美食" },
+        { id: "p11", day: 3, title: "美國村 (American Village)", lat: 26.3164, lng: 127.7576, desc: "黃昏魔幻時刻抵達，氣溫舒適的異國風情購物區與夕陽。", category: "景點" },
         { id: "p12", day: 3, title: "Hotel Collective Naha", lat: 26.2160, lng: 127.6870, desc: "D3 住宿：國際通核心五星級奢華飯店，逛街無敵方便。", category: "住宿" },
-        { id: "p13", day: 4, title: "波上宮 (Naminoue Shrine)", lat: 26.2205, lng: 127.6711, desc: "10/26 懸崖上的琉球總鎮守神社，祈求平安小書包御守與御朱印。", category: "文化" },
-        { id: "p14", day: 4, title: "知念岬公園 & 奧武島", lat: 26.1667, lng: 127.8306, desc: "南部太平洋無敵海景與貓星人聚集的奧武島天婦羅。", category: "景點" },
-        { id: "p15", day: 4, title: "瀨長島 Umikaji Terrace", lat: 26.1755, lng: 127.6433, desc: "純白希臘風階梯露台，近距離觀賞飛機起降與幸福厚鬆餅。", category: "景點" }
+        { id: "p13", day: 4, title: "波上宮 (Naminoue Shrine)", lat: 26.2205, lng: 127.6711, desc: "10/26 趁早晨不熱時參拜琉球總鎮守神社，祈求平安小書包御守。", category: "文化" },
+        { id: "p14", day: 4, title: "Ashibinaa Outlet", lat: 26.1578, lng: 127.6534, desc: "半戶外遮陽拱廊設計，回國前的精品與運動品牌最後血拼。", category: "購物" },
+        { id: "p15", day: 4, title: "瀨長島 Umikaji Terrace", lat: 26.1755, lng: 127.6433, desc: "找間有遮陽的室內咖啡廳，近距離觀賞飛機起降與吃厚鬆餅。", category: "景點" }
       ],
 
       // 4-Day Curated Itinerary (2026/10/23 - 10/26)
@@ -697,7 +697,7 @@
               mapQuery: "Miebashi Station, Naha",
               cost: "約 ¥300 / 人",
               sop: "從機場 2F 國內線連通道步行直達「那霸空港站」。可直接刷 iPhone 綁定之 Suica / ICOCA 或於自動售票機購票，搭乘至「美榮橋站」，下車由 1 號出口搭電梯至地面層。",
-              tips: "單軌電車班次密集，車程約 14 分鐘，沿途可俯瞰那霸市區夜景。"
+              tips: "單軌電車班次密集，車程約 14 分鐘，沿途可享受夜間微風冷氣與市區夜景。"
             },
             {
               time: "22:00",
@@ -719,14 +719,14 @@
               mapQuery: "Kokusai Dori Yataimura",
               cost: "約 ¥3,500 / 雙人",
               sop: "步行至鄰近居酒屋或麵屋，點選第一杯 Orion 冰涼生啤酒、阿古豬煎餃與招牌炙燒軟骨沖繩麵，為 4 天 3 夜旅程拉開完美序幕！",
-              tips: "10 月下旬夜晚海風微涼乾爽，散步在美榮橋與國際通周邊極其舒適。"
+              tips: "10 月下旬夜晚海風微涼乾爽，散步在美榮橋與國際通周邊極其舒適，無日曬困擾。"
             }
           ]
         },
         {
           day: 2,
-          dateTitle: "Day 2: 2026/10/24 (週六)・神社巡禮・自嘲熊掃貨・恩納海景",
-          subtitle: "市區取車 ➔ 沖宮與護國神社(御朱印) ➔ PARCO CITY ➔ 萬座毛 ➔ 琉球之牛",
+          dateTitle: "Day 2: 2026/10/24 (週六)・神社巡禮・室內掃貨・恩納夕陽",
+          subtitle: "市區取車 ➔ 沖宮與護國神社(御朱印) ➔ PARCO CITY(自嘲熊) ➔ 萬座毛(避烈日) ➔ 琉球之牛",
           items: [
             {
               time: "08:30 - 09:15",
@@ -737,135 +737,135 @@
               mapQuery: "Times Car Rental Naha",
               cost: "租車3天含全險約 ¥28,000",
               sop: "出示「台灣駕照正本」+「日文譯本」。確認加保全險，現場用手機環車錄影，並設定導航前往奧武山公園。",
-              tips: "今日行程非常緊密，建議提早於 08:30 完成取車手續出發。"
+              tips: "今日行程緊湊，建議提早於 08:30 完成取車手續，趁太陽還不大時出發。"
             },
             {
               time: "09:30 - 10:45",
-              title: "特色神社雙巡禮：沖宮 & 沖繩縣護國神社 (收集御朱印)",
+              title: "晨間特色神社雙巡禮：沖宮 & 沖繩縣護國神社",
               category: "文化",
               catColor: "bg-amber-600",
               icon: "fa-torii-gate",
               mapQuery: "Okinogu Shrine",
               cost: "御朱印約 ¥300-500/枚",
-              sop: "將車停於奧武山公園停車場。先參拜琉球八社之一的「沖宮」，以黃紅對比色的拜殿聞名，御朱印極具藝術感；接著步行至旁邊的「護國神社」參拜，一次收集兩座重量級神社的御朱印。",
-              tips: "記得隨身攜帶御朱印帳，若無可於沖宮現場購買充滿琉球特色的精美朱印帳。"
+              sop: "趁早晨氣溫涼爽，將車停於奧武山公園。先參拜琉球八社之一的「沖宮」，其御朱印極具藝術感；接著步行至旁邊的「護國神社」參拜，一次收集兩座重量級御朱印。",
+              tips: "早晨日照溫和，是拍攝紅黃相間神社建築的最佳時機。"
             },
             {
-              time: "11:00 - 14:00",
-              title: "San-A PARCO CITY：自嘲熊專賣店掃貨 & 午餐",
+              time: "11:00 - 14:30",
+              title: "San-A PARCO CITY (自嘲熊掃貨 & 冷氣房午餐)",
               category: "購物",
               catColor: "bg-pink-500",
               icon: "fa-bag-shopping",
               mapQuery: "SAN-A URASOE WEST COAST PARCO CITY",
               cost: "購物金預估 ¥25,000",
-              sop: "直奔 2F Nagano Market (自嘲熊官方店)。優先挑選沖繩限定「風獅爺自嘲熊娃娃」、盲盒與吊飾。採購後直接在 PARCO CITY 美食街面海座位快速享用午餐，並至 1F 辦理退稅。",
-              tips: "時間緊湊，建議午餐選擇拉麵或漢堡排等上餐快速的料理，吃飽直接北上。"
+              sop: "避開中午烈日！直奔 2F Nagano Market 挑選沖繩限定「風獅爺自嘲熊娃娃」。採購後直接在美食街面海座位吹冷氣享用午餐，並至 1F 辦理退稅。",
+              tips: "這間是全沖繩最大海景商場，室內冷氣極強，逛到下午最熱的時段過去再離開。"
             },
             {
-              time: "15:00 - 16:00",
-              title: "萬座毛 (Cape Manzamo) 象鼻海蝕斷崖",
-              category: "景點",
-              catColor: "bg-emerald-600",
-              icon: "fa-mountain-sun",
-              mapQuery: "Cape Manzamo",
-              cost: "門票 ¥100 / 人",
-              sop: "抵達恩納村，漫步於環形木棧道，欣賞大自然鬼斧神工的象鼻海蝕斷崖與清澈見底的東海海域。",
-              tips: "下午時分陽光折射在海面上非常適合拍照，風大需注意帽子。"
-            },
-            {
-              time: "16:15 - 17:00",
-              title: "御菓子御殿 恩納店 (海景紅芋塔伴手禮)",
+              time: "15:30 - 16:30",
+              title: "御菓子御殿 恩納店 (室內海景紅芋塔伴手禮)",
               category: "購物",
               catColor: "bg-pink-500",
               icon: "fa-gift",
               mapQuery: "Okashigoten Onna",
               cost: "約 ¥3,000",
-              sop: "順路造訪外觀如首里城的御菓子御殿。試吃並快速採買新鮮的紅芋塔、雪鹽與各式土產，店內後方即可看見絕美沙灘。",
+              sop: "順路北上造訪外觀如首里城的御菓子御殿。在室內吹冷氣試吃現做紅芋塔、雪鹽與各式土產，店內大片玻璃窗即可安全賞海景。",
               tips: "將伴手禮一次買齊丟車上，免去後續提著大包小包逛街的困擾。"
             },
             {
-              time: "17:15",
+              time: "17:00 - 18:00",
+              title: "萬座毛 (Cape Manzamo) 象鼻海蝕斷崖 (賞夕陽)",
+              category: "景點",
+              catColor: "bg-emerald-600",
+              icon: "fa-mountain-sun",
+              mapQuery: "Cape Manzamo",
+              cost: "門票 ¥100 / 人",
+              sop: "刻意將萬座毛排在傍晚！此時太陽已準備西下，少了正中午的毒辣日曬。漫步於環形木棧道，欣賞被夕陽染成金黃色的象鼻海蝕斷崖。",
+              tips: "海風吹來非常涼爽，是拍出絕美逆光照的最佳時刻。"
+            },
+            {
+              time: "18:15",
               title: "入住 Hotel Monterey Okinawa Spa & Resort",
               category: "住宿",
               catColor: "bg-indigo-600",
               icon: "fa-hotel",
               mapQuery: "Hotel Monterey Okinawa Spa & Resort",
               cost: "住宿費已計入總預算",
-              sop: "辦理 Check-in，將行李與戰利品放進全海景陽台客房，短暫休息洗漱。",
-              tips: "趁太陽完全下山前，在陽台喝罐 Orion 啤酒享受恩納海風。"
+              sop: "辦理 Check-in，將行李與戰利品放進全海景陽台客房，稍作洗漱。",
+              tips: "渡假村設施完善，冷氣極冷，洗個臉換上乾爽衣服準備吃大餐。"
             },
             {
-              time: "18:30 - 20:30",
+              time: "18:45 - 20:45",
               title: "極致晚餐：琉球之牛 (恩納本館) 黑毛和牛燒肉",
               category: "餐飲",
               catColor: "bg-coral-500",
               icon: "fa-fire-burner",
               mapQuery: "Yakiniku Ryukyu no Ushi Onna",
               cost: "約 ¥16,000 / 雙人",
-              sop: "【需提前預約】品嚐沖繩特選頂級和牛牛小排與厚切牛舌，油花細膩入口即化，慰勞一整天緊湊豐富的行程。",
-              tips: "距離飯店極近，可散步前往，吃飽後也能在附近超商買些零食回房。"
+              sop: "【需提前預約】品嚐沖繩特選頂級和牛牛小排與厚切牛舌，油花細膩入口即化，慰勞一整天豐富的行程。",
+              tips: "距離飯店極近，吃飽後也能在附近超商買些零食散步回房。"
             }
           ]
         },
         {
           day: 3,
-          dateTitle: "Day 3: 2026/10/25 (週日)・蔚藍絕景・美國村魔幻夕陽",
-          subtitle: "古宇利大橋 ➔ 蝦蝦飯 ➔ 殘波岬燈塔 ➔ 星野海崖咖啡 ➔ 美國村 ➔ 國際通",
+          dateTitle: "Day 3: 2026/10/25 (週日)・避暑購物・蔚藍絕景與魔幻夕陽",
+          subtitle: "古宇利車遊 ➔ 蝦蝦飯 ➔ AEON Rycom(室內避暑) ➔ Banta Cafe(岩穴) ➔ 美國村 ➔ 國際通",
           items: [
             {
-              time: "09:30 - 11:00",
-              title: "古宇利大橋 (Kouri Ocean Drive) & 心形岩",
+              time: "09:30 - 10:15",
+              title: "古宇利大橋 (Kouri Ocean Drive) 車內觀景兜風",
               category: "景點",
               catColor: "bg-emerald-600",
-              icon: "fa-bridge-water",
+              icon: "fa-car",
               mapQuery: "Kouri Bridge, Okinawa",
-              cost: "大橋免費 / 心形岩停車 ¥300",
-              sop: "早晨驅車行駛於被「古宇利藍」包圍的跨海大橋。直奔島嶼北側的「心形岩 (Heart Rock)」沙灘，踩水拍照。",
-              tips: "早點去可避開車潮，心形岩沙灘步行需經過一段礁石，請穿著好走的鞋子。"
+              cost: "大橋免費",
+              sop: "早晨驅車行駛於被「古宇利藍」包圍的跨海大橋。為了避免大量流汗，我們不在沙灘徒步，而是享受在冷氣車內看兩側無敵海景的兜風體驗。",
+              tips: "可將車停在橋頭或橋尾的停車場，快速下車拍幾張美照即上車。"
             },
             {
-              time: "11:15 - 12:30",
-              title: "午餐：Kouri Shrimp 蝦蝦飯",
+              time: "10:30 - 11:30",
+              title: "早午餐：Kouri Shrimp 蝦蝦飯",
               category: "餐飲",
               catColor: "bg-coral-500",
               icon: "fa-shrimp",
               mapQuery: "Kouri Shrimp",
               cost: "約 ¥4,000 / 雙人",
-              sop: "點選招牌「蒜香奶油辣味檸檬蝦飯」，在觀景露台邊吹海風邊俯瞰跨海大橋，享受夏威夷般的度假氛圍。",
-              tips: "點餐採自助點餐機，取餐後記得拿取大量紙巾，剝蝦會沾滿醬汁。"
+              sop: "點選招牌「蒜香奶油辣味檸檬蝦飯」，選擇二樓有頂棚遮陽的觀景露台座位，邊吹海風邊俯瞰跨海大橋。",
+              tips: "避開正中午的用餐人潮，提早吃早午餐最聰明。"
             },
             {
-              time: "13:45 - 14:45",
-              title: "殘波岬燈塔 (Cape Zanpa) 白亞斷崖絕景",
-              category: "景點",
-              catColor: "bg-emerald-600",
-              icon: "fa-tower-observation",
-              mapQuery: "Cape Zanpa Lighthouse",
-              cost: "登塔費 ¥300 / 人",
-              sop: "沿西海岸南下抵達殘波岬。這是一座高達 31 公尺的純白燈塔，體力允許務必爬 99 階樓梯登頂，俯瞰周圍 30 公尺高連綿的珊瑚礁斷崖拍打著巨浪。",
-              tips: "風非常大！但從高空俯瞰東海 360 度的視野絕對值回票價。"
+              time: "12:30 - 15:00",
+              title: "AEON MALL Okinawa Rycom (永旺夢樂城) 室內避暑大採購",
+              category: "購物",
+              catColor: "bg-pink-500",
+              icon: "fa-bag-shopping",
+              mapQuery: "AEON MALL Okinawa Rycom",
+              cost: "購物金預估 ¥15,000",
+              sop: "在全天最熱的時段，我們躲進沖繩最大的室內購物商城！這裡冷氣極冷，擁有百家服飾、日雜與免稅店，甚至有一座大水族箱可以觀賞(補足不看水族館的遺憾)。",
+              tips: "逛累了隨時有室內沙發區與咖啡廳可休息，完全不用曬太陽。"
             },
             {
-              time: "15:00 - 16:15",
-              title: "星野集團 Banta Cafe (海崖咖啡)",
+              time: "15:30 - 16:30",
+              title: "星野集團 Banta Cafe (海崖咖啡 - 岩穴遮陽區)",
               category: "美食",
               catColor: "bg-brand-600",
               icon: "fa-mug-saucer",
               mapQuery: "Hoshino Resorts BANTA CAFE",
               cost: "約 ¥3,500 / 雙人",
-              sop: "點杯沖繩香檸氣泡飲，選擇「海邊露台榻榻米區」盤腿席地而坐，在此稍作放空，聆聽海浪聲恢復體力。",
-              tips: "這是一個過渡的休憩站，喝完飲料拍完照即可準備前往下一個高密度戰區。"
+              sop: "點杯沖繩香檸氣泡飲，務必選擇「海邊露台榻榻米區」或是位於陰影處的「岩穴區 (Rocky Area)」，在此聆聽海浪聲恢復體力。",
+              tips: "不選頂樓的無遮蔽區，岩穴區天然涼爽且充滿秘境感。"
             },
             {
-              time: "16:45 - 18:45",
+              time: "17:00 - 19:00",
               title: "美國村 (American Village) 異國街區與魔幻夕陽",
               category: "景點",
               catColor: "bg-amber-500",
               icon: "fa-sun",
               mapQuery: "Mihama American Village",
               cost: "免費參觀",
-              sop: "將車停於北谷町大停車場。穿梭於色彩繽紛的美式異國建築群與 Depot Island，17:30 左右至海堤邊欣賞沖繩西海岸最著名的魔幻日落。",
-              tips: "美國村佔地廣大且路線複雜，建議鎖定海濱步道與聖誕村造景區域集中火力逛街。"
+              sop: "17:00 後陽光不再刺眼。穿梭於色彩繽紛的美式異國建築群與 Depot Island，至海堤邊欣賞沖繩西海岸最著名的魔幻日落。",
+              tips: "傍晚氣溫極為舒適，美國村的燈光亮起時氣氛最佳。"
             },
             {
               time: "19:30",
@@ -886,62 +886,51 @@
               icon: "fa-utensils",
               mapQuery: "Makishi Public Market",
               cost: "晚餐約 ¥6,000 / 雙人",
-              sop: "下樓即是國際通。漫步至牧志市場周邊的「屋台村」或特色居酒屋，點滿沖繩炒苦瓜、生魚片與生啤酒，感受那霸熱鬧的夜生活。",
+              sop: "下樓即是國際通。晚上完全無日曬，漫步至牧志市場周邊的「屋台村」或特色居酒屋，點滿沖繩炒苦瓜與生啤酒。",
               tips: "順便至唐吉訶德補齊免稅藥妝，買完直接提回對面飯店。"
             }
           ]
         },
         {
           day: 4,
-          dateTitle: "Day 4: 2026/10/26 (週一)・總鎮守祈福・南部海景・滿載賦歸",
-          subtitle: "波上宮(御朱印) ➔ 知念岬 ➔ 奧武島天婦羅 ➔ 瀨長島看飛機 ➔ 滿油還車 ➔ 21:30 賦歸",
+          dateTitle: "Day 4: 2026/10/26 (週一)・總鎮守祈福・Outlet血拼・滿載賦歸",
+          subtitle: "波上宮(御朱印) ➔ Ashibinaa Outlet ➔ 瀨長島看飛機(遮陽處) ➔ 18:30 還車 ➔ 21:30 賦歸",
           items: [
             {
-              time: "09:30 - 10:30",
+              time: "09:30 - 10:15",
               title: "琉球八社之首：波上宮 (Naminoue Shrine)",
               category: "文化",
               catColor: "bg-amber-600",
               icon: "fa-torii-gate",
               mapQuery: "Naminoue Shrine, Naha",
               cost: "御守/御朱印約 ¥1,500",
-              sop: "登上矗立於珊瑚礁斷崖上的紅色神社。完成本次旅程第三座御朱印收集，並購買知名的「書包造型交通御守」，祈求滿載平安歸。",
-              tips: "參拜後可步行至旁邊的波之上海灘，由下往上拍攝懸崖上的波上宮全貌。"
+              sop: "趁早晨涼爽時，登上矗立於珊瑚礁斷崖上的紅色神社。完成本次旅程第三座御朱印收集，並購買知名的「書包造型交通御守」。",
+              tips: "速戰速決，參拜完拍完照即上車前往南部。"
             },
             {
-              time: "11:15 - 12:15",
-              title: "南部絕景：知念岬公園 & Nirai Kanai 跨海公路",
+              time: "11:00 - 14:00",
+              title: "Okinawa Outlet Mall ASHIBINAA (半室內遮陽血拼)",
+              category: "購物",
+              catColor: "bg-pink-500",
+              icon: "fa-bag-shopping",
+              mapQuery: "Okinawa Outlet Mall ASHIBINAA",
+              cost: "購物金預估 ¥20,000",
+              sop: "沖繩唯一的大型 Outlet！園區設計有大量的連通拱廊與遮陽傘，逛街免曝曬。鎖定各大精品、運動品牌 (Nike/Adidas) 進行回國前最後掃貨，午餐直接在園區內解決。",
+              tips: "逛街環境通風且遮蔽良好，是中午避暑又不想浪費時間的最佳選擇。"
+            },
+            {
+              time: "14:30 - 16:30",
+              title: "瀨長島 Umikaji Terrace (沖繩小希臘) 室內吃鬆餅",
               category: "景點",
               catColor: "bg-emerald-600",
-              icon: "fa-road",
-              mapQuery: "Chinen Cape Park",
-              cost: "免費",
-              sop: "駛過高低落差極大、彷彿直衝太平洋的 Nirai Kanai 橋。在知念岬公園的 270 度觀景台，迎著海風遠眺神之島「久高島」。",
-              tips: "南部的海呈現漸層薄荷綠，與中北部的古宇利藍有著不同的開闊美感。"
-            },
-            {
-              time: "12:30 - 14:00",
-              title: "奧武島 (Oujima) 貓咪之島 & 中本鮮魚天婦羅",
-              category: "餐飲",
-              catColor: "bg-coral-500",
-              icon: "fa-cat",
-              mapQuery: "Nakamoto Sengyoten Tempura",
-              cost: "約 ¥1,500 / 雙人",
-              sop: "開車跨過極短的跨海橋登島。島上充滿慵懶的貓咪，排隊購買現炸的「中本鮮魚天婦羅」(推薦炸花枝與海蘊天婦羅)，坐在海堤邊吹風享用超高 CP 值午餐。",
-              tips: "小心老鷹與野貓搶食，天婦羅外皮微軟是沖繩獨特做法，非常順口。"
-            },
-            {
-              time: "14:45 - 16:45",
-              title: "瀨長島 Umikaji Terrace (沖繩小希臘) 飛機與幸福厚鬆餅",
-              category: "景點",
-              catColor: "bg-pink-500",
               icon: "fa-plane",
               mapQuery: "Umikaji Terrace Senagajima",
               cost: "約 ¥3,400 (鬆餅)",
-              sop: "來到那霸機場旁的純白階梯式建築群。品嚐「幸福厚鬆餅 (A Happy Pancake)」，近距離感受大型客機從頭頂呼嘯降落的震撼，並欣賞旅程最後的海景夕陽。",
-              tips: "周一午後人潮稍減，但鬆餅仍需提早抽號碼牌等候。"
+              sop: "來到那霸機場旁的純白階梯式建築群。我們不走在外面曬太陽，而是直接找一間有冷氣與大窗戶的室內咖啡廳 (如 幸福厚鬆餅)，邊吃甜點邊近距離看大型客機降落。",
+              tips: "周一午後人潮稍減，選擇室內靠窗座位是享受瀨長島最聰明的方式。"
             },
             {
-              time: "17:15 - 18:30",
+              time: "17:00 - 18:00",
               title: "租車門市加滿油還車 (那霸機場店)",
               category: "交通",
               catColor: "bg-ocean-500",
@@ -960,7 +949,7 @@
               mapQuery: "Naha Airport International Terminal",
               cost: "已含於機票",
               sop: "19:00 抵達台灣虎航櫃台辦理托運。通關後於免稅店進行最後的「生巧克力、薯條三兄弟、泡盛酒」補貨。21:30 準時起飛，22:05 返抵台北。",
-              tips: "4 天 3 夜緊密無冷場的奢華御朱印與自嘲熊之旅完美落幕！"
+              tips: "4 天 3 夜緊密無日曬負擔的奢華御朱印與自嘲熊之旅完美落幕！"
             }
           ]
         }
@@ -1233,53 +1222,53 @@
       appData.itinerary.forEach(day => {
         const dayCard = document.createElement("div");
         dayCard.id = `day-${day.day}`;
-        dayCard.className = "bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-6 scroll-mt-20";
+        dayCard.className = "bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-4 sm:p-6 shadow-sm space-y-5 sm:space-y-6 scroll-mt-20";
 
         // Day Header
         dayCard.innerHTML = `
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 gap-2">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 sm:pb-4 gap-2">
             <div>
-              <span class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/80 px-2.5 py-1 rounded-lg border border-brand-200 dark:border-brand-900">DAY 0${day.day}</span>
-              <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white mt-1.5">${day.dateTitle}</h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400">${day.subtitle}</p>
+              <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/80 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-brand-200 dark:border-brand-900">DAY 0${day.day}</span>
+              <h2 class="text-base sm:text-xl font-black text-slate-900 dark:text-white mt-1.5">${day.dateTitle}</h2>
+              <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">${day.subtitle}</p>
             </div>
-            <button onclick="filterMapByDay(${day.day}); switchTab('dashboard');" class="self-start sm:self-center px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center space-x-1.5 transition">
+            <button onclick="filterMapByDay(${day.day}); switchTab('dashboard');" class="self-start sm:self-center px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center space-x-1.5 transition">
               <i class="fa-solid fa-map-pin text-brand-600"></i>
-              <span>地圖檢視此日</span>
+              <span>地圖檢視</span>
             </button>
           </div>
 
           <!-- Timeline Items -->
-          <div class="relative pl-6 sm:pl-8 space-y-7 before:content-[''] before:absolute before:left-3 sm:before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
+          <div class="relative pl-5 sm:pl-8 space-y-5 sm:space-y-7 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
             ${day.items.map((item) => `
               <div class="relative group">
                 <!-- Icon Circle on Vertical Line -->
-                <div class="absolute -left-6 sm:-left-8 top-0.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full ${item.catColor} text-white flex items-center justify-center text-xs shadow-md ring-4 ring-white dark:ring-slate-900 transition-transform group-hover:scale-110">
+                <div class="absolute -left-5 sm:-left-8 top-1 sm:top-0.5 w-5 h-5 sm:w-7 sm:h-7 rounded-full ${item.catColor} text-white flex items-center justify-center text-[10px] sm:text-xs shadow-md ring-4 ring-white dark:ring-slate-900 transition-transform group-hover:scale-110">
                   <i class="fa-solid ${item.icon}"></i>
                 </div>
 
                 <!-- Content Card -->
-                <div class="bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors p-4 sm:p-5 rounded-2xl border border-slate-200/70 dark:border-slate-800 space-y-3">
+                <div class="bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors p-3.5 sm:p-5 rounded-2xl border border-slate-200/70 dark:border-slate-800 space-y-2.5 sm:space-y-3">
                   
-                  <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex items-center space-x-2">
-                      <span class="text-xs font-bold text-slate-400 dark:text-slate-500 font-mono"><i class="fa-regular fa-clock mr-1"></i>${item.time}</span>
-                      <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md ${item.catColor} text-white">${item.category}</span>
+                  <div class="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2">
+                    <div class="flex items-center space-x-1.5 sm:space-x-2">
+                      <span class="text-[11px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 font-mono"><i class="fa-regular fa-clock mr-1"></i>${item.time}</span>
+                      <span class="text-[10px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded-md ${item.catColor} text-white">${item.category}</span>
                     </div>
-                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400"><i class="fa-solid fa-coins mr-1 text-amber-500"></i>${item.cost}</span>
+                    <span class="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400"><i class="fa-solid fa-coins mr-1 text-amber-500"></i>${item.cost}</span>
                   </div>
 
-                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white">${item.title}</h3>
-                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}" target="_blank" class="inline-flex items-center space-x-1 text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 shrink-0">
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
+                    <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug">${item.title}</h3>
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}" target="_blank" class="inline-flex items-center space-x-1 text-[11px] sm:text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 shrink-0">
                       <i class="fa-solid fa-diamond-turn-right"></i>
-                      <span>Google Maps 導航</span>
+                      <span>Google Maps</span>
                     </a>
                   </div>
 
                   <!-- Detailed SOP & Risk Section -->
-                  <div class="itinerary-detail-content ${isDetailedMode ? '' : 'hidden'} space-y-2 pt-2 border-t border-slate-200 dark:border-slate-700/60 text-xs">
-                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed"><span class="font-bold text-brand-700 dark:text-brand-300">執行操作指引 (SOP)：</span>${item.sop}</p>
+                  <div class="itinerary-detail-content ${isDetailedMode ? '' : 'hidden'} space-y-1.5 sm:space-y-2 pt-2 border-t border-slate-200 dark:border-slate-700/60 text-[11px] sm:text-xs">
+                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed"><span class="font-bold text-brand-700 dark:text-brand-300">防曬與操作指引：</span>${item.sop}</p>
                     <p class="text-slate-500 dark:text-slate-400 italic"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i>${item.tips}</p>
                   </div>
 
