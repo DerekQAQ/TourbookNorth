@@ -8,10 +8,6 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Leaflet CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -85,9 +81,26 @@
             color: white;
             border-color: #3b82f6;
         }
+
+        /* Interactive SVG Map Styles */
+        .svg-map-pin {
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+            transform-box: fill-box;
+        }
+        .svg-map-pin:hover, .svg-map-pin.active {
+            transform: scale(1.22);
+        }
+        @keyframes dashDraw {
+            to { stroke-dashoffset: -40; }
+        }
+        .route-line-animated {
+            animation: dashDraw 2.5s linear infinite;
+        }
     </style>
 </head>
-<body class="text-slate-800 pb-28 pt-16"> <!-- Padding increased to pb-28 for floating bottom panel -->
+<body class="text-slate-800 pb-28 pt-16">
 
     <!-- Top Navigation -->
     <nav class="glass-nav fixed top-0 w-full z-50 transition-all duration-300">
@@ -141,13 +154,43 @@
                 <div class="absolute -right-10 -top-10 opacity-10 text-9xl">🏰</div>
                 <div class="relative z-10">
                     <h1 class="text-3xl md:text-4xl font-bold mb-2">2026 冬季奧捷匈童話之旅</h1>
-                    <p class="text-blue-100 mb-6 text-lg">12天10夜 ‧ 自然風光與雙城深度自駕</p>
+                    <p class="text-blue-100 mb-6 text-lg">12天10夜 ‧ 自然風光與雙城深度自駕 (住宿、租車、鹽礦、美泉宮、歌劇已全數確認)</p>
                     <div class="flex flex-wrap gap-3">
                         <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">📅 2026/12/23 - 2027/01/04</span>
-                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">👥 2人小團</span>
-                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">🚗 SUV 尊榮自駕</span>
-                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">❄️ 聖誕市集 & 跨年煙火</span>
+                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">👥 2人小團 (CheChi Shih)</span>
+                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">🚗 SUV 自排 (MEGA DRIVE)</span>
+                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">⛏️ 12/30 鹽礦 13:10 已訂票</span>
+                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm flex items-center">🏰 1/3 美泉宮 09:30 & 歌劇《蝙蝠》已訂票</span>
                     </div>
+                </div>
+            </div>
+
+            <!-- Booking Status Quick Summary Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div onclick="switchView('info')" class="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm cursor-pointer hover:border-blue-300 transition-colors">
+                    <div class="text-xs text-slate-400 font-medium">✈️ 國際航班</div>
+                    <div class="text-sm font-bold text-slate-800 mt-1">長榮 BR65 / BR66</div>
+                    <div class="text-xs text-emerald-600 font-bold mt-1">✅ 已確認直飛</div>
+                </div>
+                <div onclick="switchView('info')" class="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm cursor-pointer hover:border-blue-300 transition-colors">
+                    <div class="text-xs text-slate-400 font-medium">🏨 全程住宿 (10晚)</div>
+                    <div class="text-sm font-bold text-slate-800 mt-1">7 間精選飯店</div>
+                    <div class="text-xs text-emerald-600 font-bold mt-1">✅ 已全數預訂付清</div>
+                </div>
+                <div onclick="switchView('info')" class="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm cursor-pointer hover:border-blue-300 transition-colors">
+                    <div class="text-xs text-slate-400 font-medium">🚗 跨國租車 (10天)</div>
+                    <div class="text-sm font-bold text-slate-800 mt-1">MEGA DRIVE (SUV)</div>
+                    <div class="text-xs text-amber-600 font-bold mt-1">✅ 已訂 (到店付 €644.51)</div>
+                </div>
+                <div onclick="switchView('info')" class="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm cursor-pointer hover:border-blue-300 transition-colors">
+                    <div class="text-xs text-slate-400 font-medium">⛏️ 貝希特斯加登鹽礦</div>
+                    <div class="text-sm font-bold text-slate-800 mt-1">12/30 13:10 場次</div>
+                    <div class="text-xs text-emerald-600 font-bold mt-1">✅ 已付清 (€53 / #546261)</div>
+                </div>
+                <div onclick="switchView('info')" class="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm cursor-pointer hover:border-blue-300 transition-colors col-span-2 md:col-span-1">
+                    <div class="text-xs text-slate-400 font-medium">🏰 美泉宮 & 🎭 歌劇院</div>
+                    <div class="text-sm font-bold text-slate-800 mt-1">1/3 09:30 & 19:00</div>
+                    <div class="text-xs text-emerald-600 font-bold mt-1">✅ 雙票皆已付清 (€84+€380)</div>
                 </div>
             </div>
 
@@ -161,16 +204,21 @@
 
             <!-- Map & Chart Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Map -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-                    <h2 class="text-lg font-bold mb-3 text-slate-700">📍 行程總覽地圖</h2>
-                    <div id="overview-map" class="h-64 md:h-80 w-full rounded-xl z-10"></div>
+                <!-- Zero-API Interactive SVG Route Map -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex flex-col">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h2 class="text-lg font-bold text-slate-700">🗺️ 奧捷匈德斯五國自駕互動路線圖</h2>
+                        <span class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium">💡 點擊地標圓點可查看詳情與跳轉</span>
+                    </div>
+                    <div id="overview-map" class="w-full rounded-xl bg-slate-900 relative overflow-hidden border border-slate-200 flex-1 min-h-[300px]">
+                        <!-- Pure SVG Interactive Map Injected by JS -->
+                    </div>
                 </div>
                 
                 <!-- Chart -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex flex-col">
                     <h2 class="text-lg font-bold mb-3 text-slate-700">📊 行程強度分析 (時數)</h2>
-                    <div class="h-64 md:h-80 w-full relative">
+                    <div class="h-64 md:h-80 w-full relative flex-1">
                         <canvas id="intensity-chart"></canvas>
                     </div>
                 </div>
@@ -178,7 +226,7 @@
 
             <!-- Highlights List -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-                <h2 class="text-lg font-bold mb-3 text-slate-700">✨ 每日精華快覽</h2>
+                <h2 class="text-lg font-bold mb-3 text-slate-700">✨ 每日精華與住宿快覽</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="highlights-container">
                     <!-- Highlights injected by JS -->
                 </div>
@@ -256,7 +304,7 @@
                     </h3>
                     
                     <div class="flex space-x-2 mb-4">
-                        <input type="text" id="expense-name" placeholder="項目 (如: 晚餐)" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="expense-name" placeholder="項目 (如: 租車尾款)" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <input type="number" id="expense-amount" placeholder="€ 金額" class="w-24 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <button onclick="addExpense()" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors">新增</button>
                     </div>
@@ -264,7 +312,6 @@
                     <div class="flex-1 overflow-y-auto no-scrollbar border border-slate-100 rounded-lg p-2 bg-slate-50">
                         <ul id="expense-list" class="space-y-2">
                             <!-- Expenses injected here -->
-                            <li class="text-center text-slate-400 text-sm mt-4">尚無紀錄</li>
                         </ul>
                     </div>
                 </div>
@@ -273,10 +320,24 @@
 
         <!-- ================= VIEW 5: Info & Prep ================= -->
         <section id="view-info" class="view-section hidden space-y-8">
-            <!-- Flights -->
+            
+            <!-- Security Alert Banner for Marrol's Boutique Hotel Phishing -->
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🛡️</span>
+                    <div>
+                        <h3 class="text-sm font-bold text-amber-900">重要防詐提醒 (針對 Marrol's Boutique Hotel 預訂)</h3>
+                        <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                            您先前於 WhatsApp 收到來自「Shourabh Enterprise」要求點擊 <code>booking-authorize893921.com</code> 驗證訂單的訊息為<strong>典型釣魚詐騙</strong>！飯店官方確認信中已特別發佈 Security Warning 警告此類詐騙。您的官網訂單（確認號：<strong>RES101735726R2526</strong>，€184.50）已 100% 預付確認成功，<strong>請絕對不要點擊該 WhatsApp 連結或輸入任何信用卡資訊</strong>。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1. Flights -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <div class="bg-slate-100 px-6 py-4 border-b border-slate-200">
-                    <h2 class="text-lg font-bold text-slate-800 flex items-center">✈️ 關鍵航班資訊</h2>
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center">✈️ 關鍵航班資訊 (已確認)</h2>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm text-slate-600">
@@ -297,7 +358,7 @@
                                     <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-bold">長榮</span>
                                     BR65
                                 </td>
-                                <td class="px-6 py-4">23:35 TPE ➔ 06:45<sup>+1</sup> VIE</td>
+                                <td class="px-6 py-4">23:35 TPE ➔ 06:45<sup>+1</sup> VIE (12/24 抵達)</td>
                                 <td class="px-6 py-4">
                                     <a href="https://zh-tw.flightaware.com/live/flight/EVA65" target="_blank" class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1">
                                         FlightAware 追蹤
@@ -312,7 +373,7 @@
                                     <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-bold">長榮</span>
                                     BR66
                                 </td>
-                                <td class="px-6 py-4">12:05 VIE ➔ 06:40<sup>+1</sup> TPE</td>
+                                <td class="px-6 py-4">12:05 VIE ➔ 06:40<sup>+1</sup> TPE (01/05 抵達)</td>
                                 <td class="px-6 py-4">
                                     <a href="https://zh-tw.flightaware.com/live/flight/EVA66" target="_blank" class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1">
                                         FlightAware 追蹤
@@ -325,39 +386,155 @@
                 </div>
             </div>
 
-            <!-- Accommodations -->
+            <!-- 2. Accommodations -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center">🏨 住宿安排</h2>
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center">🏨 住宿預訂總覽 (7間飯店全數確認)</h2>
+                    <span class="text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-full font-medium">💡 房費皆已線上付清，僅城市稅/停車費到店支付</span>
+                </div>
                 <div class="space-y-3" id="accom-list">
                     <!-- Injected by JS -->
                 </div>
             </div>
 
-            <!-- Car Rental -->
+            <!-- 3. Car Rental -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center">🚗 租車資訊</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="flex items-start gap-3">
-                        <div class="text-2xl">🚙</div>
-                        <div>
-                            <p class="font-bold text-slate-700">預定車型</p>
-                            <p class="text-sm text-slate-600">SUV (如 VW Tiguan 或同級) 自排</p>
-                            <p class="text-xs text-slate-400 mt-1">含冬季雪胎配備</p>
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">🚗 租車憑證詳情 (EconomyCarRentals / MEGA DRIVE)</h2>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-50 text-blue-700 text-xs font-mono font-bold px-2.5 py-1 rounded">e-Voucher: ECF6E578</span>
+                        <span class="bg-indigo-50 text-indigo-700 text-xs font-mono font-bold px-2.5 py-1 rounded">車行確認號: 1EG69E</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <!-- Column 1: Vehicle & Package -->
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                        <div class="flex items-center gap-2 font-bold text-slate-800 mb-2">
+                            <span>🚙</span> 預訂車型與包含項目
+                        </div>
+                        <p class="text-sm font-bold text-blue-700">SUV 自排 (Opel Crossland 或同級)</p>
+                        <p class="text-xs text-slate-500 mt-1">5門5座 | 冷氣 | 行李容量：1大箱(100L) + 2小箱(50L)</p>
+                        <ul class="text-xs text-slate-600 mt-3 space-y-1.5">
+                            <li>✅ <strong>無限里程</strong> (Unlimited mileage)</li>
+                            <li>✅ <strong>冬季雪胎</strong> (Winter tires 已含)</li>
+                            <li>✅ <strong>異地還車費已含</strong> (One Way charge)</li>
+                            <li>✅ <strong>跨國卡已加購</strong> (1 x Cross Border Card)</li>
+                            <li>📞 車行電話：<a href="tel:+4350701045000" class="text-blue-600 underline">+43 50 70 10 45000</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Pick-up & Return -->
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                        <div class="flex items-center gap-2 font-bold text-slate-800 mb-2">
+                            <span>📍</span> 取還車時間與據點
+                        </div>
+                        <div class="space-y-3 text-xs">
+                            <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                                <span class="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">取車 Pick-Up</span>
+                                <p class="font-bold text-slate-800 mt-1">2026/12/24 (四) 08:00</p>
+                                <p class="text-slate-600">Vienna Airport (VIE) 航廈內櫃檯 (配合 BR65)</p>
+                                <a href="https://maps.google.com/maps?q=Mega+Drive+Car+Rental+Vienna+Airport" target="_blank" class="text-blue-600 hover:underline mt-1 inline-block font-medium">📍 導航至機場租車櫃檯</a>
+                            </div>
+                            <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                                <span class="bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded">還車 Return</span>
+                                <p class="font-bold text-slate-800 mt-1">2027/01/02 (六) 16:00</p>
+                                <p class="text-slate-600">Vienna Downtown: <strong>Modecenterstrasse 4a, 1030 Vienna</strong> (近地鐵 U3 Gasometer 站)</p>
+                                <a href="https://maps.google.com/maps?q=Modecenterstrasse+4a,+1030+Vienna" target="_blank" class="text-blue-600 hover:underline mt-1 inline-block font-medium">📍 導航至維也納市區還車點</a>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex items-start gap-3">
-                        <div class="text-2xl">🛡️</div>
-                        <div>
-                            <p class="font-bold text-slate-700 text-red-600">保險與注意事項</p>
-                            <p class="text-sm text-slate-600 font-medium">已保全險 (Zero Excess / 零自付額)</p>
-                            <p class="text-xs text-slate-500 mt-1">取車時請務必錄影車況。需準備國際駕照與台灣駕照正本。</p>
-                            <p class="text-xs text-slate-500">跨國需購買高速公路通行證 (Vignette)。</p>
+
+                    <!-- Column 3: Payment & Insurance -->
+                    <div class="bg-amber-50/60 rounded-xl p-4 border border-amber-200">
+                        <div class="flex items-center gap-2 font-bold text-amber-900 mb-2">
+                            <span>🛡️</span> 費用、押金與保險須知
                         </div>
+                        <ul class="text-xs text-slate-700 space-y-2 leading-relaxed">
+                            <li>💶 <strong>櫃檯待付尾款：€ 644.51</strong> (到店取車時刷卡支付)</li>
+                            <li>💳 <strong>信用卡押金 (Bond)：€ 290.00</strong> (取車時預授權凍結)</li>
+                            <li>🛡️ <strong>保險機制：</strong>已投保 EconomyCarRentals 的 <strong>Premium Excess Protection (第三方自付額全額退還險)</strong>。注意：當地車行合約自付額為 €1000，若車身有損壞會先由車行扣款，回國後憑單據向平台申請退還（取還車務必全程錄影車況）。</li>
+                            <li>⚠️ <strong>必備正本證件：</strong>駕駛人 <strong>CheChi Shih</strong> 之護照正本、台灣駕照正本、國際駕照正本、<strong>駕駛本人名下實體信用卡</strong>（不可用 Debit 金融卡）。</li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Packing List Accordion -->
+            <!-- 4. Confirmed Performance & Attraction Tickets -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">🎟️ 已確認之門票與演出憑證 (3項全數付清)</h2>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">⚠️ 皆為指定時段入場，請準時抵達</span>
+                </div>
+                <div class="space-y-4">
+                    <!-- Ticket 1: Salt Mine Berchtesgaden -->
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-200 gap-4">
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="bg-blue-600 text-white text-xs px-2.5 py-0.5 rounded font-bold">Day 7 (2026/12/30 週三 13:10)</span>
+                                <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">✅ 已付清 € 53.00 (Adult × 2)</span>
+                                <span class="text-xs font-mono font-bold text-blue-800 bg-white border border-blue-200 px-2 py-0.5 rounded">Order #546261 | QR: 431-48-10693</span>
+                            </div>
+                            <h3 class="text-base md:text-lg font-bold text-slate-800 pt-1">⛏️ 德國貝希特斯加登鹽礦 (Salzbergwerk Berchtesgaden)</h3>
+                            <p class="text-xs text-slate-600">📍 專屬停車場導航：<strong>Parkplatz Salzbergwerk, Salzburger Straße 24, D-83471 Berchtesgaden</strong> (鹽礦地址：Bergwerkstraße 83)</p>
+                            <p class="text-xs text-red-700 font-medium">⏰ <strong>報到規定：務必於預約時間前 15 分鐘（12:55 前）抵達！</strong>逾時門票將直接失效。停好車後沿地面「藍色標記 (Blue markings)」走至訪客中心，於旋轉閘門掃描同一組 QR Code（一次一人通過，共掃2次），領取連身礦工服後排隊搭礦坑小火車（全程約 1.5 小時）。</p>
+                        </div>
+                        <a href="https://maps.google.com/maps?q=Parkplatz+Salzbergwerk,+Salzburger+Stra%C3%9Fe+24,+83471+Berchtesgaden" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap">
+                            📍 鹽礦停車場導航
+                        </a>
+                    </div>
+
+                    <!-- Ticket 2: Schönbrunn Palace -->
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl border border-amber-200 gap-4">
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="bg-amber-600 text-white text-xs px-2.5 py-0.5 rounded font-bold">Day 11 (2027/01/03 週日 09:30 - 09:45)</span>
+                                <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">✅ 已付清 € 84.00 (2 x Adults)</span>
+                                <span class="text-xs font-mono font-bold text-amber-900 bg-white border border-amber-200 px-2 py-0.5 rounded">Palace Ticket (PDF-Ticket)</span>
+                            </div>
+                            <h3 class="text-base md:text-lg font-bold text-slate-800 pt-1">🏰 維也納美泉宮全覽門票 (Palace Ticket – Schönbrunn Palace)</h3>
+                            <p class="text-xs text-slate-600">📍 地址：Schönbrunner Schloßstraße 47, 1130 Wien (搭地鐵 U4 線至 Schönbrunn 站步行 5 分鐘)</p>
+                            <p class="text-xs text-amber-900 font-medium">⏰ <strong>指定入場時段：09:30 – 09:45（持票人：Shih CheChi）</strong>。包含美泉宮全覽 40 間皇家廳房與免費中文語音導覽機。宮殿入口驗票嚴格執行時段控管，請務必於 09:20 前抵達宮殿正門入口準備刷 PDF 電子票入場！</p>
+                        </div>
+                        <a href="https://maps.google.com/maps?q=Sch%C3%B6nbrunn+Palace+Vienna" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap">
+                            📍 美泉宮導航
+                        </a>
+                    </div>
+
+                    <!-- Ticket 3: Vienna State Opera -->
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200 gap-4">
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="bg-purple-600 text-white text-xs px-2.5 py-0.5 rounded font-bold">Day 11 (2027/01/03 週日 晚間)</span>
+                                <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">✅ 已付清 € 380.00 (Category 4 × 2張)</span>
+                                <span class="text-xs font-mono font-bold text-purple-800 bg-white border border-purple-200 px-2 py-0.5 rounded">ONE EVENT Order #96951</span>
+                            </div>
+                            <h3 class="text-base md:text-lg font-bold text-slate-800 pt-1">🎭 維也納國家歌劇院《蝙蝠》 (DIE FLEDERMAUS - Vienna State Opera)</h3>
+                            <p class="text-xs text-slate-600">📍 地址：Opernring 2, 1010 Vienna (從下榻 Hotel Astoria 步行僅需 2 分鐘！)</p>
+                            <p class="text-xs text-slate-500">🎫 票種：Category 4 × 2張 (持票人：CheChi Shih) | 💡 提醒：請於出發前確認最終開演時間 (通常為 19:00) 與取票方式，並著正式服裝出席。</p>
+                        </div>
+                        <a href="https://maps.google.com/maps?q=Vienna+State+Opera+Opernring+2" target="_blank" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap">
+                            📍 歌劇院導航
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Pending Bookings & Tickets Checklist -->
+            <div class="bg-white rounded-2xl shadow-sm border-2 border-blue-200 overflow-hidden">
+                <div class="bg-blue-50 px-6 py-4 border-b border-blue-100 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <h2 class="text-lg font-bold text-blue-900 flex items-center gap-2">🎫 尚未預訂項目與門票待辦清單 (To-Do Checklist)</h2>
+                        <p class="text-xs text-blue-700 mt-0.5">根據您的行程與節慶檔期整理，可直接勾選追蹤進度</p>
+                    </div>
+                    <span class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full font-bold">行前必查</span>
+                </div>
+                <div class="p-6 space-y-6" id="todo-checklist">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- 6. Packing List Accordion -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <div class="bg-slate-100 px-6 py-4 border-b border-slate-200">
                     <h2 class="text-lg font-bold text-slate-800 flex items-center">🧳 智慧行李清單</h2>
@@ -367,23 +544,26 @@
                 </div>
             </div>
 
-            <!-- Emergency Card -->
+            <!-- 7. Emergency Card -->
             <div class="bg-red-50 rounded-2xl shadow-sm border border-red-200 p-6 mt-8">
                 <h2 class="text-xl font-bold text-red-700 mb-4 flex items-center gap-2">
                     <span>🆘</span> 緊急救援卡
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-red-900">
                     <div>
-                        <p class="font-bold border-b border-red-200 pb-1 mb-2">通用緊急電話</p>
-                        <p>歐盟緊急求救：<strong class="text-lg">112</strong></p>
+                        <p class="font-bold border-b border-red-200 pb-1 mb-2">通用緊急電話與租車救援</p>
+                        <p>歐盟通用緊急求救：<strong class="text-lg">112</strong></p>
+                        <p>MEGA DRIVE 租車專線：<a href="tel:+4350701045000" class="underline font-bold">+43 50 70 10 45000</a></p>
                         <p>奧地利警察/急救：133 / 144</p>
                         <p>捷克警察/急救：158 / 155</p>
                         <p>匈牙利警察/急救：107 / 104</p>
                     </div>
                     <div>
-                        <p class="font-bold border-b border-red-200 pb-1 mb-2">駐外館處聯絡</p>
-                        <p>駐奧地利代表處急難救助：<br><a href="tel:+436643450455" class="underline">+43-664-345-0455</a></p>
-                        <p>駐捷克代表處急難救助：<br><a href="tel:+420603166707" class="underline">+420-603-166-707</a></p>
+                        <p class="font-bold border-b border-red-200 pb-1 mb-2">駐外館處急難救助</p>
+                        <p>駐奧地利代表處：<a href="tel:+436643450455" class="underline">+43-664-345-0455</a></p>
+                        <p>駐捷克代表處：<a href="tel:+420603166707" class="underline">+420-603-166-707</a></p>
+                        <p>駐匈牙利代表處：<a href="tel:+36309641546" class="underline">+36-30-964-1546</a></p>
+                        <p>駐斯洛伐克代表處：<a href="tel:+421915969454" class="underline">+421-915-969454</a></p>
                     </div>
                 </div>
                 <p class="text-xs text-red-600 mt-4 text-center">* 建議將此畫面截圖儲存於手機中</p>
@@ -392,7 +572,7 @@
 
     </main>
 
-    <!-- Floating Bottom Control Panel (Redesigned for mobile friendliness, hidden by default outside itinerary) -->
+    <!-- Floating Bottom Control Panel (Hidden outside itinerary) -->
     <div id="bottom-nav-panel" class="hidden glass-panel fixed bottom-4 left-4 right-4 md:bottom-0 md:left-0 md:right-0 md:w-full md:rounded-none rounded-2xl z-40 transition-transform duration-300 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] border border-slate-200 md:border-t md:border-l-0 md:border-r-0 md:border-b-0">
         <div class="max-w-7xl mx-auto px-3 sm:px-4 flex items-center justify-between h-14">
             
@@ -422,251 +602,375 @@
         // ================= STATE & DATA =================
         let currentView = 'dashboard';
         let isDetailMode = true;
-        let mapInstance = null;
+        let selectedMapPinId = 'D1';
         let chartInstance = null;
-        
-        const mapCenter = [48.2082, 16.3738]; // Vienna
 
-        // 建立安全的 Google Maps 搜尋 URL 輔助函數
+        // 建立免 API Key、不觸發限制的標準 Google Maps 網址
         function createGMapUrl(query) {
-            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+            return `https://maps.google.com/maps?q=${encodeURIComponent(query)}`;
         }
 
-        // Itinerary Data parsed from text file
+        // Itinerary Data (Refined with 20m roadside stops, supply stations, 12/30 13:10 Salt Mine & 1/3 09:30 Schönbrunn tickets)
         const itineraryData = [
             {
-                day: 1, date: '12/24', weekday: '週四', title: '維也納抵達 ➜ 布達佩斯', weather: { emoji: '🌥️', temp: '2°C' },
-                drive: 2.5, play: 4.5, coords: [47.4979, 19.0402], stay: '布達佩斯',
+                day: 1, date: '12/24', weekday: '週四', title: '維也納機場取車 ➜ 潘多夫補給 ➜ 格傑爾 ➜ 布達佩斯 (平安夜)', weather: { emoji: '🌥️', temp: '2°C' },
+                drive: 2.5, play: 4.5, coords: [47.4984, 19.0408], stay: '布達佩斯 (Hotel Clark Budapest)',
                 events: [
-                    { time: '06:45', title: '抵達維也納機場', icon: '🛬', tag: 'VIE', stayTime: '1.5h', depTime: '08:15', detail: '長榮 BR65 抵達。完成通關、提領行李。', tips: '先在機場超市或咖啡廳買點簡便早餐，補充體力。', gmap: createGMapUrl('Vienna International Airport') },
-                    { time: '08:15', title: '機場取車', icon: '🚗', tag: '租車中心', stayTime: '1h', depTime: '09:15', detail: '辦理取車手續，檢查車況、確認是否配備冬季雪胎與保險範圍。', tips: '務必錄影車身外觀。確認租車公司已授權跨國駕駛，並購買匈牙利高速公路電子通行證 (e-Vignette)。', gmap: createGMapUrl('Vienna International Airport Car Rental') },
-                    { time: '09:15', title: '直奔布達佩斯', icon: '🛣️', tag: '跨國公路', stayTime: '2h', depTime: '11:15', detail: '走 A4 高速公路跨越奧匈邊境。', tips: '' },
-                    { time: '11:15', title: '中繼站：高速公路休息區', icon: '☕', tag: '短暫休息', stayTime: '45m', depTime: '12:00', detail: '在進入布達佩斯前於休息站活動筋骨，適應左駕與歐洲路況。', tips: '可購買簡單的三明治當作午餐備案。' },
-                    { time: '12:30', title: '飯店放行李與簡餐', icon: '🏨', tag: '布達佩斯市區', stayTime: '1.5h', depTime: '14:00', detail: '抵達住宿點寄放行李。今天是平安夜，許多商店下午 14:00 後就會提早打烊。', tips: '午餐建議在飯店附近快速解決。', gmap: createGMapUrl('Hotel Clark Budapest') },
-                    { time: '14:00', title: '城堡山與布達皇宮外觀', icon: '🏰', tag: '城堡區', stayTime: '2h', depTime: '16:00', detail: '搭乘纜車或步行上城堡山，感受節慶前夕的寧靜氛圍。', tips: '平安夜多數博物館提早閉館，以戶外建築巡禮與拍照為主。', gmap: createGMapUrl('Buda Castle') },
-                    { time: '16:30', title: '漁人堡', icon: '🏰', tag: '漁人堡', stayTime: '1h', depTime: '17:30', detail: '帶上相機捕捉多瑙河與匈牙利國會大廈的美景。', tips: '高處風大注意保暖。', gmap: createGMapUrl('Fisherman\'s Bastion') },
-                    { time: '17:30', title: '蓋勒特山 (Gellert Hill) 夜景', icon: '📸', tag: '觀景台', stayTime: '45m', depTime: '18:15', detail: '前往蓋勒特山觀景台 (Citadella)，此處無須走遠路即可拍攝整個布達佩斯的壯闊夜景。', tips: '這晚遊客極少，是拍攝金黃夜景的最佳時機。', gmap: createGMapUrl('Citadella Budapest') },
-                    { time: '19:00', title: '平安夜聖誕晚餐', icon: '🍽️', tag: '飯店餐廳', stayTime: '2h', depTime: '-', detail: '享用預訂好的節慶晚餐，體驗歐洲過節氣氛。', tips: '強烈提醒：務必提前預訂飯店內的聖誕晚餐，外面幾乎沒有獨立餐廳營業。', gmap: createGMapUrl('Budapest Restaurant') },
-                    { time: '21:00', title: '抵達住宿', icon: '🏠', tag: '布達佩斯飯店', stayTime: '-', depTime: '-', detail: '好好休息，調整時差。', tips: '' }
+                    { time: '06:45', title: '抵達維也納國際機場 (VIE)', icon: '🛬', tag: 'BR65', stayTime: '1h15m', depTime: '08:00', detail: '長榮 BR65 直飛抵達。完成入境護照查驗與提領行李。', tips: '可先在機場買杯咖啡與簡單早餐補充體力。', gmap: createGMapUrl('Vienna International Airport') },
+                    { time: '08:00', title: 'MEGA DRIVE 機場櫃檯取車', icon: '🚗', tag: '憑證 1EG69E', stayTime: '1h', depTime: '09:00', detail: '【已預訂】前往航廈內 MEGA DRIVE 櫃檯辦理取車（車型：Opel Crossland SUV 自排或同級）。現場需刷卡支付尾款 €644.51 並預授權押金 €290。', tips: '必帶：護照、台灣駕照+國際駕照正本、CheChi Shih 本人名下實體信用卡。確認跨國卡 (Cross Border Card) 已生效，取車時務必繞車錄影紀錄外觀，並用手機上網購買「匈牙利電子通行證 (e-Vignette)」。', gmap: createGMapUrl('Mega Drive Car Rental Vienna Airport') },
+                    { time: '09:00', title: '出發上 A4 高速公路', icon: '🛣️', tag: 'A4高速', stayTime: '30m', depTime: '09:30', detail: '沿奧地利 A4 高速公路往東行駛。', tips: '奧地利段請確認擋風玻璃已有通行證貼紙(Vignette)。' },
+                    { time: '09:30', title: '順路補給站：潘多夫 (Parndorf) 超市與咖啡補給', icon: '🛒', tag: '補給站 25m', stayTime: '25m', depTime: '09:55', detail: '位於 A4 高速公路交流道旁！趁平安夜早上超市尚在營業，順路停靠採買整箱礦泉水、車上零食、水果與熱咖啡。', tips: '今天是 12/24 平安夜，下午全歐洲超市都會關門，在此先買齊接下來兩天車上飲水與零食最聰明！', gmap: createGMapUrl('Designer Outlet Parndorf') },
+                    { time: '11:00', title: '順路快拍：格傑爾 (Győr) 巴洛克市政廳廣場', icon: '🏛️', tag: '路邊快拍 25m', stayTime: '25m', depTime: '11:25', detail: '途經匈牙利西大門格傑爾，在絕美的新巴洛克式市政廳 (Városháza) 與塞切尼廣場路邊短暫停靠拍照、活動筋骨。', tips: '純路邊外觀快拍與洗手間休息，停留 25 分鐘即繼續前往布達佩斯。', gmap: createGMapUrl('Győr Town Hall Hungary') },
+                    { time: '12:30', title: '抵達克拉克布達佩斯飯店放行李', icon: '🏨', tag: '編號 73489077757679', stayTime: '1.5h', depTime: '14:00', detail: '【已預訂】抵達 Hotel Clark Budapest (Clark Ádám tér 1.)。飯店正對塞切尼鏈橋獅子雕像！先寄放行李與停妥車輛，於附近簡餐，14:00 正式入住「鏈橋景觀房 (Chain Bridge View)」。', tips: '房費已付清，現場僅需支付 4% 城市稅 (約 NT$760)。今天是平安夜，下午 14:00 後多數商店提早打烊。', gmap: createGMapUrl('Hotel Clark Budapest Clark Ádám tér 1') },
+                    { time: '14:00', title: '城堡山纜車與布達皇宮觀景台', icon: '🏰', tag: '飯店正旁邊', stayTime: '1.5h', depTime: '15:30', detail: '城堡山纜車 (Budavári Sikló) 入口就在我們住的克拉克飯店正隔壁！搭纜車或散步上山，參觀布達皇宮庭園、馬提亞斯噴泉與總統府桑多爾宮外觀。', tips: '從皇宮露台俯瞰多瑙河與對岸佩斯區，視野極佳。', gmap: createGMapUrl('Budavári Sikló Budapest') },
+                    { time: '15:30', title: '漁人堡與馬加什教堂夕陽', icon: '🌇', tag: '漁人堡', stayTime: '1h15m', depTime: '16:45', detail: '漫步至馬加什教堂與純白奇幻的漁人堡，捕捉夕陽餘暉與國會大廈剛點燈的魔幻時刻。', tips: '平安夜傍晚遊客極少，是拍出無人空景的黃金機會！', gmap: createGMapUrl('Fisherman\'s Bastion Budapest') },
+                    { time: '17:05', title: '蓋勒特山觀景台 (Citadella) 夜景快拍', icon: '📸', tag: '快拍 20m', stayTime: '20m', depTime: '17:25', detail: '開車或搭車上蓋勒特山觀景台，無須走步道，在觀景台邊花 20 分鐘快速將多瑙河多座橋樑與金黃夜景收入鏡頭。', tips: '山上風大，拍完經典全景即可下山。', gmap: createGMapUrl('Citadella Budapest') },
+                    { time: '17:40', title: '伊莉莎白橋與瓦茨街聖誕燈飾漫步', icon: '✨', tag: '節慶街景 40m', stayTime: '40m', depTime: '18:20', detail: '順路經過純白優雅的伊莉莎白橋 (Elisabeth Bridge)，在佩斯區最熱鬧的瓦茨街欣賞平安夜點燈街景。', tips: '', gmap: createGMapUrl('Váci Street Budapest') },
+                    { time: '19:00', title: '平安夜聖誕大餐', icon: '🍽️', tag: '需提前預約', stayTime: '2h', depTime: '21:00', detail: '享用預訂好的平安夜節慶晚宴，感受濃厚的歐洲聖誕氛圍。', tips: '強烈建議提前寫信請下榻的 Hotel Clark 預訂一樓 Leo Bistro 或頂樓 Leo Rooftop 景觀餐廳！', gmap: createGMapUrl('Leo Bistro Budapest') },
+                    { time: '21:00', title: '🏠 抵達住宿：Hotel Clark Budapest', icon: '🏠', tag: '布達佩斯', stayTime: '-', depTime: '-', detail: '在房間窗邊直接欣賞塞切尼鏈橋夜景，好好休息調整時差。', tips: '', gmap: createGMapUrl('Hotel Clark Budapest') }
                 ]
             },
             {
-                day: 2, date: '12/25', weekday: '週五', title: '布達佩斯 (聖誕節)', weather: { emoji: '❄️', temp: '-1°C' },
-                drive: 0, play: 7, coords: [47.5186, 19.0823], stay: '布達佩斯',
+                day: 2, date: '12/25', weekday: '週五', title: '布達佩斯 (聖誕節雙岸快拍、聖誕市集與塞切尼溫泉)', weather: { emoji: '❄️', temp: '-1°C' },
+                drive: 0, play: 7.5, coords: [47.5186, 19.0823], stay: '布達佩斯 (Hotel Clark Budapest)',
                 events: [
-                    { time: '09:30', title: '多瑙河畔與塞切尼鏈橋', icon: '🌉', tag: '多瑙河畔', stayTime: '1h', depTime: '10:30', detail: '趁著聖誕節早晨市區寧靜，漫步多瑙河畔，欣賞鏈橋與國會大廈白日之美。', tips: '河畔風大，帽子與手套必備。可順遊「多瑙河畔之鞋」紀念碑。', gmap: createGMapUrl('Széchenyi Chain Bridge') },
-                    { time: '10:30', title: '聖史蒂芬大教堂', icon: '⛪', tag: '大教堂', stayTime: '1h', depTime: '11:30', detail: '參觀雄偉的聖史蒂芬大教堂，廣場前方通常有聖誕市集攤位可逛。', tips: '可自費搭乘電梯登上穹頂俯瞰市區。', gmap: createGMapUrl('St. Stephen\'s Basilica') },
-                    { time: '11:30', title: '城市公園與沃伊達奇城堡', icon: '🌲', tag: '城市公園', stayTime: '1h', depTime: '12:30', detail: '漫步在布達佩斯最大的公園，欣賞融合多種建築風格的沃伊達奇城堡 (Vajdahunyad Castle)。', tips: '冬季公園內的湖面可能會變成大型溜冰場。', gmap: createGMapUrl('Vajdahunyad Castle') },
-                    { time: '12:30', title: '聖誕節午餐', icon: '🍲', tag: '市區', stayTime: '1.5h', depTime: '14:00', detail: '尋找有營業的餐廳或異國料理。', tips: '部分亞洲餐廳或中東料理在聖誕節依然會營業，可作為備案。', gmap: createGMapUrl('Menza Étterem és Kávéház') },
-                    { time: '14:00', title: '塞切尼溫泉浴場', icon: '♨️', tag: '溫泉', stayTime: '1.5h', depTime: '15:30', detail: '體驗全年無休的戶外蒸氣溫泉！在 0 度的氣溫下泡在暖呼呼的黃色巴洛克建築溫泉池中，是非常道地的東歐體驗。', tips: '記得自己帶泳衣、拖鞋與大浴巾。泡 1.5 小時剛剛好，避免身體過於疲勞。', gmap: createGMapUrl('Széchenyi Thermal Bath') },
-                    { time: '15:45', title: '紐約咖啡館 (New York Café)', icon: '☕', tag: '最美咖啡館', stayTime: '1.5h', depTime: '17:15', detail: '前往有「世界最美咖啡館」之稱的紐約咖啡館感受極致奢華的宮廷氛圍。', tips: '請確認聖誕節營業時間，若客滿可改至瓦茨街 (Váci Street) 漫步。', gmap: createGMapUrl('New York Café Budapest') },
-                    { time: '17:30', title: '國會大廈廣場夜景', icon: '📸', tag: '國會大廈', stayTime: '45m', depTime: '18:15', detail: '近距離欣賞點燈後的匈牙利國會大廈，感受其無與倫比的壯麗。', tips: '無需走遠，在建築物旁短暫拍照即可。', gmap: createGMapUrl('Hungarian Parliament Building') },
-                    { time: '18:30', title: '晚餐', icon: '🍽️', tag: '市區', stayTime: '1.5h', depTime: '-', detail: '享用晚餐，為明天的跨國旅程做準備。', tips: '' },
-                    { time: '20:30', title: '抵達住宿', icon: '🏠', tag: '布達佩斯飯店', stayTime: '-', depTime: '-', detail: '', tips: '' }
+                    { time: '09:15', title: '漫步塞切尼鏈橋與多瑙河畔之鞋', icon: '🌉', tag: '快拍 20m', stayTime: '35m', depTime: '09:50', detail: '從克拉克飯店走出大門過塞切尼鏈橋（約15分鐘），於佩斯河岸拜訪「多瑙河畔之鞋」雕塑（停留 20 分鐘拍照）。', tips: '聖誕節清晨街道寧靜優雅，光線極美。', gmap: createGMapUrl('Shoes on the Danube Bank') },
+                    { time: '10:00', title: '伊莉莎白廣場「布達佩斯之眼」摩天輪快拍', icon: '🎡', tag: '路邊快拍 20m', stayTime: '20m', depTime: '10:20', detail: '順路經過伊莉莎白廣場 (Erzsébet tér)，與純白浪漫的布達佩斯之眼摩天輪合照。', tips: '就在前往聖史蒂芬大教堂的順路動線上，停留 20 分鐘。', gmap: createGMapUrl('Ferris Wheel of Budapest') },
+                    { time: '10:25', title: '聖史蒂芬大教堂與聖誕市集', icon: '⛪', tag: '佩斯中心', stayTime: '1h', depTime: '11:25', detail: '參觀宏偉的聖史蒂芬大教堂，前方的聖誕市集 (Advent Basilica) 曾多次獲選歐洲最美聖誕市集！', tips: '可喝杯熱紅酒暖身，旁邊還有玫瑰花造型冰淇淋 Gelarto Rosa。', gmap: createGMapUrl('St. Stephen\'s Basilica Budapest') },
+                    { time: '11:35', title: '英雄廣場快拍 & 沃伊達奇城堡', icon: '🏛️', tag: '城市公園', stayTime: '55m', depTime: '12:30', detail: '搭乘歐洲最古老地鐵 M1 黃線直達英雄廣場（廣場千年紀念碑快拍 20 分鐘），接著走進對面城市公園欣賞童話般的沃伊達奇城堡與戶外大溜冰場。', tips: '地鐵單程票上車務必打票 (Validate)。', gmap: createGMapUrl('Heroes\' Square Budapest') },
+                    { time: '12:30', title: '聖誕節午餐', icon: '🍲', tag: '市區餐廳', stayTime: '1.5h', depTime: '14:00', detail: '品嚐匈牙利傳統燉牛肉湯 (Goulash) 與油封鴨腿。', tips: '推薦提前確認有營業的餐廳（如 Menza、Mazel Tov 或飯店周邊餐廳）。', gmap: createGMapUrl('Menza Étterem és Kávéház') },
+                    { time: '14:00', title: '塞切尼溫泉浴場 (Széchenyi Bath)', icon: '♨️', tag: '全年無休', stayTime: '1.5h', depTime: '15:30', detail: '體驗聖誕節照常營業的百年皇宮露天溫泉！在零下低溫中泡在冒著蒸氣的鵝黃色巴洛克泳池裡，感受極致東歐浪漫。', tips: '建議提前上網買含更衣室 (Cabin) 門票，並自備泳衣、拖鞋與大毛巾。泡 1.5 小時最舒服不疲勞。', gmap: createGMapUrl('Széchenyi Thermal Bath') },
+                    { time: '15:45', title: '世界最美：紐約咖啡館 (New York Café)', icon: '☕', tag: '宮廷下午茶', stayTime: '1.5h', depTime: '17:15', detail: '造訪金碧輝煌、猶如文藝復興皇宮的紐約咖啡館，聆聽現場古典樂演奏並享用下午茶。', tips: '若現場排隊過長，可改搭世界最美電車路線「2號古董黃色電車」遊多瑙河岸。', gmap: createGMapUrl('New York Café Budapest') },
+                    { time: '17:30', title: '國會大廈正面夜景快拍 (巴特亞尼廣場)', icon: '📸', tag: '快拍 20m', stayTime: '25m', depTime: '17:55', detail: '回到布達岸的巴特亞尼廣場 (Batthyány tér)，這裡正對著點燈後宛如黃金宮殿的匈牙利國會大廈與多瑙河倒影！', tips: '路邊最佳攝影機位，拍完走路 10 分鐘即可回克拉克飯店，停留 20-25 分鐘即可。', gmap: createGMapUrl('Batthyány tér Budapest') },
+                    { time: '18:15', title: '布達佩斯晚餐', icon: '🍷', tag: '市區', stayTime: '1.75h', depTime: '20:00', detail: '享用匈牙利特色晚餐與貴腐酒 (Tokaji)。', tips: '', gmap: createGMapUrl('Mazel Tov Budapest') },
+                    { time: '20:15', title: '🏠 抵達住宿：Hotel Clark Budapest', icon: '🏠', tag: '布達佩斯', stayTime: '-', depTime: '-', detail: '返回克拉克布達佩斯飯店休息，整理行李準備明日跨國。', tips: '明日退房時間為 12:00 前，我們預計 08:45 出發。', gmap: createGMapUrl('Hotel Clark Budapest') }
                 ]
             },
             {
-                day: 3, date: '12/26', weekday: '週六', title: '布達佩斯 ➜ 聖安德烈 ➜ 斯洛伐克', weather: { emoji: '⛅', temp: '1°C' },
-                drive: 2.5, play: 6.5, coords: [48.1486, 17.1077], stay: '布拉提斯拉瓦 (斯洛伐克)',
+                day: 3, date: '12/26', weekday: '週六', title: '布達佩斯 ➜ 聖安德烈 ➜ 埃斯泰爾戈姆 ➜ 斯洛伐克 (布拉提斯拉瓦)', weather: { emoji: '⛅', temp: '1°C' },
+                drive: 2.8, play: 6.5, coords: [48.1419, 17.1128], stay: '布拉提斯拉瓦 (Marrol\'s Boutique Hotel)',
                 events: [
-                    { time: '09:00', title: '啟程前往聖安德烈', icon: '🚗', tag: '近郊', stayTime: '40m', depTime: '09:40', detail: '用完早餐後退房，開車前往布達佩斯近郊的藝術小鎮。', tips: '' },
-                    { time: '09:40', title: '聖安德烈 (Szentendre)', icon: '🎨', tag: '馬德里不思議', stayTime: '1.5h', depTime: '11:10', detail: '蔡依林《馬德里不思議》MV拍攝地點！這裡充滿濃厚的地中海與塞爾維亞風情。漫步於鵝卵石街道 (Fő Tér 主廣場)。', tips: '小鎮不大，買個匈牙利煙囪捲 (Kürtőskalács) 邊走邊吃，各個巷弄都極好拍照。', gmap: createGMapUrl('Szentendre') },
-                    { time: '11:10', title: '驅車跨國前往斯洛伐克', icon: '🛣️', tag: '跨國公路', stayTime: '2h', depTime: '13:10', detail: '準備跨越邊境進入斯洛伐克首都 - 布拉提斯拉瓦。', tips: '注意需提前上網購買斯洛伐克的電子通行證 (e-Vignette)。' },
-                    { time: '13:10', title: '布拉提斯拉瓦舊城區與午餐', icon: '🇸🇰', tag: '斯洛伐克', stayTime: '1.5h', depTime: '14:40', detail: '漫步舊城區尋找著名的「工作中的男人 (Cumil)」銅像，並在此享用午餐。', tips: '試試傳統麵疙瘩 (Halušky)。', gmap: createGMapUrl('Bratislava Old Town') },
-                    { time: '14:40', title: '布拉提斯拉瓦城堡觀景', icon: '🏰', tag: '觀景台', stayTime: '45m', depTime: '15:25', detail: '外型像倒放桌子的純白城堡。此處為單純拍照點，可俯瞰多瑙河與舊城區。', tips: '不進入室內參觀，戶外花園拍完照即可離開，約停留45分鐘。', gmap: createGMapUrl('Bratislava Castle') },
-                    { time: '15:35', title: '藍色教堂拍照', icon: '⛪', tag: '特色建築', stayTime: '30m', depTime: '16:05', detail: '這座如童話般夢幻的粉藍色新藝術風格教堂。', tips: '僅在外觀短暫拍照打卡即可，停留約30分鐘。', gmap: createGMapUrl('Blue Church Bratislava') },
-                    { time: '16:20', title: 'UFO 飛碟觀景台', icon: '🛸', tag: '多瑙河畔', stayTime: '1h', depTime: '17:20', detail: '搭乘電梯登上位於橋樑頂端、造型前衛的飛碟觀景台，欣賞市區黃昏美景。', tips: '', gmap: createGMapUrl('UFO Observation Deck') },
-                    { time: '17:30', title: '飯店 Check-in 與休息', icon: '🏨', tag: '布拉提斯拉瓦', stayTime: '1h', depTime: '18:30', detail: '辦理入住手續，放妥行李。', tips: '', gmap: createGMapUrl('Marrol\'s Boutique Hotel Bratislava') },
-                    { time: '18:30', title: '斯洛伐克傳統晚餐', icon: '🍺', tag: 'Slovak Pub', stayTime: '1.5h', depTime: '-', detail: '大口喝啤酒並品嚐傳統料理。', tips: '', gmap: createGMapUrl('Slovak Pub') },
-                    { time: '20:30', title: '抵達住宿', icon: '🏠', tag: '斯洛伐克飯店', stayTime: '-', depTime: '-', detail: '', tips: '今晚在斯洛伐克過夜，養足精神。' }
+                    { time: '08:45', title: '退房啟程前往聖安德烈', icon: '🚗', tag: '北上近郊', stayTime: '35m', depTime: '09:20', detail: '辦理 Hotel Clark 退房，沿多瑙河岸往北開往藝術小鎮聖安德烈。', tips: '' },
+                    { time: '09:20', title: '聖安德烈 (Szentendre) 藝術小鎮', icon: '🎨', tag: '馬德里不思議', stayTime: '1.5h', depTime: '10:50', detail: '蔡依林《馬德里不思議》MV 拍攝地！漫步於主廣場 (Fő tér)、繽紛雨傘街與狹窄鵝卵石巷弄，欣賞巴洛克色彩建築與手工藝店。', tips: '推薦買個熱騰騰的匈牙利煙囪捲 (Kürtőskalács) 邊走邊拍，停留 1.5 小時非常充裕。', gmap: createGMapUrl('Szentendre Fő tér') },
+                    { time: '11:35', title: '順路快拍：埃斯泰爾戈姆聖殿跨國視角 (Mária Valéria Bridge)', icon: '⛪', tag: '路邊快拍 20m', stayTime: '20m', depTime: '11:55', detail: '沿著多瑙河灣往西開，經過連接匈牙利與斯洛伐克的瑪麗亞瓦萊里亞大橋！在河岸邊停靠 20 分鐘，拍攝山丘上極其宏偉的匈牙利第一大教堂「埃斯泰爾戈姆聖殿 (Esztergom Basilica)」。', tips: '純順路跨國大橋與大教堂遠眺快拍點，風景壯觀！同時於此處用手機上網購買「斯洛伐克 10天期電子通行證 (e-Vignette)」。', gmap: createGMapUrl('Mária Valéria Bridge Esztergom') },
+                    { time: '11:55', title: '驅車前往斯洛伐克首都布拉提斯拉瓦', icon: '🛣️', tag: '跨國公路', stayTime: '1h35m', depTime: '13:30', detail: '沿著多瑙河畔公路前往斯洛伐克首都，途中可於加油站休息補給。', tips: '' },
+                    { time: '13:30', title: '布拉提斯拉瓦城堡觀景台快拍', icon: '🏰', tag: '快拍 25m', stayTime: '25m', depTime: '13:55', detail: '直接開車上城堡山（有專屬停車場），在造型像「倒放桌子」的純白城堡與巴洛克花園快速拍照，俯瞰多瑙河三國交界風光。', tips: '不進室內博物館，戶外觀景台與花園快拍 25 分鐘即可下山前往飯店。', gmap: createGMapUrl('Bratislava Castle') },
+                    { time: '14:05', title: '入住 Marrol\'s Boutique Hotel 並停妥車輛', icon: '🏨', tag: '確認號 RES101735726R2526', stayTime: '40m', depTime: '14:45', detail: '【已預訂】抵達精品五星飯店 Marrol\'s Boutique Hotel (Tobrucká 4)，將車停入飯店地下車庫，放妥行李後直接徒步逛舊城區！', tips: '房費 €184.50 已預付；現場需支付城市稅 €7.00 (€3.50/人) 與地下車庫停車費 €29/晚。', gmap: createGMapUrl('Marrol\'s Boutique Hotel Bratislava') },
+                    { time: '14:45', title: '舊城區漫步與特色銅像巡禮 (含午餐)', icon: '🇸🇰', tag: '舊城區', stayTime: '1.5h', depTime: '16:15', detail: '從飯店步行 5 分鐘進入舊城區：尋找「工作中的男人 (Čumil)」、「拿破崙士兵」、邁可爾門、舊市政廳廣場，並享用斯洛伐克午餐。', tips: '必吃斯洛伐克國菜「羊奶起司培根麵疙瘩 (Bryndzové halušky)」與蒜香起司湯。', gmap: createGMapUrl('Čumil Bratislava') },
+                    { time: '16:15', title: '總統府廣場 (Grassalkovich Palace) 快拍', icon: '🏛️', tag: '路邊快拍 20m', stayTime: '20m', depTime: '16:35', detail: '順路經過洛可可風格的純白斯洛伐克總統府與前方的地球和平噴泉，快速拍照打卡。', tips: '路邊參觀 20 分鐘即可。', gmap: createGMapUrl('Grassalkovich Palace Bratislava') },
+                    { time: '16:45', title: '夢幻藍色教堂 (Modrý kostol) 外觀快拍', icon: '⛪', tag: '快拍 20m', stayTime: '20m', depTime: '17:05', detail: '參觀聖伊莉莎白教堂（藍色教堂），整座建築由粉藍色馬賽克磁磚與奶油白線條構成，宛如童話蛋糕屋。', tips: '距離我們住的 Marrol\'s 飯店走路只要 6 分鐘！外觀拍照停留 20 分鐘即足夠。', gmap: createGMapUrl('Blue Church Bratislava') },
+                    { time: '17:20', title: 'UFO 飛碟觀景台或河畔夜景', icon: '🛸', tag: '多瑙河大橋', stayTime: '1h', depTime: '18:20', detail: '從飯店散步至多瑙河畔或搭電梯登上 SNP 大橋頂端的 UFO 觀景台，欣賞布拉提斯拉瓦城堡與多瑙河夜色。', tips: '', gmap: createGMapUrl('UFO Observation Deck Bratislava') },
+                    { time: '18:30', title: '斯洛伐克傳統晚餐與飯店微醺', icon: '🍺', tag: 'Slovak Pub / Houdini', stayTime: '2h', depTime: '20:30', detail: '可選擇熱鬧的 Slovak Pub 品嚐精釀啤酒，或在飯店內高雅的 Restaurant Houdini 用餐、Library Saloon 小酌。', tips: '', gmap: createGMapUrl('Slovak Pub Bratislava') },
+                    { time: '20:30', title: '🏠 抵達住宿：Marrol\'s Boutique Hotel', icon: '🏠', tag: '斯洛伐克', stayTime: '-', depTime: '-', detail: '入住 Executive Double Room 享受五星級精品之夜（明日含豐盛早餐）。', tips: '', gmap: createGMapUrl('Marrol\'s Boutique Hotel Bratislava') }
                 ]
             },
             {
-                day: 4, date: '12/27', weekday: '週日', title: '斯洛伐克 ➜ 布爾諾 ➜ 布拉格', weather: { emoji: '☀️', temp: '0°C' },
-                drive: 3.5, play: 6.5, coords: [50.0865, 14.4114], stay: '布拉格',
+                day: 4, date: '12/27', weekday: '週日', title: '斯洛伐克 ➜ 布爾諾 ➜ D1補給站 ➜ 布拉格 (火藥塔 & 老城廣場)', weather: { emoji: '☀️', temp: '0°C' },
+                drive: 3.5, play: 6.5, coords: [50.0853, 14.4301], stay: '布拉格 (The Julius Prague)',
                 events: [
-                    { time: '09:00', title: '啟程前往捷克', icon: '🚗', tag: '跨國公路', stayTime: '1.5h', depTime: '10:30', detail: '告別斯洛伐克，驅車前往捷克。', tips: '記得確認已購買捷克的高速公路電子通行證 (e-Vignette)。' },
-                    { time: '10:30', title: '中繼站：布爾諾 (Brno)', icon: '🇨🇿', tag: '捷克第二大城', stayTime: '1.5h', depTime: '12:00', detail: '在布爾諾稍作停留。參觀宏偉的「聖彼得與保羅大教堂」或在「包心菜廣場 (Zelný trh)」散步。', tips: '這是完美的休息中繼站，讓長途駕駛不那麼疲累。', gmap: createGMapUrl('Cathedral of St. Peter and Paul Brno') },
-                    { time: '12:00', title: '布爾諾午餐', icon: '🍽️', tag: '市中心', stayTime: '1.5h', depTime: '13:30', detail: '在布爾諾市中心享用午餐。', tips: '', gmap: createGMapUrl('Brno Restaurant') },
-                    { time: '13:30', title: '驅車前往布拉格', icon: '🛣️', tag: '捷克公路', stayTime: '2h', depTime: '15:30', detail: '繼續沿著 D1 高速公路前往捷克首都布拉格。', tips: '捷克高速公路偶有修路，注意車速限制。' },
-                    { time: '15:30', title: '高堡區 (Vyšehrad) 觀景', icon: '🏰', tag: '布拉格', stayTime: '1h', depTime: '16:30', detail: '進市區前先到高堡區，這裡遊客較少，可悠閒俯瞰伏爾塔瓦河與布拉格全景。', tips: '也是傳說中布拉格的發源地。', gmap: createGMapUrl('Vyšehrad Prague') },
-                    { time: '16:30', title: '抵達布拉格飯店', icon: '🏨', tag: '布拉格', stayTime: '45m', depTime: '17:15', detail: '辦理入住，將車輛停妥。', tips: '布拉格市區石板路多，盡量將車停在飯店專屬車庫。', gmap: createGMapUrl('Grand Hotel Bohemia') },
-                    { time: '17:15', title: '火藥塔 (Powder Tower)', icon: '🗼', tag: '快速打卡', stayTime: '30m', depTime: '17:45', detail: '布拉格老城區的哥德式城門，是布拉格的地標之一。可以快速拍攝建築外觀。', tips: '就位在市民會館旁邊，順路拍照不需花費太多時間。', gmap: createGMapUrl('Powder Tower Prague') },
-                    { time: '17:45', title: '老城廣場聖誕市集與天文鐘', icon: '🎄', tag: '老城廣場', stayTime: '1.75h', depTime: '19:30', detail: '布拉格的聖誕市集會一路開到1月初！欣賞天文鐘報時，享受熱紅酒 (Svařák) 與烤麵團，感受節慶點燈的魔幻氣氛。', tips: '廣場人潮極度擁擠，請務必將背包往前揹以防專業扒手。', gmap: createGMapUrl('Prague Astronomical Clock') },
-                    { time: '19:30', title: '晚餐：捷克烤豬腳', icon: '🍖', tag: 'Pork\'s', stayTime: '1.5h', depTime: '21:00', detail: '品嚐外皮酥脆、肉質軟嫩的捷克傳統烤豬腳，搭配一杯當地黑啤酒。', tips: '份量極大，建議 2-3 人點一份分享即可。', gmap: createGMapUrl('Pork\'s Prague') },
-                    { time: '21:00', title: '抵達住宿', icon: '🏠', tag: '布拉格飯店', stayTime: '-', depTime: '-', detail: '市區自由活動後返回飯店休息。', tips: '' }
+                    { time: '08:45', title: '享用 Marrol\'s 早餐並啟程赴捷克', icon: '🚗', tag: 'D2/D1高速', stayTime: '1.5h', depTime: '10:15', detail: '享用飯店免費早餐後退房，驅車跨越邊境進入捷克摩拉維亞地區。', tips: '重要：入境捷克前，請用手機於官網 (edalnice.cz) 購買捷克 10天期電子通行證 (e-Vignette)。' },
+                    { time: '10:15', title: '中繼站：捷克第二大城「布爾諾 (Brno)」', icon: '🇨🇿', tag: '中繼休息', stayTime: '1.5h', depTime: '11:45', detail: '在布爾諾舊城區停留，漫步於「包心菜市場廣場 (Zelný trh)」，登上「聖彼得與保羅大教堂」小山丘俯瞰市景，並觀看舊市政廳傳奇黑龍標本。', tips: '車子可停在 Domini Park 地下停車場，走路 3 分鐘即達廣場。', gmap: createGMapUrl('Cathedral of St. Peter and Paul Brno') },
+                    { time: '11:45', title: '布爾諾自由廣場午餐', icon: '🍽️', tag: '市中心', stayTime: '1h15m', depTime: '13:00', detail: '在布爾諾自由廣場 (Náměstí Svobody) 周邊享用午餐與熱咖啡。', tips: '', gmap: createGMapUrl('Náměstí Svobody Brno') },
+                    { time: '13:00', title: '沿 D1 高速公路北上 & 中途補給站 (Humpolec)', icon: '⛽', tag: '高速 + 補給 20m', stayTime: '2h15m', depTime: '15:15', detail: '沿著 D1 高速公路前往布拉格，中途於 Humpolec 休息站停靠 20 分鐘加油、上洗手間與補給熱飲。', tips: '', gmap: createGMapUrl('Humpolec D1 Rest Area') },
+                    { time: '15:15', title: '高堡區 (Vyšehrad) 河谷觀景台快拍', icon: '🏰', tag: '快拍 25m', stayTime: '25m', depTime: '15:40', detail: '位於布拉格南端 D1 高速進城處！直接停靠高堡城牆觀景台，花 25 分鐘俯瞰伏爾塔瓦河多座橋樑的夕陽景致。', tips: '純觀景快拍點，不走完整個公園，拍完即前往飯店。', gmap: createGMapUrl('Vyšehrad Prague') },
+                    { time: '16:00', title: '入住布拉格朱利葉斯飯店 (The Julius Prague)', icon: '🏨', tag: '編號 73489095279488', stayTime: '45m', depTime: '16:45', detail: '【已預訂】抵達頂級設計飯店 The Julius Prague (Senovážné nám. 3)，入住「豪華開放式客房」。將車停妥後，全程改為步行探索布拉格！', tips: '房費已付清，現場僅需支付城市稅每人每晚 €2.06 (共約 €8.24)。飯店地段無敵，走路 4 分鐘就到火藥塔！', gmap: createGMapUrl('The Julius Prague Senovážné náměstí 3') },
+                    { time: '16:45', title: '火藥塔 (Powder Tower) 與市民會館快拍', icon: '🗼', tag: '快拍 20m', stayTime: '20m', depTime: '17:05', detail: '從 The Julius 飯店走出門轉個彎就到！在哥德式城門地標「火藥塔」與隔壁新藝術建築「市民會館 (Obecní dům)」外觀拍照打卡。', tips: '路邊外觀快拍 20 分鐘即可順著皇家之路走進老城。', gmap: createGMapUrl('Powder Tower Prague') },
+                    { time: '17:05', title: '順路逛：哈維爾市集 (Havelské tržiště) 紀念品補給', icon: '🛍️', tag: '順路逛 25m', stayTime: '25m', depTime: '17:30', detail: '順路穿過歷史悠久的哈維爾傳統市集，可快速挑選布拉格天文鐘磁鐵、木偶與小紀念品。', tips: '', gmap: createGMapUrl('Havelské tržiště Prague') },
+                    { time: '17:30', title: '老城廣場聖誕市集、泰恩教堂與天文鐘', icon: '🎄', tag: '老城廣場', stayTime: '2h', depTime: '19:30', detail: '走進老城廣場！欣賞整點報時的天文鐘、魔鬼教堂（泰恩教堂）雙塔，並在全歐洲最華麗的聖誕市集品嚐熱紅酒 (Svařák) 與現烤煙囪捲。', tips: '布拉格聖誕市集一路開到1月初！人潮眾多請留心隨身背包。', gmap: createGMapUrl('Old Town Square Prague') },
+                    { time: '19:30', title: '晚餐：捷克脆皮烤豬腳或熟成牛排', icon: '🍖', tag: 'Pork\'s / Kantýna', stayTime: '1.5h', depTime: '21:00', detail: '前往超人氣名店 Pork\'s 大啖脆皮烤豬腳配黑啤酒；或選擇距離我們飯店走路僅 2 分鐘的肉食天堂 Kantýna！', tips: 'Kantýna 就在飯店隔壁條街 (Politických vězňů 5)，超級方便！', gmap: createGMapUrl('Pork\'s Mostecká Prague') },
+                    { time: '21:00', title: '🏠 抵達住宿：The Julius Prague', icon: '🏠', tag: '布拉格', stayTime: '-', depTime: '-', detail: '返回布拉格朱利葉斯飯店休息。', tips: '', gmap: createGMapUrl('The Julius Prague') }
                 ]
             },
             {
-                day: 5, date: '12/28', weekday: '週一', title: '布拉格 (城堡區與市區深度)', weather: { emoji: '☁️', temp: '-2°C' },
-                drive: 0, play: 8, coords: [50.0909, 14.4005], stay: '布拉格',
+                day: 5, date: '12/28', weekday: '週一', title: '布拉格 (查理大橋、城堡區與河岸地標快拍)', weather: { emoji: '☁️', temp: '-2°C' },
+                drive: 0, play: 8.5, coords: [50.0909, 14.4005], stay: '布拉格 (The Julius Prague)',
                 events: [
-                    { time: '07:30', title: '清晨查理大橋', icon: '🌉', tag: '查理大橋', stayTime: '1h', depTime: '08:30', detail: '從容地在清晨人少時走上橋，拍攝空無一人的絕美空景與橋上雕像群。', tips: '冬季早晨氣溫常在零度以下，務必穿戴齊全保暖衣物。', gmap: createGMapUrl('Charles Bridge') },
-                    { time: '09:00', title: '前往布拉格城堡', icon: '🚋', tag: '交通', stayTime: '30m', depTime: '09:30', detail: '搭乘路面電車 22 號至 Pražský hrad 站，從後方進入城堡區。', tips: '需進行簡單的安檢，避免帶大型背包。' },
-                    { time: '09:30', title: '布拉格城堡與聖維特大教堂', icon: '⛪', tag: '城堡區', stayTime: '2h', depTime: '11:30', detail: '參觀這座耗時近 600 年才完工的哥德式大教堂，欣賞慕夏創作的彩繪玻璃窗。', tips: '建議購買城堡 B 路線套票 (Circuit B)。', gmap: createGMapUrl('Prague Castle') },
-                    { time: '11:30', title: '舊皇宮與黃金巷', icon: '🏘️', tag: '城堡區', stayTime: '1.5h', depTime: '13:00', detail: '參觀波西米亞國王的舊皇宮，接著走訪色彩繽紛的黃金巷（卡夫卡曾居於 22 號）。', tips: '黃金巷內有許多特色紀念品與錫製書籤可購買。', gmap: createGMapUrl('Golden Lane Prague') },
-                    { time: '13:00', title: '小城區午餐', icon: '🍽️', tag: 'Mala Strana', stayTime: '1h', depTime: '14:00', detail: '沿著城堡坡道走下山，在小城區尋找特色餐廳用餐。', tips: '', gmap: createGMapUrl('Mala Strana Prague') },
-                    { time: '14:15', title: '斯特拉霍夫修道院圖書館', icon: '📖', tag: '修道院', stayTime: '1h', depTime: '15:15', detail: '擁有絕美濕壁畫的神學與哲學圖書館。', tips: '拍照需額外購買攝影許可。', gmap: createGMapUrl('Strahov Monastery') },
-                    { time: '15:30', title: '藍儂牆與坎帕島', icon: '☮️', tag: 'Mala Strana', stayTime: '45m', depTime: '16:15', detail: '前往充滿塗鴉與和平精神的約翰藍儂牆拍照留念。', tips: '', gmap: createGMapUrl('Lennon Wall') },
-                    { time: '16:30', title: '萊特納公園拍照', icon: '📷', tag: 'Letná Park', stayTime: '45m', depTime: '17:15', detail: '在萊特納公園涼亭附近捕捉伏爾塔瓦河多座橋樑疊加的經典畫面。', tips: '為純拍照點，無須走完公園全程，停留約45分鐘。', gmap: createGMapUrl('Letna Park Viewpoint') },
-                    { time: '17:30', title: '跳舞的房子外觀', icon: '🏢', tag: '現代建築', stayTime: '30m', depTime: '18:00', detail: '順路來到伏爾塔瓦河畔，拍攝這棟造型奇特、如同一對舞者的新解構主義建築。', tips: '純外觀拍照，停留30分鐘。', gmap: createGMapUrl('Dancing House Prague') },
-                    { time: '18:15', title: '景觀餐廳晚餐', icon: '🍷', tag: 'Terasa U Prince', stayTime: '2h', depTime: '20:15', detail: '在老城區的頂樓景觀餐廳用餐，俯瞰整個紅屋頂之城。', tips: '極度熱門，需提前 1-2 個月預訂靠窗座位。', gmap: createGMapUrl('Terasa U Prince') },
-                    { time: '20:30', title: '抵達住宿', icon: '🏠', tag: '布拉格飯店', stayTime: '-', depTime: '-', detail: '整理行李，準備明日移動。', tips: '' }
+                    { time: '07:45', title: '清晨查理大橋 (Charles Bridge)', icon: '🌉', tag: '晨光絕景', stayTime: '1h', depTime: '08:45', detail: '趁著清晨團客尚未湧入，漫步於擁有 600 年歷史的查理大橋，觸摸聖約翰內波穆克浮雕祈求好運，拍攝晨霧中的城堡倒影。', tips: '清晨氣溫較低，請穿戴保暖毛帽與手套。', gmap: createGMapUrl('Charles Bridge Prague') },
+                    { time: '08:45', title: '搭乘 22 號古董路線電車上城堡山', icon: '🚋', tag: '輕鬆上山', stayTime: '30m', depTime: '09:15', detail: '從小城廣場站 (Malostranské náměstí) 搭乘 22 號電車至 Pražský hrad 站，由上往下逛城堡區最省力！', tips: '進城堡區需經過簡單隨身安檢。' },
+                    { time: '09:15', title: '布拉格城堡：聖維特大教堂、舊皇宮與黃金巷', icon: '⛪', tag: '金氏紀錄最大古堡', stayTime: '3h', depTime: '12:15', detail: '購買 Circuit B 套票，細細品味聖維特大教堂（必看慕夏彩繪玻璃窗與純銀聖人墓）、波西米亞舊皇宮、聖喬治大殿與卡夫卡曾居住的黃金巷 22 號。', tips: '12:00 可在第一庭院觀看衛兵交接儀式。', gmap: createGMapUrl('St. Vitus Cathedral Prague') },
+                    { time: '12:30', title: '城堡星巴克觀景台快拍 & 小城區午餐', icon: '🍽️', tag: 'Malá Strana', stayTime: '1.5h', depTime: '14:00', detail: '在城堡出口處的星巴克露台花 15 分鐘拍攝紅屋頂全景，隨後散步至小城區享用波西米亞傳統料理。', tips: '', gmap: createGMapUrl('Starbucks Prague Castle') },
+                    { time: '14:15', title: '斯特拉霍夫修道院圖書館 (Strahov Library)', icon: '📖', tag: '絕美巴洛克圖書館', stayTime: '1h', depTime: '15:15', detail: '參觀擁有驚人穹頂濕壁畫與地球儀館藏的哲學廳與神學廳。', tips: '修道院自釀的聖諾伯特啤酒 (St. Norbert) 也非常有名。', gmap: createGMapUrl('Strahov Monastery Library') },
+                    { time: '15:30', title: '藍儂牆 (Lennon Wall) 塗鴉快拍', icon: '☮️', tag: '快拍 20m', stayTime: '20m', depTime: '15:50', detail: '走訪象徵愛與和平的彩色塗鴉牆「藍儂牆」與旁邊的坎帕島水車。', tips: '路邊拍照打卡點，停留 20 分鐘即可。', gmap: createGMapUrl('Lennon Wall Prague') },
+                    { time: '15:55', title: '布拉格最窄紅綠燈巷 & 天鵝河岸 (Cihelná)', icon: '🦢', tag: '順路快拍 25m', stayTime: '25m', depTime: '16:20', detail: '順路走過趣味十足的「一人通行紅綠燈窄巷」，並到旁邊河岸拍攝成群潔白天鵝與查理大橋同框的經典畫面！', tips: '兩處相距僅 2 分鐘步行，合拍 25 分鐘非常充實。', gmap: createGMapUrl('Narrowest Street Prague') },
+                    { time: '16:35', title: '萊特納公園 (Letná Park) 拍「五橋連珠」夜景', icon: '📷', tag: '快拍 25m', stayTime: '25m', depTime: '17:00', detail: '在萊特納公園 Hanavský 涼亭旁觀景台，花 25 分鐘由高處將伏爾塔瓦河上五座橋樑同框的經典藍調夜景收入鏡頭。', tips: '純觀景台快拍，不走完整個公園。', gmap: createGMapUrl('Letna Park Viewpoint Prague') },
+                    { time: '17:15', title: '跳舞的房子 (Dancing House) 外觀快拍', icon: '🏢', tag: '快拍 20m', stayTime: '20m', depTime: '17:35', detail: '順路來到河畔拍攝造型猶如雙人共舞的現代解構主義建築地標。', tips: '路邊外觀拍照 20 分鐘。', gmap: createGMapUrl('Dancing House Prague') },
+                    { time: '17:45', title: '卡夫卡旋轉頭像 (Rotating Head) 動態雕塑', icon: '🗿', tag: '快拍 20m', stayTime: '20m', depTime: '18:05', detail: '由鬼才藝術家大衛‧切爾尼打造的 42 層不鏽鋼巨型卡夫卡頭像，在燈光下不斷旋轉變形！', tips: '從這裡散步 6 分鐘即可抵達晚餐餐廳 Terasa U Prince。', gmap: createGMapUrl('Statue of Franz Kafka Prague') },
+                    { time: '18:15', title: '老城廣場頂樓景觀晚餐 (Terasa U Prince)', icon: '🍷', tag: '預約靠窗位', stayTime: '2h', depTime: '20:15', detail: '在老城廣場正對天文鐘的王子飯店頂樓露台餐廳用餐，360度俯瞰點燈後的布拉格魔幻夜色（備有戶外暖爐）。', tips: '極度搶手，務必提前 1-2 個月於官網預訂！', gmap: createGMapUrl('Terasa U Prince Prague') },
+                    { time: '20:30', title: '🏠 抵達住宿：The Julius Prague', icon: '🏠', tag: '布拉格', stayTime: '-', depTime: '-', detail: '返回飯店打包行李（明日退房時間為 11:00 前，我們 08:00 提早出發）。', tips: '', gmap: createGMapUrl('The Julius Prague') }
                 ]
             },
             {
-                day: 6, date: '12/29', weekday: '週二', title: '布拉格 ➜ 卡羅維瓦利 ➜ 胡波卡 ➜ CK小鎮', weather: { emoji: '🌨️', temp: '-3°C' },
-                drive: 5.5, play: 6, coords: [48.8127, 14.3175], stay: '庫倫洛夫',
+                day: 6, date: '12/29', weekday: '週二', title: '布拉格 ➜ 卡羅維瓦利 (買溫泉杯) ➜ 皮爾森補給 ➜ 胡波卡城堡 ➜ CK小鎮', weather: { emoji: '🌨️', temp: '-3°C' },
+                drive: 5.0, play: 6, coords: [48.8139, 14.3168], stay: '庫倫洛夫 (Pension MONO)',
                 events: [
-                    { time: '08:00', title: '出發前往卡羅維瓦利', icon: '🚗', tag: '向西行駛', stayTime: '1.5h', depTime: '09:30', detail: '提早出發，展開史詩級的波西米亞公路旅行。開車離開布拉格，先往西前往著名溫泉鄉。', tips: '今日車程較長，建議由兩位駕駛輪流開車。' },
-                    { time: '09:30', title: '卡羅維瓦利 (Karlovy Vary) 溫泉鎮', icon: '♨️', tag: '買溫泉杯', stayTime: '1.5h', depTime: '11:00', detail: '捷克最著名的溫泉鄉。買一個精緻的陶瓷「溫泉杯」，順著長廊品嚐不同溫度的礦泉水，漫步於優雅的巴洛克式建築群中。', tips: '在此可順便品嚐當地的溫泉餅 (Oplatky)。', gmap: createGMapUrl('Karlovy Vary') },
-                    { time: '11:00', title: '驅車南下波西米亞', icon: '🛣️', tag: '捷克公路', stayTime: '3h', depTime: '14:00', detail: '長途駕駛前往南波西米亞地區，建議中途在休息站或沿途小鎮購買簡餐在車上享用，節省時間。', tips: '冬季常有積雪，務必放慢車速，留意路面結冰。' },
-                    { time: '14:00', title: '胡波卡城堡 (Hluboká Castle)', icon: '🏰', tag: '最美純白城堡', stayTime: '1h', depTime: '15:00', detail: '被譽為捷克最美的城堡，仿溫莎城堡的純白哥德式建築。', tips: '冬季內部可能不開放導覽，但在被雪覆蓋的英式花園與城堡外觀拍照也非常值得！', gmap: createGMapUrl('Hluboká Castle') },
-                    { time: '15:00', title: '驅車前往 CK 小鎮', icon: '🚗', tag: '公路', stayTime: '30m', depTime: '15:30', detail: '完成今日最後一段車程，前往被譽為歐洲最美童話小鎮的庫倫洛夫 (Český Krumlov)。', tips: '' },
-                    { time: '15:30', title: '抵達 CK 與停車', icon: '🅿️', tag: 'CK 外圍', stayTime: '45m', depTime: '16:15', detail: '小鎮內管制車輛且皆為顛簸石板路，需停在外圍停車場（建議停 P1 或 P2），並慢慢步行進入。', tips: '建議將大行李留在車上，只帶一晚的輕便盥洗包進入小鎮。', gmap: createGMapUrl('Český Krumlov Parking P1') },
-                    { time: '16:15', title: '登彩繪塔與觀景台拍照', icon: '🗼', tag: '城堡區', stayTime: '1h', depTime: '17:15', detail: '趁著天黑前，爬上樓梯俯瞰全鎮 360 度被河流環繞的太極地形美景，接著到第五庭院觀景台拍攝經典全景。', tips: '注意冬季彩繪塔關門時間較早，若已關閉則改在各觀景台拍攝外觀與全景。', gmap: createGMapUrl('Český Krumlov Castle') },
-                    { time: '17:15', title: '漫步童話小鎮與斗篷橋', icon: '🏘️', tag: 'CK 老城', stayTime: '45m', depTime: '18:00', detail: '欣賞點燈後的 CK 小鎮，冬季蓋上白雪宛如童話。走上壯觀的斗篷橋 (Cloak Bridge) 感受中世紀氛圍。', tips: '橋上的拱門是拍攝 CK 經典紅屋頂夜景的最佳畫框。', gmap: createGMapUrl('Cloak Bridge Český Krumlov') },
-                    { time: '18:00', title: '地窖餐廳晚餐', icon: '🍖', tag: 'Krčma v Šatlavské', stayTime: '1.5h', depTime: '19:30', detail: '在著名的中世紀洞穴地窖餐廳享用炭烤肉排，慰勞一天的長途駕駛。', tips: '生意極好，強烈建議出發前預訂。', gmap: createGMapUrl('Krčma v Šatlavské') },
-                    { time: '19:30', title: '抵達住宿', icon: '🏠', tag: 'CK 民宿', stayTime: '-', depTime: '-', detail: '在河畔的民宿休息，享受靜謐的童話之夜。', tips: '', gmap: createGMapUrl('Hotel Růže Český Krumlov') }
+                    { time: '08:00', title: '退房出發前往卡羅維瓦利', icon: '🚗', tag: '向西行駛', stayTime: '1.5h', depTime: '09:30', detail: '從 The Julius Prague 退房出發，展開波西米亞溫泉與古堡公路旅行！', tips: '可在飯店附近買好咖啡與可頌在車上享用。' },
+                    { time: '09:30', title: '卡羅維瓦利 (Karlovy Vary) 溫泉鎮巡禮', icon: '♨️', tag: '買溫泉杯 & 溫泉餅', stayTime: '1.5h', depTime: '11:00', detail: '007《皇家夜總會》拍攝地！漫步於普普大飯店、市集溫泉長廊與氣勢恢宏的「磨坊溫泉長廊 (Mlýnská kolonáda)」。挑選一個精美的陶瓷「貓咪或造型溫泉杯」，沿途品嚐不同溫度的天然溫泉水。', tips: '必買現烤熱呼呼的「卡羅維瓦利溫泉餅 (Oplatky)」與溫泉酒 (Becherovka)！', gmap: createGMapUrl('Mill Colonnade Karlovy Vary') },
+                    { time: '11:00', title: '南下公路 & 皮爾森 (Plzeň) 休息補給站', icon: '⛽', tag: '開車 + 補給 30m', stayTime: '2h45m', depTime: '13:45', detail: '驅車南下前往南波西米亞，中途於啤酒之鄉皮爾森外圍大型超市/休息站停靠 30 分鐘，享用簡餐、加油並補給飲水零食。', tips: '冬季山區路段請留意積雪，穩健行駛。', gmap: createGMapUrl('Pilsen Czechia') },
+                    { time: '13:45', title: '胡波卡城堡 (Hluboká Castle) 純白童話堡快拍', icon: '🏰', tag: '快拍 30m', stayTime: '30m', depTime: '14:15', detail: '抵達仿英國溫莎城堡建造的純白新哥德式城堡「胡波卡城堡」，在浪漫的皇家庭園與白色塔樓前快速拍照。', tips: '冬季內部休館，戶外花園與外觀拍照 30 分鐘非常足夠！', gmap: createGMapUrl('Hluboká Castle') },
+                    { time: '14:35', title: '順路快拍：霍拉舍維采 (Holašovice) 世遺巴洛克農莊', icon: '🏡', tag: '路邊快拍 20m', stayTime: '20m', depTime: '14:55', detail: '位於胡波卡前往 CK 小鎮的順路鄉間！這座被列入世界文化遺產的可愛圓弧形廣場，擁有 20 多棟保存完好的 18 世紀南波西米亞巴洛克農舍。', tips: '車子可直接停在廣場中央草坪旁，下車快拍一圈僅需 20 分鐘，完全不耽誤進 CK 的時間！', gmap: createGMapUrl('Holašovice South Bohemia') },
+                    { time: '15:25', title: '停妥 P1 停車場並入住 Pension MONO', icon: '🏨', tag: 'Agoda 1746735837', stayTime: '40m', depTime: '16:05', detail: '【已預訂】將車停在北側外圍的「P1 停車場 (Jelenka)」，從 P1 走進小鎮到我們下榻的 **Pension MONO (Latrán 73)** 只要 **5 分鐘（350公尺）**！完全不用拉著行李走完整個石板路老城！', tips: 'Pension MONO 房型為 Deluxe King Suite，房費已付清（現場僅需付城市稅約 NT$184，聯絡電話 +420 724 256 529）。建議只帶過夜輕便行李袋下車。', gmap: createGMapUrl('Pension MONO Latrán 73 Český Krumlov') },
+                    { time: '16:05', title: '城堡區彩繪塔、護城河與斗篷橋觀景台', icon: '🗼', tag: '民宿步行2分鐘即達', stayTime: '1h10m', depTime: '17:15', detail: 'Pension MONO 就在城堡入口紅門與彩繪塔正下方！直接走進城堡區拍攝彩繪塔、走過壯觀的多層石橋「斗篷橋 (Cloak Bridge)」與第五庭院觀景台，俯瞰伏爾塔瓦河 S 型彎道包圍紅屋頂小鎮的經典明信片視角！', tips: '黃昏轉藍調時刻的 CK 全景美得令人屏息。', gmap: createGMapUrl('Cloak Bridge Český Krumlov') },
+                    { time: '17:15', title: '漫步市政廣場與理髮師橋', icon: '🏘️', tag: 'CK 老城區', stayTime: '45m', depTime: '18:00', detail: '走過木造的理髮師橋進入內城區，逛逛溫馨的市政廣場 (Náměstí Svornosti) 與菠丹妮手工皂店。', tips: '', gmap: createGMapUrl('Náměstí Svornosti Český Krumlov') },
+                    { time: '18:00', title: '中世紀地窖餐廳炭火烤肉大餐', icon: '🍖', tag: 'Krčma v Šatlavské', stayTime: '1.5h', depTime: '19:30', detail: '在市政廣場旁超人氣的中世紀洞穴地窖餐廳，看著熊熊壁爐柴火現烤大拼盤（豬腳、肋排、烤雞）並暢飲艾格伯格黑啤酒！', tips: '座位有限，強烈建議出發前透過官網或電話預訂 18:00 座位。', gmap: createGMapUrl('Krčma v Šatlavské Český Krumlov') },
+                    { time: '19:30', title: '🏠 抵達住宿：Pension MONO', icon: '🏠', tag: '庫倫洛夫 Latrán 73', stayTime: '-', depTime: '-', detail: '漫步回到寧靜的拉特蘭街區民宿休息。', tips: '', gmap: createGMapUrl('Pension MONO Český Krumlov') }
                 ]
             },
             {
-                day: 7, date: '12/30', weekday: '週三', title: '庫倫洛夫 ➜ 特勞恩湖 ➜ 薩爾斯堡', weather: { emoji: '⛅', temp: '0°C' },
-                drive: 3, play: 6, coords: [47.8095, 13.0436], stay: '薩爾斯堡',
+                day: 7, date: '12/30', weekday: '週三', title: '庫倫洛夫 ➜ 特勞恩湖 ➜ 蒙德湖 ➜ 貝希特斯加登鹽礦 (13:10已購票) ➜ 薩爾斯堡', weather: { emoji: '⛅', temp: '0°C' },
+                drive: 3.5, play: 6.5, coords: [47.8062, 13.0419], stay: '薩爾斯堡 (Sheraton Grand Salzburg)',
                 events: [
-                    { time: '08:30', title: 'CK 清晨散步', icon: '🚶', tag: 'CK 老城', stayTime: '1h', depTime: '09:30', detail: '在團客抵達前，享受無人的童話小鎮，拍攝清晨的河畔倒影。', tips: '' },
-                    { time: '09:30', title: '前往奧地利', icon: '🚗', tag: '跨國公路', stayTime: '2h', depTime: '11:30', detail: '取車後跨越邊境進入奧地利湖區方向。', tips: '記得進入奧地利前要在邊境加油站購買高速公路通行證 (Vignette) 並貼在擋風玻璃上！' },
-                    { time: '11:30', title: '中繼站：特勞恩湖 (Gmunden)', icon: '🌊', tag: '奧地利湖區', stayTime: '1h', depTime: '12:30', detail: '在風景秀麗的特勞恩湖畔城鎮 Gmunden 稍作停留。漫步欣賞湖面與「奧特堡 (Schloss Ort)」。', tips: '不走遠路，湖畔散步拍照約1小時即可。', gmap: createGMapUrl('Schloss Ort Gmunden') },
-                    { time: '12:30', title: '湖畔午餐', icon: '🍽️', tag: 'Gmunden', stayTime: '1h', depTime: '13:30', detail: '在湖畔找間小餐廳悠閒吃頓午餐。', tips: '', gmap: createGMapUrl('Gmunden Restaurant') },
-                    { time: '13:30', title: '驅車前往薩爾斯堡', icon: '🛣️', tag: 'A1公路', stayTime: '1h', depTime: '14:30', detail: '繼續前往音樂之都薩爾斯堡。', tips: '' },
-                    { time: '14:30', title: '米拉貝爾宮', icon: '🌸', tag: '新城區', stayTime: '45m', depTime: '15:15', detail: '電影《真善美》(Do-Re-Mi) 的經典拍攝場景。', tips: '冬季花園無花，欣賞幾何對稱的法式庭園構圖即可。', gmap: createGMapUrl('Mirabell Palace') },
-                    { time: '15:30', title: '薩爾斯堡要塞', icon: '🏰', tag: '老城區', stayTime: '1.5h', depTime: '17:00', detail: '搭乘纜車登上中世紀要塞，俯瞰舊城區與阿爾卑斯山脈，並為明天的跨年先勘景。', tips: '可購買基本套票含來回纜車。', gmap: createGMapUrl('Fortress Hohensalzburg') },
-                    { time: '17:00', title: '莫札特出生地與糧食胡同', icon: '🛍️', tag: '老城區', stayTime: '1.5h', depTime: '18:30', detail: '漫步在擁有華麗鍛鐵招牌的購物街 (Getreidegasse)，參觀莫札特出生地外觀。', tips: '記得買正宗的銀色包裝莫札特巧克力 (Cafe Konditorei Fürst)。', gmap: createGMapUrl('Mozart\'s Birthplace') },
-                    { time: '18:45', title: '修道院酒場晚餐', icon: '🍺', tag: 'Augustiner Bräu', stayTime: '2h', depTime: '-', detail: '去 Augustiner Bräu 修道院酒場體驗道地啤酒與大口吃肉的熱鬧氣氛。', tips: '這是一種類似啤酒花園的大型室內酒場，氣氛極佳。', gmap: createGMapUrl('Augustiner Bräu Salzburg') },
-                    { time: '21:00', title: '抵達住宿', icon: '🏠', tag: '薩爾斯堡飯店', stayTime: '-', depTime: '-', detail: '', tips: '', gmap: createGMapUrl('Hotel Sacher Salzburg') }
+                    { time: '07:40', title: 'CK 小鎮無人清晨散步與退房', icon: '🚶', tag: '晨光秘境', stayTime: '50m', depTime: '08:30', detail: '早起獨享完全沒有遊客的童話小鎮與河岸晨霧，拍攝斯沃諾斯蒂廣場與河畔木橋，隨後回 Pension MONO 退房並於 08:30 準時從 P1 停車場出發。', tips: '已購買今日 13:10 德國鹽礦門票（需於 12:55 前抵達現場），因此早上 08:30 準時出發時間最充裕！', gmap: createGMapUrl('Český Krumlov Parking P1') },
+                    { time: '08:30', title: '跨越捷奧邊境 & 邊境加油站補給', icon: '⛽', tag: '跨國 + 補給 20m', stayTime: '2h', depTime: '10:30', detail: '告別捷克進入奧地利，途經利普諾水庫湖景，並於邊境休息站短暫停靠 15-20 分鐘買熱咖啡。', tips: '若第一天在維也納取車時車上尚未有奧地利高速公路通行證 (Vignette)，請務必在邊境加油站購買 10天期貼紙貼於擋風玻璃！' },
+                    { time: '10:30', title: '順路快拍：特勞恩湖水上奧特堡 (Schloss Ort)', icon: '🌊', tag: '快拍 25m', stayTime: '25m', depTime: '10:55', detail: '抵達陶瓷小鎮格蒙登 (Gmunden)，把車停在湖邊停車場，走上 123 公尺木棧橋快速拍攝矗立於特勞恩湖心的雪白水上城堡「奧特堡」。', tips: '純路邊湖景快拍點，停留 25 分鐘（10:55 準時離開上 A1 高速公路）。', gmap: createGMapUrl('Schloss Ort Gmunden') },
+                    { time: '11:30', title: '順路補給與快拍：蒙德湖 (Mondsee) 休息區', icon: '🏔️', tag: '快拍+簡餐 25m', stayTime: '25m', depTime: '11:55', detail: '沿 A1 高速公路途經美麗的月湖 (Mondsee)，在可俯瞰阿爾卑斯湖景的休息區停靠 25 分鐘，快速拍照並買份熱三明治/派當午餐。', tips: '先吃點輕食補充體力，待會進鹽礦導覽才不會餓！', gmap: createGMapUrl('Mondsee Raststation') },
+                    { time: '12:50', title: '⛏️ 貝希特斯加登鹽礦探險 (13:10 場次已付清)', icon: '⛏️', tag: 'Order #546261 / QR 431-48-10693', stayTime: '1h55m', depTime: '14:45', detail: '【已購票 €53.00】12:50 準時抵達鹽礦專屬停車場 (**Parkplatz Salzbergwerk, Salzburger Straße 24**)。沿地面「藍色標記 (Blue markings)」走至訪客中心，於旋轉閘門掃描同一組 QR Code `431-48-10693`（一次一人通過），換穿礦工服、搭礦坑小火車、溜兩座 40 公尺木滑梯並搭船橫渡地底鏡面鹽湖！', tips: '🚨 極重要：官方規定必須於 **13:10 前 15 分鐘（即 12:55 前）**到場掃碼，逾時門票將直接作廢！請穿著堅固防滑鞋與保暖衣物。', gmap: createGMapUrl('Parkplatz Salzbergwerk, Salzburger Straße 24, 83471 Berchtesgaden') },
+                    { time: '15:15', title: '入住薩爾斯堡喜來登大飯店 (Sheraton Grand)', icon: '🏨', tag: 'Agoda 1746801547', stayTime: '35m', depTime: '15:50', detail: '【已預訂】開車 30 分鐘返回薩爾斯堡，抵達五星級 Sheraton Grand Salzburg (Auerspergstrasse 4)，入住「Terrace Room 公園景觀露台房 (含 ETAGE7 行政禮遇與早餐)」。', tips: '房費已付清（現場僅需付城市稅約 NT$522）。喜來登飯店位置無敵，走出飯店大門就是米拉貝爾花園！', gmap: createGMapUrl('Sheraton Grand Salzburg Auerspergstrasse 4') },
+                    { time: '15:50', title: '米拉貝爾宮與花園 (Mirabell Palace) 快拍', icon: '🌸', tag: '快拍 25m', stayTime: '25m', depTime: '16:15', detail: '電影《真善美》Do-Re-Mi 經典拍攝場景！從花園飛馬噴泉與中軸線快速將遠方的薩爾斯堡要塞與大教堂同框拍攝。', tips: '就在我們住的喜來登飯店正隔壁，停留 25 分鐘即可散步過河。', gmap: createGMapUrl('Mirabell Palace Salzburg') },
+                    { time: '16:30', title: '薩爾斯堡要塞 (Festung Hohensalzburg) 纜車登頂', icon: '🏰', tag: '百萬夜景', stayTime: '1.5h', depTime: '18:00', detail: '走過掛滿愛情鎖的馬克小橋（順便勘察明晚跨年煙火最佳拍攝位），搭乘要塞登山纜車直達山頂，俯瞰被阿爾卑斯山環抱的薩爾斯堡舊城夜景。', tips: '注意冬季纜車末班時間。', gmap: createGMapUrl('Fortress Hohensalzburg') },
+                    { time: '18:30', title: '修道院啤酒場大餐 (Augustiner Bräu)', icon: '🍺', tag: '百年啤酒殿堂', stayTime: '2h', depTime: '20:30', detail: '體驗薩爾斯堡最道地的百年修道院酒場！自己從木架拿陶製啤酒杯、沖洗後交由酒保從木桶現拉鮮釀啤酒，並在美食街挑選酥脆烤豬腳與德國香腸！', tips: '氣氛熱鬧非凡，距離喜來登飯店步行僅約 12 分鐘。', gmap: createGMapUrl('Augustiner Bräu Mülln Salzburg') },
+                    { time: '20:45', title: '🏠 抵達住宿：Sheraton Grand Salzburg', icon: '🏠', tag: '薩爾斯堡', stayTime: '-', depTime: '-', detail: '返回喜來登大飯店休息，亦可前往 7 樓 ETAGE7 行政酒廊小酌賞景。', tips: '', gmap: createGMapUrl('Sheraton Grand Salzburg') }
                 ]
             },
             {
-                day: 8, date: '12/31', weekday: '週四', title: '鹽礦探險 ➜ 國王湖區 (跨年夜)', weather: { emoji: '☀️', temp: '-2°C' },
-                drive: 1.5, play: 7, coords: [47.5878, 12.9867], stay: '薩爾斯堡',
+                day: 8, date: '12/31', weekday: '週四', title: '德國國王湖遊船 ➜ 藍紹 & 辛特湖快拍 ➜ 海爾布倫宮 ➜ 薩爾斯堡跨年煙火', weather: { emoji: '☀️', temp: '-2°C' },
+                drive: 1.5, play: 7.5, coords: [47.5878, 12.9867], stay: '薩爾斯堡 (Sheraton Grand Salzburg)',
                 events: [
-                    { time: '09:00', title: '前往德國國王湖區', icon: '🚗', tag: '跨國(德)', stayTime: '40m', depTime: '09:40', detail: '距離薩爾斯堡極近，驅車前往德國邊境。', tips: '雖無海關，但仍請隨身攜帶護照備查。' },
-                    { time: '09:40', title: '鹽礦探險 (Berchtesgaden)', icon: '⛏️', tag: '全年無休', stayTime: '2h', depTime: '11:40', detail: '冬季正常開放的鹽礦！換上礦工服，搭乘小火車深入地底，體驗刺激的木製長滑梯與地底鹽湖船。', tips: '非常受歡迎且不受天氣影響，絕對是行程亮點。建議提前於官網買票。', gmap: createGMapUrl('Salzbergwerk Berchtesgaden') },
-                    { time: '12:00', title: '國王湖遊船', icon: '⛴️', tag: '國王湖', stayTime: '2h', depTime: '14:00', detail: '搭乘環保電動船，聆聽船長在群山中吹奏小號的迴音，抵達紅蔥頭教堂 (St. Bartholomä) 並於該處吃午餐。', tips: '冬季國王湖上湖 (Obersee) 結冰停駛，遊船僅開到紅蔥頭教堂，2小時來回剛好。', gmap: createGMapUrl('Königssee') },
-                    { time: '14:20', title: '藍紹教堂與魔法森林', icon: '🏞️', tag: 'Ramsau', stayTime: '1h', depTime: '15:20', detail: '開車前往僅 15 分鐘車程的藍紹，拍攝溪流、木橋與教堂的絕美阿爾卑斯山水倒影。', tips: '在教堂橋邊拍照後稍微散步即可，無需走完魔法森林全程。', gmap: createGMapUrl('Parish Church of St. Sebastian Ramsau') },
-                    { time: '16:00', title: '返回薩爾斯堡休息', icon: '🔙', tag: '市區', stayTime: '3h', depTime: '19:00', detail: '下午返回市區飯店休息，為今晚的跨年儲備體力。', tips: '' },
-                    { time: '19:00', title: '跨年晚餐', icon: '🍽️', tag: '餐廳', stayTime: '2h', depTime: '21:00', detail: '享用豐盛的跨年晚宴。', tips: '跨年夜餐廳務必半年前預訂！', gmap: createGMapUrl('Salzburg Restaurant') },
-                    { time: '23:00', title: '跨年煙火卡位', icon: '🎆', tag: '卡普齊納山', stayTime: '1h', depTime: '00:00', detail: '前往卡普齊納山 (Kapuzinerberg) 觀景台或馬克大橋架設相機。', tips: '穿上最保暖的裝備（暖暖包、厚手套），提早抵達卡位。', gmap: createGMapUrl('Kapuzinerberg') },
-                    { time: '00:00', title: '迎接2027!', icon: '🥂', tag: '市區上空', stayTime: '1h', depTime: '01:00', detail: '全城教堂敲響鐘聲，霍亨薩爾斯堡要塞上空施放壯麗煙火！將煙火、城堡與薩爾察赫河的倒影一次收錄。', tips: '享受周遭人群互道 Happy New Year 的熱情。' },
-                    { time: '01:30', title: '抵達住宿', icon: '🏠', tag: '薩爾斯堡飯店', stayTime: '-', depTime: '-', detail: '帶著美好的回憶入睡。', tips: '' }
+                    { time: '08:45', title: '享用喜來登早餐後驅車前往德國國王湖', icon: '🚗', tag: '跨國(德)約40分鐘', stayTime: '45m', depTime: '09:30', detail: '在 Sheraton 享用豐盛早餐後，開車 40 分鐘前往德國巴伐利亞阿爾卑斯山區的國王湖。', tips: '昨日已順利完成鹽礦探險，今日跨年夜可悠閒暢遊國王湖與阿爾卑斯山谷！', gmap: createGMapUrl('Königssee Parkplatz') },
+                    { time: '09:30', title: '德國國王湖遊船 (Königssee) 與紅蔥頭教堂', icon: '⛴️', tag: '人間仙境', stayTime: '2.5h', depTime: '12:00', detail: '搭乘靜音電動船滑行於翠綠如翡翠的冰川峽灣湖面，途中船長會停船對著峭壁吹奏小號展示七重迴音！登岸造訪著名的「聖巴多羅買紅蔥頭教堂 (St. Bartholomä)」，並在湖畔漫步拍照。', tips: '冬季僅行駛至紅蔥頭教堂（上湖 Obersee 冬季停航），早班船光線最柔美且遊客較少。', gmap: createGMapUrl('St. Bartholomä Königssee') },
+                    { time: '12:00', title: '國王湖畔或藍紹傳統德式午餐', icon: '🐟', tag: '巴伐利亞料理', stayTime: '1h15m', depTime: '13:15', detail: '於國王湖碼頭商店街或藍紹享用煙燻鱒魚、巴伐利亞白香腸與熱湯。', tips: '', gmap: createGMapUrl('Echostüberl Königssee') },
+                    { time: '13:30', title: '藍紹教堂 (Ramsau) 畫家橋路邊快拍', icon: '🏞️', tag: '快拍 20m', stayTime: '20m', depTime: '13:50', detail: '開車 15 分鐘抵達藍紹，車子可直接停在溪流木橋旁！站在畫家橋上花 20 分鐘將「阿爾卑斯雪山、湍急溪流、木橋與巴洛克教堂」經典構圖一次收進鏡頭。', tips: '純路邊黃金機位快拍，不需走步道，20 分鐘即拍出明信片大片。', gmap: createGMapUrl('Malerwinkel Ramsau Church Bridge') },
+                    { time: '14:00', title: '辛特湖 (Hintersee) 鏡面湖景快拍', icon: '🌲', tag: '快拍 25m', stayTime: '25m', depTime: '14:25', detail: '從藍紹順開 5 分鐘抵達靜謐如鏡的辛特湖，在湖邊巨石與雪山倒影前快拍 25 分鐘。', tips: '車子直接停湖邊，不走魔法森林長步道，輕鬆賞景。', gmap: createGMapUrl('Hintersee Ramsau') },
+                    { time: '14:55', title: '順路快拍：海爾布倫宮 (Hellbrunn Palace) 外觀', icon: '🏰', tag: '順路快拍 20m', stayTime: '20m', depTime: '15:15', detail: '從國王湖開回薩爾斯堡南郊的必經順路點！在鵝黃色巴洛克夏宮與真善美玻璃涼亭 (Sound of Music Pavilion) 快速拍照 20 分鐘。', tips: '就在回市區的順路大道旁。', gmap: createGMapUrl('Hellbrunn Palace Salzburg') },
+                    { time: '15:30', title: '薩爾斯堡老城：糧食胡同、莫札特出生地與跨年市集', icon: '🎼', tag: '老城漫步', stayTime: '1.75h', depTime: '17:15', detail: '停妥車後漫步於鍛鐵招牌林立的糧食胡同 (Getreidegasse) 9號莫札特出生地、大教堂廣場跨年市集，並購買創始店 Fürst 手工銀色包裝莫札特巧克力！', tips: '跨年夜下午老城區充滿歡樂的新年市集攤位與街頭音樂表演。', gmap: createGMapUrl('Mozart\'s Birthplace Salzburg') },
+                    { time: '17:15', title: '回喜來登飯店休息 & ETAGE7 行政酒廊禮遇', icon: '🏨', tag: '跨年儲備體力', stayTime: '1.75h', depTime: '19:00', detail: '返回 Sheraton Grand Salzburg 飯店休息、沖個熱水澡，或至 7 樓 ETAGE7 行政酒廊享用飲品點心、俯瞰市景，為午夜跨年養足精神！', tips: '', gmap: createGMapUrl('Sheraton Grand Salzburg') },
+                    { time: '19:00', title: '薩爾斯堡跨年晚宴 (Silvester Dinner)', icon: '🍽️', tag: '需提前預約', stayTime: '2.5h', depTime: '21:30', detail: '享用豐盛的跨年夜大餐，在大教堂廣場跨年市集感受現場樂團演出與香檳歡慶氣氛。', tips: '跨年夜餐廳極滿，務必提前預訂（可訂喜來登館內餐廳、Bärenwirt 或 St. Peter 千年餐廳）。', gmap: createGMapUrl('St. Peter Stiftskulinarium Salzburg') },
+                    { time: '23:15', title: '跨年煙火卡位：馬克小橋或卡普齊納山', icon: '🎆', tag: '飯店步行6分鐘', stayTime: '45m', depTime: '00:00', detail: '穿上最暖外套與暖暖包，從喜來登飯店散步 6 分鐘到薩爾察赫河上的「馬克小橋 (Makartsteg)」或登上「卡普齊納山觀景台」，架好相機對準薩爾斯堡要塞！', tips: '馬克小橋離我們飯店超級近，拍完煙火走路 6 分鐘就能回溫暖房間！', gmap: createGMapUrl('Makartsteg Salzburg') },
+                    { time: '00:00', title: '🥂 迎接 2027 新年快樂！要塞壯麗煙火秀', icon: '🥂', tag: 'Happy New Year', stayTime: '45m', depTime: '00:45', detail: '午夜零時全城教堂鐘聲齊鳴，霍亨薩爾斯堡要塞上空綻放璀璨跨年煙火，河面倒影與古典華爾滋音樂交織出最難忘的歐洲跨年夜！', tips: '' },
+                    { time: '01:00', title: '🏠 抵達住宿：Sheraton Grand Salzburg', icon: '🏠', tag: '薩爾斯堡', stayTime: '-', depTime: '-', detail: '步行 6 分鐘輕鬆回到喜來登大飯店休息。', tips: '明日元旦退房時間為 12:00 前，可以睡飽再出發！', gmap: createGMapUrl('Sheraton Grand Salzburg') }
                 ]
             },
             {
-                day: 9, date: '01/01', weekday: '週五', title: '薩爾斯堡 ➜ 哈修塔特 (元旦)', weather: { emoji: '🌨️', temp: '-4°C' },
-                drive: 1.5, play: 5.5, coords: [47.5622, 13.6493], stay: '哈修塔特湖區',
+                day: 9, date: '01/01', weekday: '週五', title: '薩爾斯堡 ➜ 富施爾湖 ➜ 沃夫岡湖 ➜ 巴德伊舍 ➜ 高薩湖 ➜ 哈修塔特 (元旦)', weather: { emoji: '🌨️', temp: '-4°C' },
+                drive: 1.5, play: 5.5, coords: [47.5625, 13.6491], stay: '哈修塔特 (Polreich Bed&Breakfast)',
                 events: [
-                    { time: '10:30', title: '新年啟程入湖區', icon: '🚗', tag: '奧地利湖區', stayTime: '1h', depTime: '11:30', detail: '新年第一天，睡飽後悠閒退房，開車進入高山湖區。', tips: '沿途風景如畫，盡情享受。' },
-                    { time: '11:30', title: '高薩湖 (Gosausee) 雪景拍照', icon: '❄️', tag: '隱藏秘境', stayTime: '45m', depTime: '12:15', detail: '在進入哈修塔特前，稍微繞道前往高薩湖。冬季這裡會有被冰雪覆蓋的阿爾卑斯達赫斯坦山脈倒影。', tips: '就在湖畔觀景台拍照打卡，不走環湖步道，約停留45分鐘即可。', gmap: createGMapUrl('Gosausee') },
-                    { time: '12:45', title: '抵達與停車', icon: '🅿️', tag: 'Hallstatt', stayTime: '15m', depTime: '13:00', detail: '將車輛停放在小鎮外的 P2 停車場，步行進入小鎮。', tips: '若預訂鎮內特定飯店，會有接駁車到停車場接送行李。', gmap: createGMapUrl('Hallstatt P2 Parking') },
-                    { time: '13:00', title: '明信片視角拍照', icon: '📸', tag: '經典視角', stayTime: '45m', depTime: '13:45', detail: '擁抱高山與冰川湖。走到小鎮北側，捕捉最經典的哈修塔特教堂與湖面倒影。', tips: '不須走遠步道，在此拍照約需45分鐘。當地禁飛空拍機。', gmap: createGMapUrl('Hallstatt Viewpoint') },
-                    { time: '14:00', title: '天空步道觀景台', icon: '🚠', tag: 'Skywalk', stayTime: '1.5h', depTime: '15:30', detail: '搭乘纜車登上鹽礦山上方的天空步道 (Skywalk)，從 360 公尺高空俯瞰哈修塔特湖。', tips: '冬季鹽礦內部不開放，但纜車與觀景台仍會營運（需再次確認官網冬季時刻表）。', gmap: createGMapUrl('Hallstatt Skywalk') },
-                    { time: '15:30', title: '人骨教堂與小鎮漫步', icon: '💀', tag: '小鎮漫步', stayTime: '1h', depTime: '16:30', detail: '參觀半山腰的骸骨教堂 (Charnel House)，欣賞畫有彩繪裝飾的頭骨，隨後於小鎮巷弄漫步。', tips: '', gmap: createGMapUrl('Charnel House Hallstatt') },
-                    { time: '16:30', title: '湖畔市集廣場', icon: '☕', tag: '馬克廣場', stayTime: '1h', depTime: '17:30', detail: '在被繽紛彩色木屋環繞的廣場喝杯熱可可。', tips: '天黑得早，小鎮夜晚非常安靜。', gmap: createGMapUrl('Marktplatz Hallstatt') },
-                    { time: '18:00', title: '抵達住宿與晚餐', icon: '🏠', tag: '湖區木屋/飯店', stayTime: '-', depTime: '-', detail: '在飯店享用晚餐（湖區特產烤鱒魚）。', tips: '', gmap: createGMapUrl('Seehotel Grüner Baum') }
+                    { time: '09:50', title: '新年啟程：158 號景觀公路入湖區', icon: '🚗', tag: '薩爾茨卡默古特', stayTime: '25m', depTime: '10:15', detail: '2027 元旦早晨，睡飽並享用喜來登早餐後退房，沿著風景絕美的 158 號公路進入阿爾卑斯高山湖區。', tips: '' },
+                    { time: '10:15', title: '順路快拍：富施爾湖 (Fuschlsee) 觀景台', icon: '🌊', tag: '路邊快拍 20m', stayTime: '20m', depTime: '10:35', detail: '158 號公路第一個寶石湖泊！在路邊觀景台停靠 20 分鐘，拍攝翠綠湖水與紅牛 (Red Bull) 總部火山建築外觀。', tips: '純路邊觀景快拍 20 分鐘。', gmap: createGMapUrl('Fuschlsee Viewpoint') },
+                    { time: '10:50', title: '順路快拍：聖吉爾根與沃夫岡湖 (Wolfgangsee)', icon: '⛵', tag: '路邊快拍 20m', stayTime: '20m', depTime: '11:10', detail: '在莫札特母親故鄉「聖吉爾根 (St. Gilgen)」湖畔短暫停留 20 分鐘，拍攝清澈的沃夫岡湖與十二角峰山景。', tips: '純湖畔快拍點，不走步道。', gmap: createGMapUrl('St. Gilgen Wolfgangsee') },
+                    { time: '11:30', title: '順路補給：巴德伊舍 (Bad Ischl) 皇室甜點店 Zauner', icon: '🍰', tag: '補給外帶 25m', stayTime: '25m', depTime: '11:55', detail: '途經茜茜公主與皇帝訂婚的溫泉小鎮巴德伊舍，在傳奇皇室御用甜點店「Konditorei Zauner」買杯熱咖啡並外帶著名的栗子蛋糕與千層酥！', tips: '元旦最佳甜點補給站，停留 25 分鐘。', gmap: createGMapUrl('Konditorei Zauner Bad Ischl') },
+                    { time: '12:20', title: '隱藏秘境：高薩湖 (Gosausee) 冰川倒影快拍', icon: '❄️', tag: '快拍 25m', stayTime: '25m', depTime: '12:45', detail: '進入哈修塔特前順道彎進高薩湖。冬季白雪皚皚的達赫斯坦冰川 (Dachstein) 倒映在鏡面般的湖水上，靜謐宛如仙境！', tips: '停車場就在湖邊，不走環湖步道，在湖口觀景台快拍 25 分鐘即可。', gmap: createGMapUrl('Vorderer Gosausee') },
+                    { time: '13:05', title: '抵達哈修塔特外圍停車 & 入住 Polreich B&B', icon: '🏨', tag: 'Agoda 1746816623', stayTime: '55m', depTime: '14:00', detail: '【已預訂】將車輛停放於哈修塔特外圍 P1 或 P2 停車場，進入小鎮核心的五星高評價民宿 **Polreich Bed&Breakfast (Seestraße 89)**（湖景雙人房 Double Room with Lake View，15:00 正式入住，可先寄放行李）。', tips: '房費已付清（現場僅需付城市稅約 NT$184，信箱 polreich.hallstatt@gmail.com）。Polreich 位置極佳，就在馬克廣場與湖畔木屋旁，房間陽台直接看湖！', gmap: createGMapUrl('Polreich Bed&Breakfast Seestraße 89 Hallstatt') },
+                    { time: '14:00', title: '哈修塔特天空步道觀景台 (Skywalk)', icon: '🚠', tag: '360公尺高空視角', stayTime: '1h15m', depTime: '15:15', detail: '從 P2 停車場旁搭乘鹽礦纜車直達山頂「世界遺產觀景台 (Welterbeblick Skywalk)」，居高臨下俯瞰哈修塔特湖與阿爾卑斯群山。', tips: '冬季鹽礦坑道不開放，但登山纜車與天空步道照常營運（上去拍完高空視角即可下山）。', gmap: createGMapUrl('Hallstatt Skywalk Lift') },
+                    { time: '15:30', title: '經典明信片視角 (Classic Viewpoint) 快拍', icon: '📸', tag: '快拍 25m', stayTime: '25m', depTime: '15:55', detail: '散步至小鎮北側 Gosaumühlstraße 67 觀景台，捕捉尖塔教堂、木屋群與湖面倒影的經典明信片畫面（從傍晚拍到華燈初上）。', tips: '從我們住的 Polreich B&B 走到明信片拍照點只要 4 分鐘！純定點拍照 25 分鐘即足夠。', gmap: createGMapUrl('Hallstatt Viewpoint Gosaumühlstraße') },
+                    { time: '16:00', title: '人骨教堂與馬克廣場 (Marktplatz) 漫步', icon: '☕', tag: '小鎮中心', stayTime: '1h15m', depTime: '17:15', detail: '造訪半山腰彩繪頭骨的人骨教堂，隨後在被彩色木屋環繞的馬克廣場喝杯熱紅酒或熱可可。', tips: '', gmap: createGMapUrl('Marktplatz Hallstatt') },
+                    { time: '17:30', title: '哈修塔特湖區烤鱒魚晚餐', icon: '🐟', tag: '湖畔餐廳', stayTime: '1.5h', depTime: '19:00', detail: '在湖畔傳統餐廳品嚐現烤哈修塔特冰川湖鱒魚 (Reinanke / Forelle)。', tips: '冬季小鎮餐廳打烊較早，建議 17:30 提早用餐。', gmap: createGMapUrl('Seewirt Zauner Hallstatt') },
+                    { time: '19:00', title: '🏠 抵達住宿：Polreich Bed&Breakfast', icon: '🏠', tag: '哈修塔特 Seestraße 89', stayTime: '-', depTime: '-', detail: '在湖景房享受靜謐的阿爾卑斯湖畔之夜（明日含免費早餐）。', tips: '明日退房時間為 11:00 前，我們預計 09:15 出發返回維也納。', gmap: createGMapUrl('Polreich Bed&Breakfast Hallstatt') }
                 ]
             },
             {
-                day: 10, date: '01/02', weekday: '週六', title: '哈修塔特 ➜ 梅爾克 ➜ 維也納 (皇家音樂會)', weather: { emoji: '⛅', temp: '1°C' },
-                drive: 3.5, play: 6.5, coords: [48.2082, 16.3738], stay: '維也納',
+                day: 10, date: '01/02', weekday: '週六', title: '哈修塔特 ➜ 特勞恩基興 ➜ 梅爾克修道院 ➜ 維也納還車 (最後採買 & 音樂會)', weather: { emoji: '⛅', temp: '1°C' },
+                drive: 3.5, play: 6.5, coords: [48.2046, 16.3709], stay: '維也納 (Hotel Astoria Vienna, Curio by Hilton)',
                 events: [
-                    { time: '08:30', title: '湖區晨間散步', icon: '🚶', tag: '湖畔', stayTime: '45m', depTime: '09:15', detail: '早起享受完全無遊客的寧靜早晨，此時湖面常有晨霧，仙氣十足。', tips: '湖畔散步拍照約45分鐘。' },
-                    { time: '09:30', title: '驅車返維也納', icon: '🚗', tag: 'A1公路', stayTime: '1.5h', depTime: '11:00', detail: '沿著 A1 高速公路返回首都方向。', tips: '' },
-                    { time: '11:00', title: '中繼站：梅爾克修道院 (Melk Abbey)', icon: '⛪', tag: '世界文化遺產', stayTime: '1h', depTime: '12:00', detail: '在多瑙河畔的梅爾克稍作停留。這座黃色的巴洛克式修道院極其宏偉，被譽為世上最美的圖書館之一。', tips: '以參觀修道院精華區與圖書館為主，停留1小時。', gmap: createGMapUrl('Melk Abbey') },
-                    { time: '12:00', title: '修道院周邊午餐', icon: '🍽️', tag: 'Melk', stayTime: '1h', depTime: '13:00', detail: '在修道院附近簡單吃午餐。', tips: '', gmap: createGMapUrl('Melk Restaurant') },
-                    { time: '13:00', title: '繼續前往維也納', icon: '🛣️', tag: '公路', stayTime: '1.5h', depTime: '14:30', detail: '完成最後一段車程進入維也納市區。', tips: '' },
-                    { time: '14:30', title: '市區還車與放行李', icon: '🔑', tag: '租車點', stayTime: '1h', depTime: '15:30', detail: '先至維也納飯店卸下行李，隨後前往租車公司辦理還車。', tips: '記得還車前要加滿油！並保留最後的加油收據與還車確認單。', gmap: createGMapUrl('Vienna Car Rental') },
-                    { time: '15:45', title: '克恩滕大街採買', icon: '🛍️', tag: '購物街', stayTime: '2h', depTime: '17:45', detail: '在 Kärntner Straße 與 Graben 大道輕鬆採買伴手禮。', tips: '超級重點：明天是週日，奧地利法規規定超市與零售店全面休息！今天是最後採買機會。', gmap: createGMapUrl('Kärntner Straße') },
-                    { time: '18:00', title: '炸肉排大餐', icon: '🍖', tag: 'Figlmüller', stayTime: '1.5h', depTime: '19:30', detail: '提前享用比臉還大的維也納百年經典炸肉排 (Schnitzel)。', tips: '為了晚上的音樂會，晚餐必須提早。需提前網路預約。', gmap: createGMapUrl('Figlmüller Bäckerstraße') },
-                    { time: '20:15', title: '🎵 皇家古典音樂會 (Imperial Gala Konzert)', icon: '🎻', tag: '音樂饗宴', stayTime: '2h', depTime: '22:15', detail: '來到維也納怎能錯過音樂會！在金碧輝煌的宮廷廳內（如霍夫堡），穿著正式服裝欣賞由樂團演奏的莫札特與約翰史特勞斯名曲。', tips: '需提前幾個月線上購票，並準備Smart Casual (微正式) 服裝出席。', gmap: createGMapUrl('Hofburg Vienna') },
-                    { time: '22:30', title: '抵達住宿', icon: '🏠', tag: '維也納飯店', stayTime: '-', depTime: '-', detail: '', tips: '', gmap: createGMapUrl('Steigenberger Hotel Herrenhof') }
+                    { time: '08:00', title: '哈修塔特無人晨霧快拍 & 民宿早餐', icon: '🚶', tag: '仙境晨霧 25m', stayTime: '1h15m', depTime: '09:15', detail: '早起走出 Polreich 民宿花 25 分鐘獨享完全沒有觀光客的清晨湖岸與空靈晨霧！拍完照後回民宿享用免費早餐與咖啡，辦理退房。', tips: '', gmap: createGMapUrl('Hallstatt Viewpoint') },
+                    { time: '10:00', title: '順路快拍：特勞恩基興 (Traunkirchen) 湖畔半島教堂', icon: '⛪', tag: '路邊快拍 20m', stayTime: '20m', depTime: '10:20', detail: '北上離開湖區必經的 145 號公路旁！在湖畔停靠 20 分鐘，拍攝突出於特勞恩湖岩石半島上的絕美小教堂與阿爾卑斯倒影。', tips: '就位在公路邊，下車快拍 20 分鐘即接上 A1 高速公路！', gmap: createGMapUrl('Johannesbergkapelle Traunkirchen') },
+                    { time: '11:35', title: '中繼站：梅爾克修道院 (Melk Abbey) 與簡餐', icon: '🏛️', tag: '世界文化遺產', stayTime: '1h25m', depTime: '13:00', detail: '在多瑙河畔的梅爾克停留，參觀金碧輝煌的鵝黃色巴洛克建築「梅爾克修道院」並於周邊享用簡餐。', tips: '完美的長途開車中繼站。', gmap: createGMapUrl('Melk Abbey Austria') },
+                    { time: '13:00', title: '沿 A1 高速前往維也納 & 還車前加油補給站', icon: '⛽', tag: '高速 + 加滿油', stayTime: '1h15m', depTime: '14:15', detail: '完成最後一段自駕路程進入維也納市區，進城時順路於加油站將油箱加滿！', tips: '保留最後一張滿油收據以便還車查驗。' },
+                    { time: '14:15', title: '抵達 Hotel Astoria Vienna 側門卸行李與入住', icon: '🏨', tag: 'Agoda 1747193282', stayTime: '35m', depTime: '14:50', detail: '【已預訂】抵達百年典雅五星飯店 **Hotel Astoria Vienna, Curio Collection by Hilton**，入住「King Premium Room (含雙人早餐)」。先把大件行李全部卸在飯店！', tips: '重要導航提醒：飯店正面在克恩滕步行街 (Kärntner Strasse 32-34)，開車卸行李請導航至側門入口 **Führichgasse 1, 1010 Wien**！房費已付清，現場僅需付城市稅約 NT$1,246。', gmap: createGMapUrl('Führichgasse 1, 1010 Wien') },
+                    { time: '14:50', title: '前往 MEGA DRIVE 維也納市區據點還車', icon: '🔑', tag: '16:00前還車', stayTime: '1h', depTime: '15:50', detail: '【已確認】由飯店開車約 15 分鐘前往市區還車點：**Modecenterstrasse 4a, 1030 Vienna**（請於 16:00 前完成還車）。還車後步行至旁邊地鐵 U3 Gasometer 站，搭 7 分鐘地鐵直達 Stephansplatz 站即回到飯店旁！', tips: '還車時再次拍照/錄影車身與儀表板滿油表留存，確認退還 €290 押金預授權。', gmap: createGMapUrl('Modecenterstrasse 4a, 1030 Vienna') },
+                    { time: '16:00', title: '克恩滕大街與格拉本大街最後黃金採買', icon: '🛍️', tag: '飯店門口就是精品街', stayTime: '2h', depTime: '18:00', detail: '我們住的 Hotel Astoria 走出大門就是維也納最繁華的「克恩滕大街 (Kärntner Straße)」！輕鬆採買伴手禮（Manner 威化餅旗艦店、莫札特巧克力、小紅帽咖啡、Billa Plus 超市、精品退稅），買完直接提回房間放！', tips: '超級重點：明天 (1/3) 是週日，奧地利法規規定所有百貨、精品與超市全面關門！今天下午 16:00-18:00 是整趟旅程最後的黃金採買時間！', gmap: createGMapUrl('Kärntner Straße 32 Vienna') },
+                    { time: '18:00', title: '維也納百年炸肉排或一公尺豬肋排大餐', icon: '🍖', tag: 'Figlmüller / Ribs', stayTime: '1.75h', depTime: '19:45', detail: '享用比臉還大的維也納百年經典炸肉排 (Figlmüller) 或地窖一公尺烤豬肋排 (Ribs of Vienna)。', tips: '兩家皆為超人氣名店，務必提前於官網線上訂位。', gmap: createGMapUrl('Figlmüller Bäckerstraße Vienna') },
+                    { time: '20:15', title: '🎵 皇家古典音樂會 (Imperial Gala Konzert) 或微醺散步', icon: '🎻', tag: '音樂之都饗宴', stayTime: '2h', depTime: '22:15', detail: '可於霍夫堡宮殿或金色大廳欣賞莫札特與史特勞斯圓舞曲音樂會；若想保留體力給明晚已訂妥的國家歌劇院《蝙蝠》，今晚亦可改在舊城區散步小酌。', tips: '', gmap: createGMapUrl('Hofburg Vienna') },
+                    { time: '22:30', title: '🏠 抵達住宿：Hotel Astoria Vienna', icon: '🏠', tag: '維也納克恩滕大街', stayTime: '-', depTime: '-', detail: '步行回到阿斯托利亞希爾頓格芮精選飯店休息。', tips: '', gmap: createGMapUrl('Hotel Astoria Vienna Curio Collection by Hilton') }
                 ]
             },
             {
-                day: 11, date: '01/03', weekday: '週日', title: '維也納 (皇宮巡禮與國家歌劇院)', weather: { emoji: '☀️', temp: '3°C' },
-                drive: 0, play: 8.5, coords: [48.1848, 16.3122], stay: '維也納',
+                day: 11, date: '01/03', weekday: '週日', title: '維也納 (09:30 美泉宮已購票 ➜ 卡爾教堂 ➜ 霍夫堡 ➜ 19:00 國家歌劇院《蝙蝠》)', weather: { emoji: '☀️', temp: '3°C' },
+                drive: 0, play: 9.0, coords: [48.2032, 16.3691], stay: '維也納 (Hotel Astoria Vienna, Curio by Hilton)',
                 events: [
-                    { time: '09:30', title: '美泉宮 (熊布朗宮)', icon: '🏰', tag: 'Schönbrunn', stayTime: '2.5h', depTime: '12:00', detail: '搭乘地鐵 U4 前往參觀哈布斯堡家族氣勢磅礡的夏宮。參加 Grand Tour 導覽看 40 個華麗房間。', tips: '宮殿內部嚴禁拍照。結束後可到後方花園與凱旋門 (Gloriette) 眺望市景。', gmap: createGMapUrl('Schönbrunn Palace') },
-                    { time: '12:30', title: '納旭市場 (Naschmarkt) 午餐', icon: '🍽️', tag: '百年市場', stayTime: '1.5h', depTime: '14:00', detail: '前往維也納最大的露天市場，雖然週日攤販不開，但周邊的餐廳與異國料理依然熱鬧營業。', tips: '在這裡可以找到各種中東或地中海風情的美食。', gmap: createGMapUrl('Naschmarkt') },
-                    { time: '14:15', title: '霍夫堡與奧地利國家圖書館', icon: '🏛️', tag: 'Hofburg', stayTime: '1.5h', depTime: '15:45', detail: '參觀冬宮霍夫堡建築群，並進入絕美的巴洛克式國家圖書館 (Prunksaal) 參觀。', tips: '這天非常適合純粹的建築與藝文巡禮。', gmap: createGMapUrl('Austrian National Library') },
-                    { time: '16:00', title: '百年咖啡館', icon: '☕', tag: 'Cafe Central', stayTime: '1h', depTime: '17:00', detail: '在中央咖啡館享受傳統維也納咖啡文化與皇帝煎餅 (Kaiserschmarrn)。', tips: '因時間緊湊，若排隊過長可改外帶或其他不需排隊的經典咖啡館。', gmap: createGMapUrl('Café Central Vienna') },
-                    { time: '17:15', title: '聖史蒂芬大教堂', icon: '⛪', tag: '內城區', stayTime: '45m', depTime: '18:00', detail: '參觀維也納的地標，欣賞其獨特的拼花屋頂。', tips: '外觀與內部大廳參觀，停留約45分鐘。', gmap: createGMapUrl('St. Stephen\'s Cathedral Vienna') },
-                    { time: '18:00', title: '晚餐 (歌劇前簡餐)', icon: '🥪', tag: '市區', stayTime: '45m', depTime: '18:45', detail: '為了趕上19:00的歌劇，建議吃點香腸攤 (Würstelstand) 或簡餐。', tips: '看劇前不要吃太飽以免想睡覺。' },
-                    { time: '19:00', title: '🎭 維也納國家歌劇院《蝙蝠》', icon: '🏛️', tag: 'Wiener Staatsoper', stayTime: '3h', depTime: '22:00', detail: '新年必看劇目！在世界最頂級的歌劇院欣賞約翰史特勞斯的經典輕歌劇《蝙蝠》(Die Fledermaus) 或當季劇目。', tips: '此為頂級社交場合，務必著正式服裝。門票需在幾個月前一開賣就上網搶購！', gmap: createGMapUrl('Wiener Staatsoper') },
-                    { time: '22:30', title: '抵達住宿', icon: '🏠', tag: '維也納飯店', stayTime: '-', depTime: '-', detail: '整理行李，確認退稅單據皆已填妥。', tips: '' }
+                    { time: '08:35', title: '享用飯店早餐 & 搭地鐵 U4 前往美泉宮', icon: '🚇', tag: '09:20前抵達入口', stayTime: '45m', depTime: '09:20', detail: '在 Hotel Astoria 享用豐盛早餐後，從旁邊 Karlsplatz 站搭乘地鐵 U4 綠線直達 Schönbrunn 站（車程約 12 分鐘）。', tips: '可購買維也納 24 小時交通卡，單日搭超過 3 次即回本。' },
+                    { time: '09:30', title: '🏰 美泉宮全覽 (Palace Ticket 09:30-09:45 已付清)', icon: '🏰', tag: '已付 €84.00 / 2 Adults', stayTime: '2h15m', depTime: '11:45', detail: '【已購票 €84.00】持 PDF 電子門票於指定時段 **09:30 – 09:45** 刷票入場（持票人：Shih CheChi）！領取免費中文語音導覽機，參觀哈布斯堡王朝最華麗的 40 間皇家廳房（鏡廳、大畫廊、弗蘭茨約瑟夫與茜茜公主起居室），隨後至後方巴洛克花園快拍凱旋門 (Gloriette)。', tips: '🚨 美泉宮嚴格執行入場時段控管，請務必於 09:30–09:45 之間刷過入口閘門！宮殿內部禁止拍照。', gmap: createGMapUrl('Schönbrunn Palace Vienna') },
+                    { time: '12:00', title: '順路快拍：卡爾教堂 (Karlskirche) 與分離派金色圓頂', icon: '⛪', tag: '快拍 25m', stayTime: '25m', depTime: '12:25', detail: '搭 U4 地鐵回到 Karlsplatz 站出站即達！在擁有巨大橢圓穹頂與雙石柱的「卡爾教堂」水池前快拍倒影，並順路打卡隔壁的「分離派展覽館 (Secession) 金色月桂葉圓頂」。', tips: '就在地鐵站出口往午餐的順路動線上，外觀快拍 25 分鐘！', gmap: createGMapUrl('Karlskirche Vienna') },
+                    { time: '12:30', title: '市區午餐：Plachutta 皇帝清燉牛肉或納旭市場餐廳', icon: '🍽️', tag: '維也納國菜', stayTime: '1h15m', depTime: '13:45', detail: '品嚐弗蘭茨約瑟夫皇帝最愛的維也納清燉牛肉 (Tafelspitz)，先喝濃郁牛骨湯配煎餅條，再享用軟嫩牛肉佐蘋果辣根醬。', tips: '週日零售店休息，但餐廳與咖啡館照常營業。', gmap: createGMapUrl('Plachutta Wollzeile Vienna') },
+                    { time: '14:00', title: '霍夫堡皇宮 (Hofburg) 與奧地利國家圖書館大廳', icon: '🏛️', tag: '皇室藝文巡禮', stayTime: '1.75h', depTime: '15:45', detail: '漫步於冬宮霍夫堡英雄廣場與米歇爾廣場，並進入被譽為「世界最美巴洛克圖書館」的奧地利國家圖書館大廳 (Prunksaal) 參觀！', tips: '霍夫堡與國家圖書館距離我們住的 Hotel Astoria 步行僅 5 分鐘！', gmap: createGMapUrl('Austrian National Library Prunksaal') },
+                    { time: '15:45', title: '維也納百年宮廷咖啡館下午茶', icon: '☕', tag: 'Cafe Central / Demel', stayTime: '1h15m', depTime: '17:00', detail: '造訪世界最美的「中央咖啡館 (Café Central)」或皇室御用糕點店「Demel」，品嚐米朗琪咖啡 (Melange)、沙河蛋糕與皇帝煎餅 (Kaiserschmarrn)！', tips: '若中央咖啡館排隊過長，推薦前往飯店對面的 Hotel Sacher Café 或 Café Sperl。', gmap: createGMapUrl('Café Central Vienna') },
+                    { time: '17:00', title: '聖史蒂芬大教堂 & 回飯店換裝、歌劇前香腸攤輕食', icon: '⛪', tag: '飯店步行2分鐘', stayTime: '1.5h', depTime: '18:30', detail: '參觀維也納地標「聖史蒂芬大教堂」馬賽克屋頂與哥德式大廳，隨後走回 Hotel Astoria 休息並換上優雅正式服裝。開演前可在歌劇院旁最著名的 Bitzinger 香腸攤吃份起司爆漿香腸配香檳！', tips: '飯店就在歌劇院正後方（走路 2 分鐘），換裝與休息超級從容！', gmap: createGMapUrl('St. Stephen\'s Cathedral Vienna') },
+                    { time: '19:00', title: '🎭 維也納國家歌劇院《蝙蝠》(DIE FLEDERMAUS)', icon: '🏛️', tag: '已付 €380 / Order #96951', stayTime: '3h', depTime: '22:00', detail: '【已確認付款 €380】走進世界歌劇最高殿堂「維也納國家歌劇院 (Opernring 2)」，欣賞約翰‧史特勞斯最歡樂華麗的新年傳統必演輕歌劇《蝙蝠》（Category 4 座位 × 2張，持票人 CheChi Shih）！', tips: '請提早 30 分鐘（約 18:30）入場，可在金碧輝煌的大理石樓梯與茶沙龍拍照，座位螢幕皆附有英文字幕切換。', gmap: createGMapUrl('Vienna State Opera Opernring 2') },
+                    { time: '22:15', title: '🏠 抵達住宿：Hotel Astoria Vienna', icon: '🏠', tag: '維也納', stayTime: '-', depTime: '-', detail: '散步 2 分鐘回到飯店，整理戰利品與退稅單據，為完美旅程畫下句點。', tips: '請確認所有退稅單 (Global Blue / Planet) 已填妥護照號碼、英文姓名與地址。', gmap: createGMapUrl('Hotel Astoria Vienna') }
                 ]
             },
             {
-                day: 12, date: '01/04', weekday: '週一', title: '賦歸', weather: { emoji: '✈️', temp: '-' },
-                drive: 0.5, play: 0, coords: [48.1103, 16.5697], stay: '飛機上',
+                day: 12, date: '01/04', weekday: '週一', title: '維也納 ➜ 機場辦理退稅 ➜ 長榮直飛返台', weather: { emoji: '✈️', temp: '-' },
+                drive: 0.5, play: 0, coords: [48.1103, 16.5697], stay: '溫暖的家 (機上)',
                 events: [
-                    { time: '08:00', title: '飯店早餐與退房', icon: '🥐', tag: '飯店', stayTime: '45m', depTime: '08:45', detail: '享用最後的歐洲早餐。', tips: '' },
-                    { time: '08:45', title: '前往機場', icon: '🚊', tag: '大眾運輸', stayTime: '30m', depTime: '09:15', detail: '搭乘機場快線 CAT (16分鐘) 或一般 S-Bahn/Railjet 前往維也納國際機場 (VIE)。', tips: '' },
-                    { time: '09:15', title: '辦理退稅手續', icon: '💰', tag: 'VIE 機場', stayTime: '45m', depTime: '10:00', detail: '拿著填寫好的退稅單與購買商品，前往海關蓋章並至 Global Blue / Planet 櫃檯領取退稅款。', tips: '超級重點：若退稅商品要放進「托運行李」，請先去海關蓋章再辦理登機報到！', gmap: createGMapUrl('Vienna International Airport') },
-                    { time: '10:00', title: '航班報到與安檢', icon: '🛂', tag: '出境', stayTime: '2h', depTime: '12:05', detail: '長榮航空櫃台報到，通過安檢前往登機門。', tips: '' },
-                    { time: '12:05', title: '搭機返台', icon: '🛫', tag: 'BR66', stayTime: '-', depTime: '-', detail: '搭乘長榮班機直飛返台。', tips: '結束美好充實的 12 日奧捷匈深度之旅！' }
+                    { time: '07:45', title: '享用 Hotel Astoria 早餐與退房', icon: '🥐', tag: '含免費早餐', stayTime: '55m', depTime: '08:40', detail: '享用飯店豐盛的維也納早餐，辦理退房手續。', tips: '' },
+                    { time: '08:40', title: '前往維也納國際機場 (VIE)', icon: '🚊', tag: 'CAT快線 / Uber', stayTime: '35m', depTime: '09:15', detail: '可從飯店叫 Uber/Bolt 直達機場（約 25 分鐘，最輕鬆免搬行李），或搭地鐵至 Wien Mitte 轉乘機場快線 CAT（16 分鐘直達機場）。', tips: '', gmap: createGMapUrl('Wien Mitte CAT Terminal') },
+                    { time: '09:15', title: '機場海關蓋章與辦理退稅 (Tax Refund)', icon: '💰', tag: 'VIE 第3航廈', stayTime: '45m', depTime: '10:00', detail: '抵達維也納機場 Terminal 3。若有退稅商品需放入「託運行李」，請先至長榮櫃檯報到領取登機證（向地勤聲明有 Tax Refund 要蓋章，將貼好行李條的行李箱拉至海關櫃檯查驗蓋章），隨後投入退稅信箱或領取退稅款。', tips: '手提行李退稅則於通過安檢後的海關櫃檯辦理。請將所有高單價退稅品集中放置以便海關抽查。', gmap: createGMapUrl('Vienna International Airport Terminal 3') },
+                    { time: '10:00', title: '長榮航空報到、出境查驗與免稅店巡禮', icon: '🛂', tag: '出境大廳', stayTime: '2h', depTime: '12:05', detail: '完成行李託運與隨身安檢、護照查驗，前往登機門候機。', tips: '' },
+                    { time: '12:05', title: '🛫 搭乘長榮 BR66 直飛返台', icon: '🛫', tag: 'BR66 直飛', stayTime: '11h35m', depTime: '06:40+1', detail: '12:05 由維也納起飛，預計於隔日 2027/01/05 (二) 清晨 06:40 抵達台北桃園機場 (TPE)。', tips: '帶著滿滿的雪國美景、溫泉杯與音樂回憶平安返家！' }
                 ]
             }
         ];
 
         const foodData = [
             // Vienna
-            { category: 'meat', name: 'Figlmüller', city: '維也納', stars: '4.4', desc: '比臉還大的百年維也納炸肉排名店。', map: createGMapUrl('Figlmüller Bäckerstraße') },
+            { category: 'meat', name: 'Figlmüller', city: '維也納', stars: '4.4', desc: '比臉還大的百年維也納炸肉排名店（離下榻 Astoria 飯店步行僅8分鐘）。', map: createGMapUrl('Figlmüller Bäckerstraße') },
             { category: 'meat', name: 'Ribs of Vienna', city: '維也納', stars: '4.5', desc: '在地超人氣地窖豬肋排，長達一公尺的美味。', map: createGMapUrl('Ribs of Vienna') },
-            { category: 'local', name: 'Plachutta', city: '維也納', stars: '4.4', desc: '皇帝最愛的清燉牛肉 (Tafelspitz) 經典名店。', map: createGMapUrl('Plachutta Wollzeile') },
-            { category: 'cafe', name: 'Café Central', city: '維也納', stars: '4.4', desc: '世界最美咖啡館之一，體驗傳統維也納咖啡文化。', map: createGMapUrl('Café Central Vienna') },
-            { category: 'cafe', name: 'Café Sperl', city: '維也納', stars: '4.5', desc: '電影《愛在黎明破曉時》拍攝地，傳統寧靜氛圍。', map: createGMapUrl('Café Sperl') },
-            { category: 'cafe', name: 'Demel (德梅爾)', city: '維也納', stars: '4.3', desc: '曾為皇室御用糕點店，推薦沙河蛋糕與紫羅蘭糖。', map: createGMapUrl('Demel Vienna') },
+            { category: 'local', name: 'Plachutta Wollzeile', city: '維也納', stars: '4.4', desc: '皇帝法蘭茲約瑟夫最愛的清燉牛肉 (Tafelspitz) 經典名店。', map: createGMapUrl('Plachutta Wollzeile') },
+            { category: 'local', name: 'Bitzinger Würstelstand', city: '維也納', stars: '4.5', desc: '就在國家歌劇院與 Astoria 飯店旁！維也納最著名的起司爆漿香腸攤。', map: createGMapUrl('Bitzinger Würstelstand Albertina') },
+            { category: 'cafe', name: 'Café Central', city: '維也納', stars: '4.4', desc: '世界最美咖啡館之一，體驗傳統維也納咖啡文化與皇帝煎餅。', map: createGMapUrl('Café Central Vienna') },
+            { category: 'cafe', name: 'Café Sperl', city: '維也納', stars: '4.5', desc: '電影《愛在黎明破曉時》拍攝地，傳統典雅的百年氛圍。', map: createGMapUrl('Café Sperl') },
+            { category: 'cafe', name: 'Demel (德梅爾)', city: '維也納', stars: '4.3', desc: '皇室御用糕點店，推薦沙河蛋糕、皇帝煎餅與紫羅蘭糖。', map: createGMapUrl('Demel Vienna') },
 
             // Budapest
-            { category: 'local', name: 'Menza (Goulash)', city: '布達佩斯', stars: '4.5', desc: '復古風格餐廳，必點匈牙利燉牛肉湯。', map: createGMapUrl('Menza Étterem és Kávéház') },
+            { category: 'view', name: 'Leo Rooftop & Leo Bistro', city: '布達佩斯', stars: '4.5', desc: '就在我們住的 Hotel Clark 館內！頂樓可飽覽鏈橋與城堡夜景，平安夜大餐首選。', map: createGMapUrl('Leo Bistro Budapest') },
+            { category: 'local', name: 'Menza Étterem', city: '布達佩斯', stars: '4.5', desc: '復古風格人氣餐廳，必點匈牙利燉牛肉湯與鴨胸。', map: createGMapUrl('Menza Étterem és Kávéház') },
             { category: 'local', name: 'Hungarikum Bisztró', city: '布達佩斯', stars: '4.7', desc: '道地匈牙利家庭料理，氣氛溫馨，需提早預約。', map: createGMapUrl('Hungarikum Bisztró') },
-            { category: 'cafe', name: 'New York Café', city: '布達佩斯', stars: '4.3', desc: '華麗奢華的世界最美咖啡館，宛如置身皇宮。', map: createGMapUrl('New York Café Budapest') },
-            { category: 'view', name: 'Mazel Tov', city: '布達佩斯', stars: '4.6', desc: '猶太區廢墟酒吧餐廳，藤蔓與燈泡交織的絕美中東料理。', map: createGMapUrl('Mazel Tov Budapest') },
-            { category: 'cafe', name: 'Gelarto Rosa', city: '布達佩斯', stars: '4.6', desc: '聖史蒂芬大教堂旁超美玫瑰花造型冰淇淋。', map: createGMapUrl('Gelarto Rosa') },
+            { category: 'cafe', name: 'New York Café', city: '布達佩斯', stars: '4.3', desc: '華麗奢華的世界最美咖啡館，宛如置身文藝復興皇宮。', map: createGMapUrl('New York Café Budapest') },
+            { category: 'view', name: 'Mazel Tov', city: '布達佩斯', stars: '4.6', desc: '猶太區最美廢墟花園餐廳，燈串交織的浪漫中東地中海料理。', map: createGMapUrl('Mazel Tov Budapest') },
+            { category: 'cafe', name: 'Gelarto Rosa', city: '布達佩斯', stars: '4.6', desc: '聖史蒂芬大教堂旁超美手工玫瑰花造型冰淇淋。', map: createGMapUrl('Gelarto Rosa') },
 
-            // Prague
-            { category: 'meat', name: 'Pork\'s 烤豬腳', city: '布拉格', stars: '4.6', desc: '外皮酥脆、肉質軟嫩的捷克烤豬腳。', map: createGMapUrl('Pork\'s Prague') },
-            { category: 'meat', name: 'Kantýna', city: '布拉格', stars: '4.6', desc: '肉食愛好者天堂，在地人也愛的立吞牛排與生牛肉塔塔。', map: createGMapUrl('Kantyna Prague') },
-            { category: 'local', name: 'Trdelník 煙囪捲', city: '布拉格', stars: '4.5', desc: '街邊隨處可見的捷克傳統甜點，熱熱吃最好吃。', map: createGMapUrl('Trdelnik Prague') },
-            { category: 'view', name: 'Terasa U Prince', city: '布拉格', stars: '4.2', desc: '老城廣場最佳俯瞰視角，適合喝杯調酒。', map: createGMapUrl('Terasa U Prince') },
-            { category: 'local', name: 'U Fleků', city: '布拉格', stars: '4.3', desc: '擁有500年歷史的古老啤酒館，自釀黑啤酒極具特色。', map: createGMapUrl('U Fleků') },
-            { category: 'cafe', name: 'Café Louvre', city: '布拉格', stars: '4.5', desc: '卡夫卡與愛因斯坦曾造訪的百年咖啡館。', map: createGMapUrl('Café Louvre') },
+            // Bratislava & Prague
+            { category: 'local', name: 'Slovak Pub', city: '斯洛伐克', stars: '4.4', desc: '布拉提斯拉瓦必訪傳統酒館，必點羊奶起司麵疙瘩與蒜香濃湯。', map: createGMapUrl('Slovak Pub Bratislava') },
+            { category: 'meat', name: 'Kantýna', city: '布拉格', stars: '4.6', desc: '距離下榻 The Julius 飯店步行僅1分鐘！捷克頂級熟成牛排與生牛肉塔塔天堂。', map: createGMapUrl('Kantyna Prague') },
+            { category: 'meat', name: 'Pork\'s 烤豬腳', city: '布拉格', stars: '4.6', desc: '查理大橋旁超人氣名店，外皮酥脆、肉質軟嫩的捷克烤豬腳。', map: createGMapUrl('Pork\'s Prague') },
+            { category: 'view', name: 'Terasa U Prince', city: '布拉格', stars: '4.2', desc: '老城廣場正對天文鐘的頂樓露台餐廳，360度無死角夜景。', map: createGMapUrl('Terasa U Prince') },
+            { category: 'local', name: 'U Fleků', city: '布拉格', stars: '4.3', desc: '擁有500年歷史的傳奇啤酒館，自釀黑啤酒與手風琴演奏極具特色。', map: createGMapUrl('U Fleků') },
+            { category: 'cafe', name: 'Café Louvre (羅浮咖啡)', city: '布拉格', stars: '4.5', desc: '卡夫卡與愛因斯坦曾造訪的百年咖啡館，熱巧克力極濃郁。', map: createGMapUrl('Café Louvre') },
 
-            // CK / Salzburg
-            { category: 'local', name: 'Krumlovský mlýn', city: '庫倫洛夫', stars: '4.4', desc: '河畔餐廳，提供道地波西米亞料理。', map: createGMapUrl('Krumlovský mlýn') },
-            { category: 'view', name: 'Papa\'s Living Restaurant', city: '庫倫洛夫', stars: '4.5', desc: '伏爾塔瓦河畔的超人氣餐廳，義大利麵與烤肉皆優。', map: createGMapUrl('Papa\'s Living Restaurant') },
-            { category: 'cafe', name: 'Cafe Tomaselli', city: '薩爾斯堡', stars: '4.2', desc: '奧地利最古老的咖啡館，莫札特也愛來。', map: createGMapUrl('Café Tomaselli') },
-            { category: 'local', name: 'Bärenwirt', city: '薩爾斯堡', stars: '4.6', desc: '薩爾斯堡超美味炸雞與奧地利傳統料理。', map: createGMapUrl('Bärenwirt Salzburg') },
-            { category: 'local', name: 'St. Peter Stiftskulinarium', city: '薩爾斯堡', stars: '4.5', desc: '歐洲最古老餐廳(超過1200年)，米其林推薦的洞穴晚宴。', map: createGMapUrl('St. Peter Stiftskulinarium') },
-            { category: 'meat', name: 'Augustiner Bräu', city: '薩爾斯堡', stars: '4.7', desc: '修道院大酒場，熱鬧非凡的大口吃肉喝酒聖地。', map: createGMapUrl('Augustiner Bräu Salzburg') }
+            // CK / Salzburg / Hallstatt
+            { category: 'meat', name: 'Krčma v Šatlavské', city: '庫倫洛夫', stars: '4.6', desc: 'CK 小鎮必吃中世紀洞穴地窖炭火現烤肉排大餐。', map: createGMapUrl('Krčma v Šatlavské Český Krumlov') },
+            { category: 'view', name: 'Papa\'s Living Restaurant', city: '庫倫洛夫', stars: '4.5', desc: '伏爾塔瓦河畔景觀餐廳，豬肋排與義大利麵皆優。', map: createGMapUrl('Papa\'s Living Restaurant') },
+            { category: 'cafe', name: 'Cafe Tomaselli', city: '薩爾斯堡', stars: '4.2', desc: '奧地利最古老的咖啡館(1703年創立)，莫札特生前最愛。', map: createGMapUrl('Café Tomaselli') },
+            { category: 'local', name: 'Bärenwirt', city: '薩爾斯堡', stars: '4.6', desc: '薩爾斯堡超美味黃金炸雞與奧地利傳統料理名店。', map: createGMapUrl('Bärenwirt Salzburg') },
+            { category: 'local', name: 'St. Peter Stiftskulinarium', city: '薩爾斯堡', stars: '4.5', desc: '西元803年創立、歐洲最古老餐廳！適合跨年晚宴的岩壁音樂廳餐廳。', map: createGMapUrl('St. Peter Stiftskulinarium') },
+            { category: 'meat', name: 'Augustiner Bräu', city: '薩爾斯堡', stars: '4.7', desc: '百年修道院大酒場，自己洗陶杯裝木桶鮮釀啤酒配烤豬腳。', map: createGMapUrl('Augustiner Bräu Salzburg') },
+            { category: 'local', name: 'Seewirt Zauner', city: '哈修塔特', stars: '4.3', desc: '距離下榻 Polreich 民宿僅1分鐘！傳承百年的木屋餐廳，必吃碳烤哈修塔特湖鱒魚。', map: createGMapUrl('Seewirt Zauner Hallstatt') }
         ];
 
+        // Exact 7 Confirmed Hotels from User PDFs
         const accommodations = [
-            { day: 'Day 1-2', city: '布達佩斯', name: 'Hotel Clark Budapest', type: '多瑙河景雙人房 x1', checkin: '15:00 後', map: createGMapUrl('Hotel Clark Budapest') },
-            { day: 'Day 3', city: '斯洛伐克', name: 'Marrol\'s Boutique Hotel', type: '經典雙人房 x1', checkin: '14:00 後', map: createGMapUrl('Marrol\'s Boutique Hotel Bratislava') },
-            { day: 'Day 4-5', city: '布拉格', name: 'Grand Hotel Bohemia', type: '豪華雙人房 x1', checkin: '14:00 後', map: createGMapUrl('Grand Hotel Bohemia') },
-            { day: 'Day 6', city: '庫倫洛夫', name: 'Hotel Růže', type: '古典雙人房 x1', checkin: '15:00 後', map: createGMapUrl('Hotel Růže Český Krumlov') },
-            { day: 'Day 7-8', city: '薩爾斯堡', name: 'Hotel Sacher Salzburg', type: '河景雙人房 x1', checkin: '15:00 後', map: createGMapUrl('Hotel Sacher Salzburg') },
-            { day: 'Day 9', city: '哈修塔特', name: 'Seehotel Grüner Baum', type: '湖景陽台房 x1', checkin: '15:00 - 18:00 (留意限時)', map: createGMapUrl('Seehotel Grüner Baum') },
-            { day: 'Day 10-11', city: '維也納', name: 'Steigenberger Hotel Herrenhof', type: '經典雙人房 x1', checkin: '15:00 後', map: createGMapUrl('Steigenberger Hotel Herrenhof') }
+            {
+                day: 'Day 1-2 (12/24 - 12/26，2晚)',
+                city: '🇭🇺 布達佩斯',
+                name: 'Hotel Clark Budapest (克拉克布達佩斯飯店 - 僅供成人入住)',
+                bookingId: 'Hotels.com 編號：73489077757679',
+                type: 'Chain Bridge View - Legendary Lions (鏈橋景觀雙人房)',
+                checkin: '入住 14:00 後 | 退房 12:00 前',
+                address: 'Clark Ádám tér 1., Budapest, 1011 Hungary (電話: +36 1 610 4890)',
+                payment: '✅ 房費 NT$19,941 已付清 | 💳 到店付：4% 城市稅 (約 NT$760)',
+                map: createGMapUrl('Hotel Clark Budapest Clark Ádám tér 1')
+            },
+            {
+                day: 'Day 3 (12/26 - 12/27，1晚)',
+                city: '🇸🇰 斯洛伐克 (布拉提斯拉瓦)',
+                name: 'Marrol\'s Boutique Hotel (馬羅爾斯精品五星飯店)',
+                bookingId: '官網確認號：RES101735726R2526',
+                type: 'Executive Double Room (行政雙人房 ‧ 含免費早餐與 WiFi)',
+                checkin: '入住 14:00 後 (已備註 Need Car Parking) | 退房 12:00 前',
+                address: 'Tobrucká 4, 811 02 Bratislava, Slovakia',
+                payment: '✅ 房費 €184.50 已付清 | 💳 到店付：城市稅 €7.00 + 地下車庫停車費 €29/晚',
+                map: createGMapUrl('Marrol\'s Boutique Hotel Bratislava')
+            },
+            {
+                day: 'Day 4-5 (12/27 - 12/29，2晚)',
+                city: '🇨🇿 布拉格',
+                name: 'The Julius Prague (布拉格朱利葉斯飯店)',
+                bookingId: 'Hotels.com 編號：73489095279488',
+                type: '豪華開放式客房 (Deluxe Studio)',
+                checkin: '入住 15:00 後 | 退房 11:00 前',
+                address: '3 Senovážné nám., Prague, 110 00 Czechia (電話: +420 233 111 222)',
+                payment: '✅ 房費 NT$24,595 已付清 | 💳 到店付：城市稅 €8.24 (€2.06/人/晚，約 NT$301)',
+                map: createGMapUrl('The Julius Prague Senovážné náměstí 3')
+            },
+            {
+                day: 'Day 6 (12/29 - 12/30，1晚)',
+                city: '🇨🇿 庫倫洛夫 (CK小鎮)',
+                name: 'Pension MONO *****',
+                bookingId: 'Agoda 編號：1746735837 (參照號 6642004027)',
+                type: 'Deluxe King Suite (豪華特大床套房)',
+                checkin: '12/29 入住 (建議停北側 P1 停車場步行5分鐘即達)',
+                address: 'Latrán 73, 381 01 Český Krumlov, Czechia (電話: +420 724 256 529)',
+                payment: '✅ 房費 NT$3,806.77 已付清 (12/14前可免費取消) | 💳 到店付：城市稅約 NT$184',
+                map: createGMapUrl('Pension MONO Latrán 73 Český Krumlov')
+            },
+            {
+                day: 'Day 7-8 (12/30 - 01/01，2晚 ‧ 跨年)',
+                city: '🇦🇹 薩爾斯堡',
+                name: 'Sheraton Grand Salzburg ***** (薩爾斯堡喜來登大飯店)',
+                bookingId: 'Agoda 編號：1746801547 (參照號 6562433160)',
+                type: 'Terrace Room ETAGE7 Access, 1 King, Park view (含早餐 & ETAGE7 酒廊禮遇)',
+                checkin: '入住 15:00 後 | 退房 12:00 前',
+                address: 'Auerspergstrasse 4, 5020 Salzburg, Austria (電話: +43 662 889990)',
+                payment: '✅ 房費 NT$32,633.18 已付清 | 💳 到店付：城市稅約 NT$522.44',
+                map: createGMapUrl('Sheraton Grand Salzburg Auerspergstrasse 4')
+            },
+            {
+                day: 'Day 9 (01/01 - 01/02，1晚 ‧ 元旦)',
+                city: '🇦🇹 哈修塔特 (Hallstatt)',
+                name: 'Polreich Bed&Breakfast *****',
+                bookingId: 'Agoda 編號：1746816623 (參照號 5716563837)',
+                type: 'Double Room with Lake View (湖景雙人房 ‧ 含免費早餐與咖啡/茶)',
+                checkin: '入住 15:00 後 | 退房 11:00 前',
+                address: 'Seestraße 89, 4830 Hallstatt, Austria (信箱: polreich.hallstatt@gmail.com)',
+                payment: '✅ 房費 NT$11,324.29 已付清 | 💳 到店付：城市稅約 NT$183.96',
+                map: createGMapUrl('Polreich Bed&Breakfast Seestraße 89 Hallstatt')
+            },
+            {
+                day: 'Day 10-11 (01/02 - 01/04，2晚)',
+                city: '🇦🇹 維也納',
+                name: 'Hotel Astoria Vienna, Curio Collection by Hilton *****',
+                bookingId: 'Agoda 編號：1747193282 (參照號 3495629516)',
+                type: 'King Premium Room (尊貴特大床房 ‧ 含免費早餐)',
+                checkin: '入住 15:00 後 | 退房 12:00 前 (開車卸行李導航至 Führichgasse 1)',
+                address: 'Kärntner Strasse 32-34 / Entrance Führichgasse 1, 1010 Wien, Austria',
+                payment: '✅ 房費 NT$27,181.98 已付清 | 💳 到店付：城市稅約 NT$1,246.48',
+                map: createGMapUrl('Hotel Astoria Vienna Curio Collection by Hilton')
+            }
+        ];
+
+        // Pending Bookings & Tickets Checklist (Updated after Salt Mine & Schönbrunn Palace are booked)
+        const todoChecklistData = [
+            {
+                category: '🚗 跨國自駕必買：電子通行證 (e-Vignette) 與租車待辦',
+                badge: '取車後憑車牌號碼線上購買',
+                items: [
+                    { title: '匈牙利 10天期高速公路電子通行證 (Hungary e-Vignette - D1等級)', desc: '12/24 早上於維也納機場取車拿到車牌號碼後，跨越邊境前用手機於匈牙利官方網站 (ematrica.nemzetiutdij.hu) 購買並確認生效。' },
+                    { title: '斯洛伐克 10天期高速公路電子通行證 (Slovakia e-Vignette)', desc: '12/26 中午從聖安德烈/埃斯泰爾戈姆開往斯洛伐克前，於斯洛伐克官方網站 (eznamka.sk) 輸入車牌購買（約 €12）。' },
+                    { title: '捷克 10天期高速公路電子通行證 (Czechia e-Vignette)', desc: '12/27 早上從斯洛伐克開往布爾諾/布拉格前，於捷克官方網站 (edalnice.cz) 輸入車牌購買（約 270 CZK）。' },
+                    { title: '確認奧地利高速公路通行證 (Austria Vignette)', desc: '維也納機場取車時，向 MEGA DRIVE 櫃檯確認奧地利本地車輛是否已貼妥奧地利年票；若無則於機場或加油站購買 10天期通行證。' },
+                    { title: '準備 CheChi Shih 本人實體信用卡與國際駕照正本', desc: '12/24 08:00 機場櫃檯取車需刷卡支付尾款 €644.51 及預授權押金 €290.00（務必確認信用卡額度充足且開通海外交易與 PIN 碼）。' }
+                ]
+            },
+            {
+                category: '🎟️ 景點門票確認與選配待辦 (核心大票皆已買齊！)',
+                badge: '鹽礦、美泉宮、歌劇院已訂妥',
+                items: [
+                    { title: '✅ 【已完成訂票】12/30 13:10 德國貝希特斯加登鹽礦 (Order #546261 / QR: 431-48-10693)', desc: '已付清 €53.00 (2 Adults)。請將 PDF 門票存入手機離線檔案，當天務必於 12:55 前抵達鹽礦刷 QR Code 入場！', checked: true },
+                    { title: '✅ 【已完成訂票】01/03 09:30-09:45 維也納美泉宮 Palace Ticket (2 Adults)', desc: '已付清 €84.00。請下載保存 PDF-Ticket，當天務必於 09:30–09:45 指定時段內刷票入場！', checked: true },
+                    { title: '✅ 【已完成訂票】01/03 晚間 維也納國家歌劇院《蝙蝠》 (Order #96951)', desc: '已付清 €380.00 (Category 4 × 2張)。', checked: true },
+                    { title: '【Day 2 ‧ 12/25 聖誕節】布達佩斯塞切尼溫泉浴場 (Széchenyi Thermal Bath)', desc: '聖誕節當天照常營業但十分熱門，建議提前於官網購買含私人更衣間 (Cabin) 的入場票。' },
+                    { title: '【Day 5 ‧ 12/28】布拉格城堡套票 (Circuit B) & 斯特拉霍夫修道院圖書館', desc: '布拉格城堡與斯特拉霍夫修道院可現場購票；若想額外進入克萊門特學院 (Clementinum) 則需提前上網預約。' },
+                    { title: '【Day 7 & Day 8 & Day 9】薩爾斯堡要塞纜車、國王湖遊船、哈修塔特 Skywalk 纜車', desc: '此三項交通纜車/船票隨到隨買即可（或前一天線上買要塞纜車票），不限入場時段，彈性最高。' }
+                ]
+            },
+            {
+                category: '🍽️ 節慶檔期必搶餐廳訂位清單 (平安夜/跨年夜極重要！)',
+                badge: '避免節慶撲空',
+                items: [
+                    { title: '【Day 1 ‧ 12/24 平安夜】布達佩斯平安夜聖誕晚餐', desc: '🔥 極重要！12/24 晚上布達佩斯 90% 餐廳休假。強烈建議立即寫信給下榻的 Hotel Clark Budapest 預訂館內的 Leo Bistro 或頂樓 Leo Rooftop 平安夜套餐！' },
+                    { title: '【Day 8 ‧ 12/31 跨年夜】薩爾斯堡跨年大餐 (Silvester Dinner)', desc: '🔥 極重要！跨年夜餐廳一位難求，建議立即聯繫下榻的 Sheraton Grand Salzburg 預訂館內餐廳，或上網預訂 St. Peter Stiftskulinarium / Bärenwirt。' },
+                    { title: '【Day 6 ‧ 12/29】CK 小鎮中世紀地窖烤肉 (Krčma v Šatlavské)', desc: '洞穴餐廳座位極少，冬季無法坐戶外，務必提前寫信或電話預約 12/29 18:00 晚餐座位。' },
+                    { title: '【Day 4 & Day 5】布拉格人氣餐廳：Pork\'s 烤豬腳 & Terasa U Prince 頂樓景觀餐廳', desc: 'Terasa U Prince 若想坐正對老城廣場與天文鐘的位子，務必提前 1-2 個月預約 12/28 18:15 座位。' },
+                    { title: '【Day 10 ‧ 01/02】維也納百年炸肉排 Figlmüller 或 Ribs of Vienna 一公尺豬肋排', desc: '週六晚間極易客滿，建議提前於官網線上預訂 01/02 18:00 座位。' }
+                ]
+            }
         ];
 
         const packingList = [
-            { category: '📜 證件與重要文件', items: ['護照正本 (效期>6個月)', '申根保險英文證明', '國際駕照 & 台灣駕照正本', '租車預訂單', '信用卡 (備2-3張)', '歐元現金 (約500-1000)'] },
-            { category: '🧥 衣物 (洋蔥式穿法)', items: ['防風防水保暖外套', '發熱衣褲 x3', '毛衣/帽T x3', '保暖毛帽、圍巾、手套', '防滑好走的靴子', '一般長褲 x3', '厚襪子'] },
-            { category: '🔌 電子產品', items: ['歐洲雙圓孔轉接頭 x2', '行動電源', '相機、腳架 (拍夜景必備)', '各式充電線'] },
-            { category: '💊 個人藥品', items: ['感冒藥、退燒藥', '腸胃藥', '個人慢性處方箋', '保濕乳液、護唇膏 (歐洲極乾)'] },
-            { category: '🚗 自駕必備', items: ['手機車架', '車充', '太陽眼鏡 (雪地反光)', '車用音樂歌單'] }
+            { category: '📜 證件與已確認憑證 (必帶正本)', items: ['護照正本 (效期>6個月)', '台灣駕照正本 + 國際駕照正本 (缺一不可！)', '駕駛本人 (CheChi Shih) 實體信用卡 x2-3張 (含 PIN 碼，取車刷 €644.51 + 押金 €290)', 'MEGA DRIVE 租車憑證紙本 (ECF6E578 / 1EG69E)', '12/30 13:10 貝希特斯加登鹽礦 QR Code 門票 (#546261 / 431-48-10693)', '1/3 09:30 美泉宮 Palace Ticket PDF 門票 + 19:00 國家歌劇院《蝙蝠》門票 (#96951)', '7 間飯店訂房確認單 & 申根旅遊平安保險英文證明', '歐元現金 (約 €500-800，付城市稅、聖誕市集與小費)'] },
+            { category: '🧥 冬季保暖與歌劇院穿搭', items: ['防風防水保暖長版羽絨外套', '歌劇院正式服裝 (Smart Casual / 西裝外套或洋裝、皮鞋，1/3 國家歌劇院必備)', '發熱衣褲 x3-4套', '保暖毛衣/刷毛上衣 x3', '毛帽、圍巾、防風觸控手套 (拍夜景必備)', '泳衣、泳帽、防滑拖鞋 (12/25 塞切尼溫泉必備)', '防滑防水好走的冬靴 + 羊毛厚襪 (12/30 鹽礦規定穿堅固鞋款)'] },
+            { category: '🔌 攝影與電子產品', items: ['歐洲雙圓孔轉接頭 (Type C/E/F) x2-3個', '相機、廣角鏡頭與穩固腳架 (拍漁人堡、查理大橋與跨年煙火)', '行動電源 (低溫耗電快，建議隨身放口袋保暖)', 'eSIM 或歐洲跨國網卡 (確認涵蓋奧、捷、匈、斯、德五國)'] },
+            { category: '💊 個人藥品與其他', items: ['綜合感冒藥、止痛退燒藥、腸胃藥、暈車藥', '高保濕乳液、護手霜、護唇膏 (歐洲冬季室內暖氣極乾)', '暖暖包 x10-20片 (跨年夜與清晨拍照神器)', '保溫瓶 (隨時裝熱水或熱紅酒)'] },
+            { category: '🚗 歐洲冬季自駕必備', items: ['手機出風口/吸盤車架 (導航必備)', '車用充電線 (USB-A 與 USB-C 皆備)', '偏光太陽眼鏡 (防雪地與冰川強烈反光)', '過夜輕便提袋 (住 CK 小鎮與哈修塔特時免搬大行李箱)'] }
         ];
 
 
@@ -712,7 +1016,6 @@
             // Show target view
             const target = document.getElementById(`view-${viewId}`);
             target.classList.remove('hidden');
-            // Slight delay to trigger opacity transition if we added one
             setTimeout(() => target.classList.add('active'), 10);
 
             // Update Desktop Nav UI
@@ -733,7 +1036,7 @@
             });
             document.getElementById('mobile-menu').classList.add('hidden');
 
-            // Toggle floating bottom navigation panel visibility
+            // Toggle floating bottom navigation panel visibility (Only show on itinerary page)
             const bottomNav = document.getElementById('bottom-nav-panel');
             if (viewId === 'itinerary') {
                 bottomNav.classList.remove('hidden');
@@ -743,11 +1046,6 @@
 
             currentView = viewId;
             window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            // Fix map rendering issue if initialized while hidden
-            if (viewId === 'dashboard' && mapInstance) {
-                setTimeout(() => mapInstance.invalidateSize(), 200);
-            }
         }
 
         function scrollToDay(dayNum) {
@@ -757,7 +1055,6 @@
             setTimeout(() => {
                 const element = document.getElementById(`day-${dayNum}`);
                 if (element) {
-                    // 偏移頂部導覽列的高度 (64px) + 小間距 (6px) = 70px
                     const y = element.getBoundingClientRect().top + window.pageYOffset - 70;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                 }
@@ -805,13 +1102,12 @@
             const hlContainer = document.getElementById('highlights-container');
             let hlHtml = '';
             itineraryData.forEach(day => {
-                const hlEvent = day.events.find(e => e.gmap) || day.events[1] || day.events[0];
                 hlHtml += `
-                    <div onclick="scrollToDay(${day.day})" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-100 cursor-pointer transition-colors">
-                        <div class="bg-blue-50 text-blue-600 rounded-lg p-2 font-bold text-sm min-w-[40px] text-center">D${day.day}</div>
+                    <div onclick="scrollToDay(${day.day})" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 border border-slate-100/80 hover:border-blue-200 cursor-pointer transition-colors">
+                        <div class="bg-blue-50 text-blue-600 rounded-lg p-2 font-bold text-sm min-w-[44px] text-center">D${day.day}<br><span class="text-[10px] font-normal">${day.date}</span></div>
                         <div class="flex-1 overflow-hidden">
-                            <p class="text-sm font-bold text-slate-800 truncate">${day.stay}: ${hlEvent.title}</p>
-                            <p class="text-xs text-slate-500 truncate">${day.title}</p>
+                            <p class="text-sm font-bold text-slate-800 truncate">${day.title}</p>
+                            <p class="text-xs text-indigo-600 font-medium truncate mt-0.5">🏨 ${day.stay}</p>
                         </div>
                         <div class="text-slate-300">❯</div>
                     </div>
@@ -820,42 +1116,123 @@
             hlContainer.innerHTML = hlHtml;
         }
 
+        // 零外部 API 依賴：純原生高質感互動式 SVG 奧捷匈德斯五國自駕路線地圖
+        const svgMapNodes = [
+            { id: 'D1', day: 1, x: 755, y: 395, label: '布達佩斯', sub: 'D1-D2 (12/24-25)', hotel: 'Hotel Clark Budapest', note: '塞切尼鏈橋景觀房・漁人堡・塞切尼溫泉', color: '#ef4444', main: true },
+            { id: 'S1', day: 3, x: 745, y: 360, label: '聖安德烈', sub: 'D3 順遊', hotel: '馬德里不思議小鎮', note: '鵝卵石巷弄與埃斯泰爾戈姆聖殿遠眺', color: '#38bdf8', main: false },
+            { id: 'D3', day: 3, x: 605, y: 325, label: '斯洛伐克', sub: 'D3 (12/26)', hotel: 'Marrol\'s Boutique Hotel', note: '布拉提斯拉瓦舊城・藍色教堂・UFO觀景台', color: '#8b5cf6', main: true },
+            { id: 'S2', day: 4, x: 545, y: 215, label: '布爾諾', sub: 'D4 中繼站', hotel: '捷克第二大城', note: '包心菜廣場・聖彼得與保羅大教堂', color: '#38bdf8', main: false },
+            { id: 'D4', day: 4, x: 375, y: 105, label: '布拉格', sub: 'D4-D5 (12/27-28)', hotel: 'The Julius Prague', note: '火藥塔・老城聖誕市集・查理大橋・布拉格城堡', color: '#f59e0b', main: true },
+            { id: 'S3', day: 6, x: 225, y: 95, label: '卡羅維瓦利', sub: 'D6 溫泉鄉', hotel: '買溫泉杯 & 溫泉餅', note: '磨坊溫泉長廊・普普大飯店', color: '#38bdf8', main: false },
+            { id: 'S4', day: 6, x: 360, y: 215, label: '胡波卡城堡', sub: 'D6 順遊', hotel: '純白溫莎風城堡', note: '胡波卡城堡 & 霍拉舍維采世遺農莊', color: '#38bdf8', main: false },
+            { id: 'D6', day: 6, x: 365, y: 265, label: 'CK 庫倫洛夫', sub: 'D6 (12/29)', hotel: 'Pension MONO (Latrán 73)', note: '彩繪塔・斗篷橋・地窖炭火烤肉', color: '#10b981', main: true },
+            { id: 'S5', day: 7, x: 315, y: 335, label: '特勞恩湖', sub: 'D7 順遊', hotel: 'Gmunden 奧特堡', note: '水上奧特堡與蒙德湖休息區', color: '#38bdf8', main: false },
+            { id: 'D7', day: 7, x: 235, y: 355, label: '薩爾斯堡', sub: 'D7-D8 (12/30-31 跨年)', hotel: 'Sheraton Grand Salzburg', note: '米拉貝爾宮・薩爾斯堡要塞・跨年煙火秀', color: '#3b82f6', main: true },
+            { id: 'D8', day: 8, x: 205, y: 395, label: '國王湖 & 鹽礦', sub: 'D7 鹽礦 / D8 國王湖', hotel: '已訂 12/30 13:10 鹽礦 (#546261)', note: '貝希特斯加登鹽礦・國王湖紅蔥頭教堂・藍紹', color: '#06b6d4', main: true },
+            { id: 'D9', day: 9, x: 300, y: 385, label: '哈修塔特', sub: 'D9 (01/01 元旦)', hotel: 'Polreich Bed&Breakfast', note: '高薩湖冰川倒影・Skywalk・明信片視角', color: '#ec4899', main: true },
+            { id: 'S6', day: 10, x: 455, y: 305, label: '梅爾克修道院', sub: 'D10 中繼站', hotel: '瓦豪河谷世遺', note: '金碧輝煌的巴洛克修道院', color: '#38bdf8', main: false },
+            { id: 'D10', day: 10, x: 545, y: 305, label: '維也納', sub: 'D1 / D10-D12 (1/2-1/4)', hotel: 'Hotel Astoria Vienna (Hilton)', note: '1/2 16:00還車・1/3 09:30美泉宮 & 19:00歌劇《蝙蝠》', color: '#6366f1', main: true }
+        ];
+
         function initMap() {
-            mapInstance = L.map('overview-map').setView(mapCenter, 6);
-            
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
-                maxZoom: 19
-            }).addTo(mapInstance);
+            const container = document.getElementById('overview-map');
+            if (!container) return;
 
-            const pathCoords = [];
+            const routePoints = '545,305 755,395 745,360 605,325 545,215 375,105 225,95 360,215 365,265 315,335 205,395 235,355 300,385 455,305 545,305';
 
-            itineraryData.forEach(day => {
-                if (day.coords) {
-                    pathCoords.push(day.coords);
-                    
-                    const customIcon = L.divIcon({
-                        className: 'custom-div-icon',
-                        html: `<div style="background-color:#3b82f6; color:white; border-radius:50%; width:24px; height:24px; display:flex; justify-content:center; align-items:center; font-weight:bold; font-size:12px; border:2px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.3);">D${day.day}</div>`,
-                        iconSize: [24, 24],
-                        iconAnchor: [12, 12]
-                    });
-
-                    const marker = L.marker(day.coords, {icon: customIcon}).addTo(mapInstance);
-                    
-                    const popupContent = `
-                        <div class="text-center p-1">
-                            <h3 class="font-bold text-sm mb-1">Day ${day.day}: ${day.stay}</h3>
-                            <p class="text-xs text-gray-500 mb-2">${day.title}</p>
-                            <button onclick="scrollToDay(${day.day})" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium hover:bg-blue-700">查看行程</button>
-                        </div>
-                    `;
-                    marker.bindPopup(popupContent);
-                }
+            let pinsSvg = '';
+            svgMapNodes.forEach(node => {
+                const r = node.main ? 13 : 8;
+                const fontSize = node.main ? 9.5 : 8;
+                const labelY = node.y < 130 ? node.y - 18 : node.y + 24;
+                pinsSvg += `
+                    <g class="svg-map-pin ${node.id === selectedMapPinId ? 'active' : ''}" onclick="selectMapPin('${node.id}')">
+                        ${node.main ? `<circle cx="${node.x}" cy="${node.y}" r="${r + 5}" fill="${node.color}" opacity="0.25"><animate attributeName="r" values="${r+2};${r+8};${r+2}" dur="2.5s" repeatCount="indefinite"/></circle>` : ''}
+                        <circle cx="${node.x}" cy="${node.y}" r="${r}" fill="${node.color}" stroke="#ffffff" stroke-width="2.5" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"/>
+                        <text x="${node.x}" y="${node.y + 3.5}" text-anchor="middle" fill="#ffffff" font-size="${fontSize}" font-weight="bold" font-family="monospace">${node.main ? 'D' + node.day : '•'}</text>
+                        <rect x="${node.x - 38}" y="${labelY - 11}" width="76" height="16" rx="4" fill="rgba(15,23,42,0.85)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                        <text x="${node.x}" y="${labelY}" text-anchor="middle" fill="#f8fafc" font-size="10" font-weight="600">${node.label}</text>
+                    </g>
+                `;
             });
 
-            L.polyline(pathCoords, {color: '#3b82f6', weight: 2, opacity: 0.5, dashArray: '5, 5'}).addTo(mapInstance);
+            container.innerHTML = `
+                <div class="flex flex-col h-full justify-between">
+                    <div class="relative w-full overflow-hidden">
+                        <svg viewBox="0 0 900 470" class="w-full h-auto select-none">
+                            <defs>
+                                <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#0f172a"/>
+                                    <stop offset="100%" stop-color="#1e293b"/>
+                                </linearGradient>
+                                <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#38bdf8"/>
+                                    <stop offset="50%" stop-color="#818cf8"/>
+                                    <stop offset="100%" stop-color="#f472b6"/>
+                                </linearGradient>
+                            </defs>
+                            <rect width="900" height="470" fill="url(#bgGrad)"/>
+                            
+                            <!-- Subtle Country Regions & Labels -->
+                            <g opacity="0.18" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,4" fill="none">
+                                <polygon points="160,60 590,50 610,240 330,275 180,170" fill="#f59e0b" fill-opacity="0.15"/>
+                                <polygon points="140,290 570,255 585,395 160,420" fill="#3b82f6" fill-opacity="0.15"/>
+                                <polygon points="585,245 840,220 850,335 585,345" fill="#8b5cf6" fill-opacity="0.15"/>
+                                <polygon points="575,345 860,335 870,455 565,455" fill="#ef4444" fill-opacity="0.15"/>
+                            </g>
+                            <text x="380" y="75" fill="#64748b" font-size="13" font-weight="bold" letter-spacing="3">🇨🇿 CZECHIA 捷克</text>
+                            <text x="80" y="340" fill="#64748b" font-size="13" font-weight="bold" letter-spacing="2">🇩🇪 GERMANY</text>
+                            <text x="375" y="365" fill="#64748b" font-size="13" font-weight="bold" letter-spacing="3">🇦🇹 AUSTRIA 奧地利</text>
+                            <text x="690" y="295" fill="#64748b" font-size="13" font-weight="bold" letter-spacing="2">🇸🇰 SLOVAKIA</text>
+                            <text x="710" y="445" fill="#64748b" font-size="13" font-weight="bold" letter-spacing="3">🇭🇺 HUNGARY 匈牙利</text>
+
+                            <!-- Danube River Curve -->
+                            <path d="M 150,310 Q 420,285 605,325 T 755,395 L 760,460" fill="none" stroke="#0284c7" stroke-width="3" opacity="0.35"/>
+
+                            <!-- Driving Route Base & Animated Line -->
+                            <polyline points="${routePoints}" fill="none" stroke="url(#routeGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+                            <polyline points="${routePoints}" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6,6" stroke-linecap="round" stroke-linejoin="round" class="route-line-animated"/>
+
+                            <!-- Map Nodes -->
+                            ${pinsSvg}
+                        </svg>
+                    </div>
+
+                    <!-- Selected Pin Info Bar -->
+                    <div id="map-pin-detail" class="bg-slate-800/95 border-t border-slate-700 px-4 py-3 text-white flex flex-wrap items-center justify-between gap-2">
+                        <!-- Injected by selectMapPin -->
+                    </div>
+                </div>
+            `;
+            selectMapPin(selectedMapPinId);
+        }
+
+        function selectMapPin(pinId) {
+            selectedMapPinId = pinId;
+            const node = svgMapNodes.find(n => n.id === pinId) || svgMapNodes[0];
+            const detailBox = document.getElementById('map-pin-detail');
+            if (!detailBox) return;
+
+            detailBox.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <span class="px-2.5 py-1 rounded-lg text-xs font-bold text-white" style="background-color:${node.color}">${node.sub}</span>
+                    <div>
+                        <div class="text-sm font-bold text-white flex items-center gap-2">
+                            <span>📍 ${node.label}</span>
+                            <span class="text-xs font-normal text-sky-300">🏨 ${node.hotel}</span>
+                        </div>
+                        <p class="text-xs text-slate-300 mt-0.5">${node.note}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 ml-auto">
+                    <a href="${createGMapUrl(node.label + ' ' + node.hotel)}" target="_blank" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg transition-colors">
+                        Google Maps
+                    </a>
+                    <button onclick="scrollToDay(${node.day})" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">
+                        跳轉 Day ${node.day} 行程 ➔
+                    </button>
+                </div>
+            `;
         }
 
         function initChart() {
@@ -873,13 +1250,13 @@
                         {
                             label: '🚗 車程 (小時)',
                             data: driveData,
-                            backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                            backgroundColor: 'rgba(99, 102, 241, 0.85)',
                             borderRadius: 4
                         },
                         {
-                            label: '🚶 遊玩 (小時)',
+                            label: '🚶 遊玩與賞景 (小時)',
                             data: playData,
-                            backgroundColor: 'rgba(56, 189, 248, 0.8)',
+                            backgroundColor: 'rgba(56, 189, 248, 0.85)',
                             borderRadius: 4
                         }
                     ]
@@ -920,14 +1297,17 @@
                 html += `
                     <div id="day-${day.day}" class="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8 scroll-mt-20">
                         <!-- Day Header -->
-                        <div class="sticky top-16 z-30 bg-white/95 backdrop-blur-md px-6 py-4 border-b border-slate-100 flex items-center justify-between rounded-t-2xl shadow-sm">
+                        <div class="sticky top-16 z-30 bg-white/95 backdrop-blur-md px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 rounded-t-2xl shadow-sm">
                             <div>
-                                <span class="text-blue-600 font-black text-xl mr-2">Day ${day.day}</span>
-                                <span class="text-slate-500 text-sm font-medium">${day.date} ${day.weekday}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-blue-600 font-black text-xl">Day ${day.day}</span>
+                                    <span class="text-slate-500 text-sm font-medium">${day.date} (${day.weekday})</span>
+                                    <span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-0.5 rounded font-medium border border-emerald-200">🏨 ${day.stay}</span>
+                                </div>
                                 <h2 class="text-lg font-bold text-slate-800 mt-1">${day.title}</h2>
                             </div>
                             <div class="text-right hidden sm:block">
-                                <span class="bg-indigo-50 text-indigo-700 text-xs px-2 py-1 rounded-md">🚗 ${day.drive}h</span>
+                                <span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-md font-medium">🚗 車程約 ${day.drive}h</span>
                             </div>
                         </div>
 
@@ -942,7 +1322,7 @@
                     html += `
                         <div class="relative flex flex-col md:flex-row items-start z-10 group">
                             
-                            <!-- Left: Time, Icon, Stay Info (Redesigned for Mobile) -->
+                            <!-- Left: Time, Icon, Stay Info -->
                             <div class="flex items-center md:items-start md:w-32 mb-3 md:mb-0 md:pr-4 flex-shrink-0 w-full md:w-auto">
                                 <div class="bg-white border-2 border-slate-200 rounded-full w-10 h-10 flex items-center justify-center text-lg shadow-sm z-10 group-hover:border-blue-400 group-hover:scale-110 transition-transform flex-shrink-0">
                                     ${event.icon}
@@ -973,8 +1353,8 @@
                                 
                                 <!-- Detail Block -->
                                 <div class="detail-block space-y-2 mt-2">
-                                    ${event.detail ? `<div class="bg-slate-50 border-l-2 border-blue-300 rounded-r-lg p-2.5 text-[13px] text-slate-700 leading-relaxed">${event.detail}</div>` : ''}
-                                    ${event.tips ? `<div class="bg-yellow-50/50 rounded-lg p-2.5 text-[13px] text-slate-700 flex items-start gap-2 leading-relaxed"><span>💡</span> <span>${event.tips}</span></div>` : ''}
+                                    ${event.detail ? `<div class="bg-slate-50 border-l-2 border-blue-400 rounded-r-lg p-2.5 text-[13px] text-slate-700 leading-relaxed">${event.detail}</div>` : ''}
+                                    ${event.tips ? `<div class="bg-amber-50/70 border border-amber-100 rounded-lg p-2.5 text-[13px] text-slate-700 flex items-start gap-2 leading-relaxed"><span>💡</span> <span>${event.tips}</span></div>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -1042,7 +1422,13 @@
         });
 
         // ================= VIEW 4: TOOLS =================
-        let expenses = [];
+        let expenses = [
+            { name: 'MEGA DRIVE 租車櫃檯尾款 (待付)', amount: 644.51, id: 1 },
+            { name: '維也納國家歌劇院《蝙蝠》門票 x2 (已付 #96951)', amount: 380.00, id: 2 },
+            { name: '維也納美泉宮 Palace Ticket x2 (已付 1/3 09:30)', amount: 84.00, id: 3 },
+            { name: '德國貝希特斯加登鹽礦門票 x2 (已付 #546261)', amount: 53.00, id: 4 },
+            { name: '斯洛伐克 Marrol\'s 飯店城市稅+停車費 (待付)', amount: 36.00, id: 5 }
+        ];
         
         function initTools() {
             const baseRateInput = document.getElementById('base-rate');
@@ -1064,6 +1450,8 @@
             baseRateInput.addEventListener('input', () => { updateFromEur(); updateLedgerTotal(); });
             eurInput.addEventListener('input', updateFromEur);
             twdInput.addEventListener('input', updateFromTwd);
+
+            renderLedger();
         }
 
         function addExpense() {
@@ -1095,10 +1483,10 @@
                 let html = '';
                 expenses.forEach(exp => {
                     html += `
-                        <li class="flex justify-between items-center bg-white p-2 rounded border border-slate-100 shadow-sm text-sm">
+                        <li class="flex justify-between items-center bg-white p-2.5 rounded border border-slate-100 shadow-sm text-sm">
                             <span class="font-medium text-slate-700">${exp.name}</span>
                             <div class="flex items-center gap-3">
-                                <span class="text-slate-600">€ ${exp.amount.toFixed(2)}</span>
+                                <span class="text-slate-600 font-mono">€ ${exp.amount.toFixed(2)}</span>
                                 <button onclick="removeExpense(${exp.id})" class="text-red-400 hover:text-red-600 text-lg leading-none">&times;</button>
                             </div>
                         </li>
@@ -1118,27 +1506,58 @@
 
         // ================= VIEW 5: INFO & PREP =================
         function renderInfoPrep() {
+            // 1. Render Confirmed Accommodations
             const accomList = document.getElementById('accom-list');
             let accomHtml = '';
             accommodations.forEach(acc => {
                 accomHtml += `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
-                        <div class="mb-2 sm:mb-0">
-                            <div class="flex items-center gap-2">
-                                <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded font-bold">${acc.day}</span>
-                                <span class="text-slate-500 text-sm">${acc.city}</span>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80 gap-3 hover:border-blue-300 transition-colors">
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="bg-indigo-600 text-white text-xs px-2.5 py-0.5 rounded font-bold">${acc.day}</span>
+                                <span class="text-slate-700 font-bold text-sm">${acc.city}</span>
+                                <span class="bg-blue-50 text-blue-700 border border-blue-200 text-xs font-mono px-2 py-0.5 rounded">${acc.bookingId}</span>
                             </div>
-                            <h3 class="font-bold text-slate-800 mt-1">${acc.name}</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">${acc.type} | Check-in: ${acc.checkin}</p>
+                            <h3 class="font-bold text-base text-slate-900 pt-1">${acc.name}</h3>
+                            <p class="text-xs text-slate-600">🛏️ 房型：<strong>${acc.type}</strong> | 🕒 ${acc.checkin}</p>
+                            <p class="text-xs text-slate-500">📍 地址：${acc.address}</p>
+                            <p class="text-xs text-emerald-700 font-medium pt-0.5">${acc.payment}</p>
                         </div>
-                        <a href="${acc.map}" target="_blank" class="inline-block text-center text-xs bg-white border border-slate-200 text-slate-600 px-3 py-2 rounded hover:bg-slate-100 transition-colors whitespace-nowrap">
-                            📍 地圖
+                        <a href="${acc.map}" target="_blank" class="inline-flex items-center justify-center text-xs bg-slate-800 text-white font-medium px-4 py-2.5 rounded-lg hover:bg-slate-700 transition-colors whitespace-nowrap self-start md:self-center">
+                            📍 飯店導航
                         </a>
                     </div>
                 `;
             });
             accomList.innerHTML = accomHtml;
 
+            // 2. Render To-Do Checklist (Pending Tickets & Reservations)
+            const todoContainer = document.getElementById('todo-checklist');
+            let todoHtml = '';
+            todoChecklistData.forEach(group => {
+                todoHtml += `
+                    <div class="space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                            <h3 class="font-bold text-slate-800 text-base">${group.category}</h3>
+                            <span class="text-xs bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full font-medium">${group.badge}</span>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2.5">
+                            ${group.items.map(item => `
+                                <label class="flex items-start space-x-3 cursor-pointer p-3 ${item.checked ? 'bg-emerald-50/70 border-emerald-200' : 'bg-slate-50 border-slate-200/70'} hover:bg-blue-50/40 rounded-xl border transition-colors">
+                                    <input type="checkbox" ${item.checked ? 'checked' : ''} class="form-checkbox h-5 w-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 mt-0.5 flex-shrink-0">
+                                    <div class="text-xs leading-relaxed">
+                                        <p class="font-bold text-slate-800 text-sm">${item.title}</p>
+                                        <p class="text-slate-600 mt-0.5">${item.desc}</p>
+                                    </div>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            todoContainer.innerHTML = todoHtml;
+
+            // 3. Render Packing List Accordion
             const accordion = document.getElementById('packing-accordion');
             let packHtml = '';
             packingList.forEach((cat, idx) => {
@@ -1152,7 +1571,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                                 ${cat.items.map(item => `
                                     <label class="flex items-start space-x-3 cursor-pointer p-2 hover:bg-slate-50 rounded">
-                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 mt-0.5">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 mt-0.5 flex-shrink-0">
                                         <span class="text-slate-600 text-sm">${item}</span>
                                     </label>
                                 `).join('')}
@@ -1175,7 +1594,6 @@
                 icon.classList.remove('rotate-180');
             }
         }
-
     </script>
 </body>
 </html>
